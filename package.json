@@ -1,0 +1,15 @@
+{
+  "name": "happy-child-game-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "《快乐小孩》AI叙事视觉小说 Web 原型项目。",
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build"
+  },
+  "keywords": ["visual-novel", "ai-npc", "react", "typescript", "express"],
+  "author": "",
+  "license": "UNLICENSED"
+}

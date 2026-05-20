@@ -1,0 +1,62 @@
+import type { AITrace, GameState, Choice, Traits } from "../types/game";
+import { applyChoice } from "./applyChoice";
+
+const initialTraits: Traits = {
+  authorityResistance: 0,
+  truthDesire: 0,
+  selfProtection: 0,
+  empathy: 0,
+  realityJudgment: 0,
+  trust: 0,
+  joyPerception: 0,
+};
+
+export const initialGameState: GameState = {
+  currentSceneId: "start",
+  traits: initialTraits,
+  choiceHistory: [],
+  npcTrust: {
+    liuyu: 0,
+    wangTeacher: 0,
+    zhouJunxiu: 0,
+  },
+  exploration: 0,
+  rebellion: 0,
+  joyProof: 0,
+  aiTraces: [],
+};
+
+export type GameAction =
+  | { type: "CHOOSE"; choice: Choice }
+  | { type: "GO_NEXT"; nextSceneId: string }
+  | { type: "ADD_AI_TRACE"; trace: AITrace }
+  | { type: "LOAD"; state: GameState }
+  | { type: "RESET" };
+
+export function gameReducer(state: GameState, action: GameAction): GameState {
+  switch (action.type) {
+    case "CHOOSE":
+      return applyChoice(state, action.choice);
+
+    case "GO_NEXT":
+      return {
+        ...state,
+        currentSceneId: action.nextSceneId,
+      };
+
+    case "ADD_AI_TRACE":
+      return {
+        ...state,
+        aiTraces: [...state.aiTraces, action.trace],
+      };
+
+    case "LOAD":
+      return action.state;
+
+    case "RESET":
+      return initialGameState;
+
+    default:
+      return state;
+  }
+}
