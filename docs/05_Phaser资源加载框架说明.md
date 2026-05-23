@@ -43,8 +43,9 @@ client/
         bedroom/tileset.png
         classroom/map.json
         classroom/tileset.png
-      sprites/yps_walk.png
-      sprites/liuyu_walk.png
+      sprites/yps.png
+      sprites/liuyu.png
+      portraits/yps_default.png
       portraits/liuyu_smile.png
       ui/dialogue_box.png
       effects/suffocation.png
@@ -52,6 +53,8 @@ client/
 ```
 
 ## 3. AssetManifest 示例
+
+> 角色精灵图统一为 256×256 px 单张 Sprite Sheet，Phaser 按行列手动切帧。
 
 ```ts
 export const AssetManifest = {
@@ -71,16 +74,25 @@ export const AssetManifest = {
   },
   sprites: {
     yps: {
-      key: "sprite_yps_walk",
-      image: "/assets/sprites/yps_walk.png",
-      frameWidth: 32,
-      frameHeight: 48,
+      key: "sprite_yps",
+      image: "/assets/sprites/yps.png",
+      // 256×256 单张 Sprite Sheet，按行手动切帧
+      // 行0: idle 3帧, 行1: run 4帧, 行2: attack 4帧, 行3: hit 3-4帧
+      // 每帧约 17×40 px，行间距24px，帧间距25px
     },
     liuyu: {
-      key: "sprite_liuyu_walk",
-      image: "/assets/sprites/liuyu_walk.png",
-      frameWidth: 32,
-      frameHeight: 48,
+      key: "sprite_liuyu",
+      image: "/assets/sprites/liuyu.png",
+    },
+  },
+  portraits: {
+    yps_default: {
+      key: "portrait_yps_default",
+      image: "/assets/portraits/yps_default.png",
+    },
+    liuyu_smile: {
+      key: "portrait_liuyu_smile",
+      image: "/assets/portraits/liuyu_smile.png",
     },
   },
   effects: {
@@ -111,8 +123,8 @@ export const AssetManifest = {
 
 - 加载 Tiled 地图 JSON
 - 加载 tileset 图片
-- 加载角色 sprite sheet
-- 加载 UI、特效、音频
+- 加载角色 sprite sheet（256×256 单张，手动切帧）
+- 加载立绘、UI、特效、音频
 - 显示加载进度
 - 加载完成后进入主地图
 
@@ -130,11 +142,14 @@ export class PreloadScene extends Phaser.Scene {
       this.load.image(map.tilesetKey, map.tilesetImage);
     });
 
+    // 角色精灵图：加载整张 256×256 图片，切帧在 AnimationRegistry 中处理
     Object.values(AssetManifest.sprites).forEach((sprite) => {
-      this.load.spritesheet(sprite.key, sprite.image, {
-        frameWidth: sprite.frameWidth,
-        frameHeight: sprite.frameHeight,
-      });
+      this.load.image(sprite.key, sprite.image);
+    });
+
+    // 立绘
+    Object.values(AssetManifest.portraits || {}).forEach((portrait) => {
+      this.load.image(portrait.key, portrait.image);
     });
   }
 
@@ -167,36 +182,73 @@ export const MapRegistry = {
 
 ## 6. AnimationRegistry 示例
 
-假设 sprite sheet 排列：0-3向下，4-7向左，8-11向右，12-15向上。
+> Sprite Sheet 布局（256×256 px）：
+> - 行0 (y:12-51, 高40px): 站立/idle 3帧
+> - 行1 (y:76-116, 高41px): 跑步/run 4帧
+> - 行2 (y:140-180, 高41px): 攻击/attack 4帧
+> - 行3 (y:205-244, 高40px): 受击/hit 3-4帧
+>
+> 由于帧间距不规则（非等分网格），需用 `generateFrameNumbers` 手动指定每帧的区域。
 
 ```ts
+// 精灵图帧坐标定义（基于 yps.png 的实测布局）
+const SPRITE_FRAME_ROWS = {
+  idle:    { y: 12,  height: 40, frames: 3, frameWidths: [17, 16, 16], xStarts: [10, 42, 74] },
+  run:     { y: 76,  height: 41, frames: 4, frameWidths: [17, 16, 16, 17], xStarts: [10, 42, 74, 105] },
+  attack:  { y: 140, height: 41, frames: 4, frameWidths: [17, 16, 16, 17], xStarts: [10, 42, 74, 105] },
+  hit:     { y: 205, height: 40, frames: 3, frameWidths: [17, 16, 16], xStarts: [10, 42, 74] },
+} as const;
+
 export function createPlayerAnimations(scene: Phaser.Scene) {
+  // 站立/idle 动画
   scene.anims.create({
-    key: "yps_walk_down",
-    frames: scene.anims.generateFrameNumbers("sprite_yps_walk", { start: 0, end: 3 }),
+    key: "yps_idle",
+    frames: scene.anims.generateFrameNumbers("sprite_yps", {
+      start: 0,
+      end: 2,
+    }),
+    frameRate: 4,
+    repeat: -1,
+  });
+
+  // 跑步/run 动画
+  scene.anims.create({
+    key: "yps_run",
+    frames: scene.anims.generateFrameNumbers("sprite_yps", {
+      start: 3,
+      end: 6,
+    }),
     frameRate: 8,
     repeat: -1,
   });
+
+  // 攻击/attack 动画
   scene.anims.create({
-    key: "yps_walk_left",
-    frames: scene.anims.generateFrameNumbers("sprite_yps_walk", { start: 4, end: 7 }),
-    frameRate: 8,
-    repeat: -1,
+    key: "yps_attack",
+    frames: scene.anims.generateFrameNumbers("sprite_yps", {
+      start: 7,
+      end: 10,
+    }),
+    frameRate: 10,
+    repeat: 0,
   });
+
+  // 受击/hit 动画
   scene.anims.create({
-    key: "yps_walk_right",
-    frames: scene.anims.generateFrameNumbers("sprite_yps_walk", { start: 8, end: 11 }),
+    key: "yps_hit",
+    frames: scene.anims.generateFrameNumbers("sprite_yps", {
+      start: 11,
+      end: 13,
+    }),
     frameRate: 8,
-    repeat: -1,
-  });
-  scene.anims.create({
-    key: "yps_walk_up",
-    frames: scene.anims.generateFrameNumbers("sprite_yps_walk", { start: 12, end: 15 }),
-    frameRate: 8,
-    repeat: -1,
+    repeat: 0,
   });
 }
 ```
+
+> **注意**：由于帧间距不规则，实际开发时需在 PreloadScene 中手动将每帧裁切为独立纹理，
+> 或使用 Phaser 的 `spritesheet` 配合自定义 `getFrameOffsets` 回调。
+> 上面的 `generateFrameNumbers` 方案仅作为逻辑示意，具体切帧方式需根据引擎能力调整。
 
 ## 7. Tiled 对象属性建议
 
