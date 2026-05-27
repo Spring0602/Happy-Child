@@ -85,7 +85,7 @@ export const scenes: Record<string, Scene> = {
     choices: [
       {
         id: "ch1_contact_liuyu",
-        text: "用手机向她确认"规则是什么"，试探对方是否参赛者",
+        text: "用手机向她确认「规则是什么」，试探对方是否参赛者",
         nextSceneId: "ch1_store_deal",
         effects: {
           truthDesire: 2,
@@ -118,7 +118,7 @@ export const scenes: Record<string, Scene> = {
     choices: [
       {
         id: "ch1_share_analysis",
-        text: "坦诚分享自己对"磁场"的理解，展示合作诚意",
+        text: "坦诚分享自己对\u300C磁场\u300D的理解，展示合作诚意",
         nextSceneId: "ch1_enter_countdown",
         effects: {
           trust: 2,
@@ -148,7 +148,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "/assets/bg/dorm_dark.svg",
     speaker: "旁白",
-    text: "23:55。\n\n我火急火燎地收拾行囊。室友说我是"真·高速小马达"。\n\n00:00。\n\n我眼前一黑——\n\n下一瞬，置身于一片星海。四周星辰点点，而我漂浮于宇宙中，并无失重感。\n\n「欢迎参赛者来到'人类进化计划'候场区~」",
+    text: "23:55。\n\n我火急火燎地收拾行囊。室友说我是\u300C真·高速小马达\u300D。\n\n00:00。\n\n我眼前一黑——\n\n下一瞬，置身于一片星海。四周星辰点点，而我漂浮于宇宙中，并无失重感。\n\n「欢迎参赛者来到'人类进化计划'候场区~」",
     nextSceneId: "ch2_skill_extract",
   },
 
@@ -328,7 +328,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "家庭区域",
     background: "/assets/bg/dorm_dark.svg",
     speaker: "旁白",
-    text: "窒息感越来越强。我必须找到让"我"快乐的理由——否则我就要死在这里。\n\n「想想你的同学。」\n\n「刘宇不是很快就察觉到你的异常了吗？」\n\n「周骐瑞找作业的样子，你是真心觉得有趣。」\n\n脑内的声音沉默了。脖子上的力量骤然消失。\n\n「你说服我了。但是，明天就不一定了。」",
+    text: "窒息感越来越强。我必须找到让\u300C我\u300D快乐的理由——否则我就要死在这里。\n\n「想想你的同学。」\n\n「刘宇不是很快就察觉到你的异常了吗？」\n\n「周骐瑞找作业的样子，你是真心觉得有趣。」\n\n脑内的声音沉默了。脖子上的力量骤然消失。\n\n「你说服我了。但是，明天就不一定了。」",
     nextSceneId: "ch4_classroom_rules",
   },
 
@@ -367,7 +367,7 @@ export const scenes: Record<string, Scene> = {
       },
       {
         id: "ch4_paint_conform",
-        text: "画一幅符合"好孩子"标准的画，取悦老师",
+        text: "画一幅符合\u300C好孩子\u300D标准的画，取悦老师",
         nextSceneId: "ch4_wang_judge",
         effects: {
           selfProtection: 2,
@@ -402,7 +402,7 @@ export const scenes: Record<string, Scene> = {
       },
       {
         id: "ch4_accept_trade",
-        text: "接受等价交换，询问"镜中尸骸、湖中遗物、书中落叶"",
+        text: "接受等价交换，询问\u300C镜中尸骸、湖中遗物、书中落叶\u300D",
         nextSceneId: "ch4_wang_hint",
         effects: {
           realityJudgment: 2,
@@ -651,7 +651,7 @@ export const scenes: Record<string, Scene> = {
     choices: [
       {
         id: "ch6_delete_good_child",
-        text: "删除"成为好孩子"规则",
+        text: "删除\u300C成为好孩子\u300D规则",
         nextSceneId: "ch6_delete_rule",
         effects: {
           authorityResistance: 3,
@@ -926,8 +926,61 @@ export const scenes: Record<string, Scene> = {
     chapter: "结局裁决",
     background: "/assets/bg/rule_warning.svg",
     speaker: "系统",
-    text: "（嗯。）\n\n脑内的警报声停止，"我"的存在也同时消失。\n\n「恭喜您找到'被遗弃的呐喊碎片2'，副本探索进度20%。」\n\n「家庭区域叛逆值已达35%。」\n\n「混沌磁场范围扩大。」\n\n副本即将结束。AI正在分析您的人格画像，准备裁决您的结局……",
+    text: "（嗯。）\n\n脑内的警报声停止，\u300C我\u300D的存在也同时消失。\n\n「恭喜您找到'被遗弃的呐喊碎片2'，副本探索进度20%。」\n\n「家庭区域叛逆值已达35%。」\n\n「混沌磁场范围扩大。」\n\n副本即将结束。AI正在分析您的人格画像，准备裁决您的结局……",
     aiEvent: "ending_judge",
+  },
+
+  // ══════════════════════════════════════════════
+  // 客厅交互对话（livingroom item interactions）
+  // ══════════════════════════════════════════════
+
+  // --- 垃圾桶（重要线索） ---
+  interact_livingroom_trash: {
+    id: "interact_livingroom_trash",
+    chapter: "客厅",
+    speaker: "叶平生",
+    text: "垃圾桶里塞满了废纸团。我翻了一下，发现一张被揉皱的纸条。\n\n上面写着：「规则第③条——家庭区域内，禁止在22:00后离开卧室。」\n\n字迹潦草，像是匆匆写下的。",
+    nextSceneId: "interact_livingroom_trash_2",
+  },
+  interact_livingroom_trash_2: {
+    id: "interact_livingroom_trash_2",
+    chapter: "客厅",
+    speaker: "叶平生",
+    text: "（这张纸条……是父亲写的？还是妈妈？）\n\n我把纸条折好，塞进口袋。也许之后会有用。",
+  },
+
+  // --- 茶几 ---
+  interact_livingroom_table: {
+    id: "interact_livingroom_table",
+    chapter: "客厅",
+    speaker: "叶平生",
+    text: "茶几上摆着几本杂志和一只空茶杯。\n\n都是些过期的家居周刊。封面上的家庭看起来总是那么完美。",
+  },
+
+  // --- 电视 ---
+  interact_livingroom_tv: {
+    id: "interact_livingroom_tv",
+    chapter: "客厅",
+    speaker: "叶平生",
+    text: "电视关着，屏幕上映出我模糊的影子。\n\n遥控器不知道放哪去了。算了，也没什么好看的。",
+  },
+
+  // --- 盆栽 ---
+  interact_livingroom_plant: {
+    id: "interact_livingroom_plant",
+    chapter: "客厅",
+    speaker: "叶平生",
+    text: "一盆绿萝，叶片有些发黄。\n\n看来很久没人浇水了。它和我们家一样，都在努力活着。",
+  },
+
+  // --- 椅子（坐下动作）---
+  // 注：椅子交互走 sitAction 路径（PlayerController.sit），不触发此对话
+  // 此 sceneId 作为占位，防止未定义错误
+  interact_livingroom_chair: {
+    id: "interact_livingroom_chair",
+    chapter: "客厅",
+    speaker: "叶平生",
+    text: "我在椅子上坐了下来。\n\n（按下任意方向键起身。）",
   },
 
 };

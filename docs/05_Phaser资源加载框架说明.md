@@ -25,7 +25,8 @@ client/
         BootScene.ts
         PreloadScene.ts
         MapScene.ts
-        DialogueBridge.ts
+      bridge/
+        GameBridge.ts
       config/
         assetManifest.ts
         mapRegistry.ts
@@ -35,22 +36,28 @@ client/
         InteractionSystem.ts
         TriggerSystem.ts
       types/
-        gameAssets.ts
+        gameMap.ts
+    components/
+      PhaserContainer.tsx
+      DialogOverlay.tsx
   public/
     assets/
       maps/
+        livingroom/map.json
+        livingroom/客厅.png
         bedroom/map.json
-        bedroom/tileset.png
-        classroom/map.json
-        classroom/tileset.png
+        bedroom/主角房间.png
+        bathroom/map.json
+        bathroom/卫生间.png
       sprites/yps.png
-      sprites/liuyu.png
-      portraits/yps_default.png
-      portraits/liuyu_smile.png
+      portraits/yps_defult.png
+      portraits/ly_smile.png
       ui/dialogue_box.png
-      effects/suffocation.png
-      audio/sfx_system_beep.mp3
+      effects/
+      audio/
 ```
+
+> **已删除**：`bg/` 和 `characters/` 文件夹。场景背景改用 Phaser 像素地图，角色改用 `portraits/` 立绘。
 
 ## 3. AssetManifest 示例
 
@@ -265,38 +272,42 @@ export function createPlayerAnimations(scene: Phaser.Scene) {
 
 ## 8. React 与 Phaser 交互桥
 
+当前采用**融合架构**：Phaser 地图始终可见，对话以 DialogOverlay 浮动叠层呈现。
+
 ```mermaid
 sequenceDiagram
     participant P as Phaser地图
-    participant B as DialogueBridge
-    participant R as React UI
+    participant B as GameBridge
+    participant R as React (App.tsx)
+    participant D as DialogOverlay
     participant AI as 后端AI接口
-    P->>B: 触发 sceneId
-    B->>R: 打开对话框
-    R->>AI: 请求NPC回复/人格分析
-    AI-->>R: 返回文本
-    R->>B: 对话结束
-    B-->>P: 恢复玩家控制
+    P->>B: TRIGGER_DIALOGUE {sceneId}
+    B->>R: 事件通知
+    R->>P: FREEZE_PLAYER（冻结移动）
+    R->>R: DIALOG_START
+    R->>D: 显示对话框+立绘
+    D->>AI: 请求NPC回复/人格分析
+    AI-->>D: 返回文本
+    D->>R: DIALOG_END
+    R->>P: UNFREEZE_PLAYER（恢复移动）
 ```
 
-接口占位：
+> **关键变化**：不再使用"双模式切换"（explore ↔ narrative），Phaser 场景**始终可见**。对话作为叠层显示在 Phaser 上方。
+
+事件定义：
 
 ```ts
-type DialogueEvent = {
-  sceneId: string;
-  npcId?: string;
-  itemId?: string;
-  mapId: string;
-};
+// Phaser → React（触发事件）
+type PhaserToReactEvent =
+  | { type: "TRIGGER_DIALOGUE"; sceneId: string; mapId: string }
+  | { type: "TRIGGER_ITEM"; itemId: string; mapId: string }
+  | { type: "TRIGGER_DOOR"; targetMap: string; spawnId: string };
 
-type DialogueResult = {
-  nextSceneId?: string;
-  setFlags?: string[];
-  changeMap?: {
-    mapId: string;
-    spawnId: string;
-  };
-};
+// React → Phaser（控制指令）
+type ReactToPhaserCommand =
+  | { type: "CHANGE_MAP"; mapId: string; spawnId: string }
+  | { type: "FREEZE_PLAYER" }
+  | { type: "UNFREEZE_PLAYER" };
 ```
 
 ## 9. CodeBuddy 任务清单

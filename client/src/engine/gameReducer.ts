@@ -24,6 +24,10 @@ export const initialGameState: GameState = {
   rebellion: 0,
   joyProof: 0,
   aiTraces: [],
+  currentMapId: "bedroom",
+  playerPosition: { x: 0, y: 0 },
+  flags: {},
+  interactedItems: [],
 };
 
 export type GameAction =
@@ -31,7 +35,13 @@ export type GameAction =
   | { type: "GO_NEXT"; nextSceneId: string }
   | { type: "ADD_AI_TRACE"; trace: AITrace }
   | { type: "LOAD"; state: GameState }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "CHANGE_MAP"; mapId: string; spawnId: string; position: { x: number; y: number } }
+  | { type: "SET_FLAG"; flag: string }
+  | { type: "INTERACT_ITEM"; itemId: string }
+  | { type: "UPDATE_POSITION"; position: { x: number; y: number } }
+  | { type: "DIALOG_START"; sceneId: string }
+  | { type: "DIALOG_END" };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -55,6 +65,31 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "RESET":
       return initialGameState;
+
+    case "CHANGE_MAP":
+      return {
+        ...state,
+        currentMapId: action.mapId,
+        playerPosition: action.position,
+      };
+
+    case "SET_FLAG":
+      return { ...state, flags: { ...state.flags, [action.flag]: true } };
+
+    case "INTERACT_ITEM":
+      return {
+        ...state,
+        interactedItems: [...state.interactedItems, action.itemId],
+      };
+
+    case "UPDATE_POSITION":
+      return { ...state, playerPosition: action.position };
+
+    case "DIALOG_START":
+      return { ...state, currentSceneId: action.sceneId };
+
+    case "DIALOG_END":
+      return { ...state, currentSceneId: "" };
 
     default:
       return state;

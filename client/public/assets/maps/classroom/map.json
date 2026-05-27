@@ -1,0 +1,578 @@
+{
+  "compressionlevel": -1,
+  "height": 15,
+  "infinite": false,
+  "layers": [
+    {
+      "data": [
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+      ],
+      "height": 15,
+      "id": 1,
+      "name": "ground",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 20,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "data": [
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,3,3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3,3,0,
+        0,3,3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3,3,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,3,3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3,3,0,
+        0,3,3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3,3,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,3,3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3,3,0,
+        0,3,3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3,3,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      ],
+      "height": 15,
+      "id": 2,
+      "name": "furniture",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 20,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "id": 3,
+      "name": "collision",
+      "objects": [
+        {
+          "height": 480,
+          "id": 1,
+          "name": "wall_top",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 640,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "height": 32,
+          "id": 2,
+          "name": "wall_bottom",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 640,
+          "x": 0,
+          "y": 448
+        },
+        {
+          "height": 480,
+          "id": 3,
+          "name": "wall_left",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 32,
+          "x": 0,
+          "y": 0
+        },
+        {
+          "height": 480,
+          "id": 4,
+          "name": "wall_right",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 32,
+          "x": 608,
+          "y": 0
+        },
+        {
+          "height": 64,
+          "id": 10,
+          "name": "desks_row1_left",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 192,
+          "x": 32,
+          "y": 64
+        },
+        {
+          "height": 64,
+          "id": 11,
+          "name": "desks_row1_right",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 192,
+          "x": 416,
+          "y": 64
+        },
+        {
+          "height": 64,
+          "id": 12,
+          "name": "desks_row2_left",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 192,
+          "x": 32,
+          "y": 160
+        },
+        {
+          "height": 64,
+          "id": 13,
+          "name": "desks_row2_right",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 192,
+          "x": 416,
+          "y": 160
+        },
+        {
+          "height": 64,
+          "id": 14,
+          "name": "desks_row3_left",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 192,
+          "x": 32,
+          "y": 256
+        },
+        {
+          "height": 64,
+          "id": 15,
+          "name": "desks_row3_right",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 192,
+          "x": 416,
+          "y": 256
+        },
+        {
+          "height": 32,
+          "id": 16,
+          "name": "blackboard",
+          "properties": [],
+          "rotation": 0,
+          "type": "collision",
+          "visible": true,
+          "width": 448,
+          "x": 96,
+          "y": 384
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "id": 4,
+      "name": "npcs",
+      "objects": [
+        {
+          "height": 40,
+          "id": 20,
+          "name": "npc_liuyu",
+          "properties": [
+            {
+              "name": "dialogId",
+              "type": "string",
+              "value": "ch1_liuyu_intro"
+            },
+            {
+              "name": "spriteKey",
+              "type": "string",
+              "value": "sprite_liuyu"
+            },
+            {
+              "name": "facing",
+              "type": "string",
+              "value": "down"
+            },
+            {
+              "name": "npcId",
+              "type": "string",
+              "value": "liuyu"
+            }
+          ],
+          "rotation": 0,
+          "type": "npc",
+          "visible": true,
+          "width": 17,
+          "x": 230,
+          "y": 162
+        },
+        {
+          "height": 40,
+          "id": 21,
+          "name": "npc_zhouqr",
+          "properties": [
+            {
+              "name": "dialogId",
+              "type": "string",
+              "value": "ch1_zhouqr_intro"
+            },
+            {
+              "name": "spriteKey",
+              "type": "string",
+              "value": "sprite_zhouqr"
+            },
+            {
+              "name": "facing",
+              "type": "string",
+              "value": "down"
+            },
+            {
+              "name": "npcId",
+              "type": "string",
+              "value": "zhouqr"
+            }
+          ],
+          "rotation": 0,
+          "type": "npc",
+          "visible": true,
+          "width": 17,
+          "x": 134,
+          "y": 260
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "id": 5,
+      "name": "player_spawn",
+      "objects": [
+        {
+          "height": 40,
+          "id": 30,
+          "name": "spawn_default",
+          "properties": [
+            {
+              "name": "playerId",
+              "type": "string",
+              "value": "yps"
+            },
+            {
+              "name": "facing",
+              "type": "string",
+              "value": "up"
+            }
+          ],
+          "rotation": 0,
+          "type": "spawn",
+          "visible": true,
+          "width": 17,
+          "x": 310,
+          "y": 258
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "id": 6,
+      "name": "triggers",
+      "objects": [
+        {
+          "height": 64,
+          "id": 40,
+          "name": "trigger_blackboard",
+          "properties": [
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch2_blackboard_task"
+            },
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "value": "看黑板"
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": false
+            }
+          ],
+          "rotation": 0,
+          "type": "trigger",
+          "visible": true,
+          "width": 448,
+          "x": 96,
+          "y": 352
+        },
+        {
+          "height": 32,
+          "id": 41,
+          "name": "trigger_notice_board",
+          "properties": [
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch3_notice_wish_list"
+            },
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "value": "查看公告栏"
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": true
+            }
+          ],
+          "rotation": 0,
+          "type": "trigger",
+          "visible": true,
+          "width": 64,
+          "x": 544,
+          "y": 64
+        },
+        {
+          "height": 32,
+          "id": 42,
+          "name": "trigger_yps_desk",
+          "properties": [
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch1_yps_inner_monologue"
+            },
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "auto"
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": true
+            }
+          ],
+          "rotation": 0,
+          "type": "trigger",
+          "visible": true,
+          "width": 32,
+          "x": 304,
+          "y": 256
+        },
+        {
+          "height": 32,
+          "id": 43,
+          "name": "trigger_door_exit",
+          "properties": [
+            {
+              "name": "targetMap",
+              "type": "string",
+              "value": "corridor"
+            },
+            {
+              "name": "targetSpawn",
+              "type": "string",
+              "value": "spawn_from_classroom"
+            },
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "walk"
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "value": "走廊"
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": false
+            }
+          ],
+          "rotation": 0,
+          "type": "transition",
+          "visible": true,
+          "width": 64,
+          "x": 288,
+          "y": 448
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "id": 7,
+      "name": "props",
+      "objects": [
+        {
+          "height": 32,
+          "id": 50,
+          "name": "prop_exam_paper",
+          "properties": [
+            {
+              "name": "propId",
+              "type": "string",
+              "value": "exam_paper_ch2"
+            },
+            {
+              "name": "interactable",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "value": "看试卷"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch2_exam_score_reveal"
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": true
+            }
+          ],
+          "rotation": 0,
+          "type": "prop",
+          "visible": true,
+          "width": 16,
+          "x": 306,
+          "y": 258
+        },
+        {
+          "height": 32,
+          "id": 51,
+          "name": "prop_liuyu_note",
+          "properties": [
+            {
+              "name": "propId",
+              "type": "string",
+              "value": "secret_note_ch3"
+            },
+            {
+              "name": "interactable",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "value": "纸条"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch3_liuyu_secret_note"
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "requireChapter",
+              "type": "int",
+              "value": 3
+            }
+          ],
+          "rotation": 0,
+          "type": "prop",
+          "visible": false,
+          "width": 16,
+          "x": 232,
+          "y": 162
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 60,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "source": "tileset.tsx"
+    }
+  ],
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 20
+}

@@ -1,0 +1,90 @@
+{
+  "compressionlevel": -1,
+  "height": 20,
+  "infinite": false,
+  "layers": [
+    {
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "厨房.png",
+      "x": 0,
+      "y": 0,
+      "id": 1,
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "draworder": "topdown",
+      "id": 2,
+      "name": "collision",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        { "id": 1, "name": "wall_top", "type": "collision", "x": 0, "y": 0, "width": 960, "height": 32 },
+        { "id": 2, "name": "wall_bottom", "type": "collision", "x": 0, "y": 608, "width": 960, "height": 32 },
+        { "id": 3, "name": "wall_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 640 },
+        { "id": 4, "name": "wall_right", "type": "collision", "x": 928, "y": 0, "width": 32, "height": 640 }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 3,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        { "id": 1, "name": "spawn_kitchen_door", "type": "spawn", "x": 480, "y": 560, "width": 32, "height": 48 }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 4,
+      "name": "triggers",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1, "name": "door_livingroom", "type": "door",
+          "x": 440, "y": 560, "width": 80, "height": 80,
+          "properties": [
+            { "name": "triggerType", "type": "string", "value": "walk" },
+            { "name": "targetMap", "type": "string", "value": "livingroom" },
+            { "name": "targetSpawn", "type": "string", "value": "spawn_from_kitchen" }
+          ]
+        }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 5,
+      "name": "npcs",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": []
+    },
+    {
+      "draworder": "topdown",
+      "id": 6,
+      "name": "items",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": []
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 10,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilesets": [],
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 30
+}

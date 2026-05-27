@@ -53,6 +53,7 @@ export interface AITrace {
 }
 
 export interface GameState {
+  // ====== 现有字段 ======
   currentSceneId: string;
   traits: Traits;
   choiceHistory: string[];
@@ -61,4 +62,10 @@ export interface GameState {
   rebellion: number;
   joyProof: number;
   aiTraces: AITrace[];
+
+  // ====== 探索模式字段 ======
+  currentMapId: string;
+  playerPosition: { x: number; y: number };
+  flags: Record<string, boolean>;
+  interactedItems: string[];
 }

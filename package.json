@@ -9,7 +9,16 @@
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build"
   },
-  "keywords": ["visual-novel", "ai-npc", "react", "typescript", "express"],
+  "keywords": [
+    "visual-novel",
+    "ai-npc",
+    "react",
+    "typescript",
+    "express"
+  ],
   "author": "",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "docx": "^9.7.0"
+  }
 }
