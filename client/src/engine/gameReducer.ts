@@ -1,4 +1,4 @@
-import type { AITrace, GameState, Choice, Traits } from "../types/game";
+import type { AITrace, GameState, Choice, Traits, ExplorationState } from "../types/game";
 import { applyChoice } from "./applyChoice";
 
 const initialTraits: Traits = {
@@ -24,12 +24,20 @@ export const initialGameState: GameState = {
   rebellion: 0,
   joyProof: 0,
   aiTraces: [],
+  exploreState: {
+    visitedMaps: [],
+    visitedTiles: {},
+    interactions: [],
+    totalExplored: 0,
+  },
 };
 
 export type GameAction =
   | { type: "CHOOSE"; choice: Choice }
   | { type: "GO_NEXT"; nextSceneId: string }
   | { type: "ADD_AI_TRACE"; trace: AITrace }
+  | { type: "UPDATE_EXPLORE"; exploreState: ExplorationState }
+  | { type: "ADD_INTERACTION"; interactionId: string }
   | { type: "LOAD"; state: GameState }
   | { type: "RESET" };
 
@@ -50,11 +58,35 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         aiTraces: [...state.aiTraces, action.trace],
       };
 
+    case "UPDATE_EXPLORE":
+      return {
+        ...state,
+        exploreState: action.exploreState,
+      };
+
+    case "ADD_INTERACTION":
+      return {
+        ...state,
+        exploreState: {
+          ...state.exploreState,
+          interactions: [...state.exploreState.interactions, action.interactionId],
+        },
+      };
+
     case "LOAD":
-      return action.state;
+      return {
+        ...action.state,
+        // 确保探索状态完整
+        exploreState: {
+          visitedMaps: action.state.exploreState?.visitedMaps ?? [],
+          visitedTiles: action.state.exploreState?.visitedTiles ?? {},
+          interactions: action.state.exploreState?.interactions ?? [],
+          totalExplored: action.state.exploreState?.totalExplored ?? 0,
+        },
+      };
 
     case "RESET":
-      return initialGameState;
+      return { ...initialGameState };
 
     default:
       return state;

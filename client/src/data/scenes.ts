@@ -85,7 +85,7 @@ export const scenes: Record<string, Scene> = {
     choices: [
       {
         id: "ch1_contact_liuyu",
-        text: "用手机向她确认"规则是什么"，试探对方是否参赛者",
+        text: "用手机向她确认「规则是什么」，试探对方是否参赛者",
         nextSceneId: "ch1_store_deal",
         effects: {
           truthDesire: 2,
@@ -118,7 +118,7 @@ export const scenes: Record<string, Scene> = {
     choices: [
       {
         id: "ch1_share_analysis",
-        text: "坦诚分享自己对"磁场"的理解，展示合作诚意",
+        text: "坦诚分享自己对「磁场」的理解，展示合作诚意",
         nextSceneId: "ch1_enter_countdown",
         effects: {
           trust: 2,
@@ -148,7 +148,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "/assets/bg/dorm_dark.svg",
     speaker: "旁白",
-    text: "23:55。\n\n我火急火燎地收拾行囊。室友说我是"真·高速小马达"。\n\n00:00。\n\n我眼前一黑——\n\n下一瞬，置身于一片星海。四周星辰点点，而我漂浮于宇宙中，并无失重感。\n\n「欢迎参赛者来到'人类进化计划'候场区~」",
+    text: "23:55。\n\n我火急火燎地收拾行囊。室友说我是「真·高速小马达」。\n\n00:00。\n\n我眼前一黑——\n\n下一瞬，置身于一片星海。四周星辰点点，而我漂浮于宇宙中，并无失重感。\n\n「欢迎参赛者来到'人类进化计划'候场区~」",
     nextSceneId: "ch2_skill_extract",
   },
 
@@ -180,6 +180,8 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "桌上一本封面温馨的笔记本，和整个房间格格不入。\n\n扉页写着：\n\n「考上c9。30岁结婚生子。35岁实现财富自由。」\n\n「作为好孩子，我要关爱亲人，成为爸妈的骄傲。我要得到老师同学的青睐，我要帮助他人。我要变得更强……」\n\n计划表最下方有一行红笔批注：\n\n「我真的好累。我一点也不快乐。」",
+    returnToMap: true,
+    mapId: "bedroom",
     choices: [
       {
         id: "ch2_read_plan",
@@ -201,6 +203,39 @@ export const scenes: Record<string, Scene> = {
           truthDesire: -1,
         },
         tags: ["谨慎", "自保"],
+        needAIAnalysis: true,
+      },
+    ],
+  },
+
+  ch2_father_meet: {
+    id: "ch2_father_meet",
+    chapter: "副本一：快乐小孩",
+    background: "/assets/bg/bedroom_day.svg",
+    speaker: "父亲",
+    character: "father",
+    text: "父亲坐在沙发上，电视没开，手里攥着一份文件。\n\n他的嘴唇动了动，但什么也没说。\n\n「爸爸，你怎么了？」\n\n他抬起头，挤出一个笑脸——那张笑脸和计划本上说的一模一样。\n\n「没事，平生。爸爸只是……在想一些工作上的事。」",
+    choices: [
+      {
+        id: "ch2_father_ask",
+        text: "追问父亲的情况，尝试了解更多",
+        nextSceneId: "ch2_home_rules",
+        effects: {
+          empathy: 1,
+          truthDesire: 1,
+        },
+        tags: ["关心", "探索"],
+        needAIAnalysis: true,
+      },
+      {
+        id: "ch2_father_leave",
+        text: "假装没注意到，让他保留自己的空间",
+        nextSceneId: "ch2_home_rules",
+        effects: {
+          selfProtection: 1,
+          empathy: -1,
+        },
+        tags: ["尊重", "回避"],
         needAIAnalysis: true,
       },
     ],
@@ -258,6 +293,8 @@ export const scenes: Record<string, Scene> = {
     speaker: "刘宇",
     character: "liuyu",
     text: "「有事一定要联系我，不准一个人硬撑。」\n\n他笑着说，语气轻松得像是一切都没有发生。\n\n但他的眼神告诉我——他知道我是谁。",
+    returnToMap: true,
+    mapId: "classroom",
     choices: [
       {
         id: "ch3_trust_liuyu_full",
@@ -268,6 +305,7 @@ export const scenes: Record<string, Scene> = {
           selfProtection: 1,
           realityJudgment: 1,
         },
+        npcTrustEffects: { liuyu: 2 },
         tags: ["信任", "谨慎合作"],
         needAIAnalysis: true,
       },
@@ -280,6 +318,7 @@ export const scenes: Record<string, Scene> = {
           authorityResistance: 1,
           selfProtection: 1,
         },
+        npcTrustEffects: { liuyu: -2 },
         tags: ["独立", "怀疑"],
         needAIAnalysis: true,
       },
@@ -328,7 +367,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "家庭区域",
     background: "/assets/bg/dorm_dark.svg",
     speaker: "旁白",
-    text: "窒息感越来越强。我必须找到让"我"快乐的理由——否则我就要死在这里。\n\n「想想你的同学。」\n\n「刘宇不是很快就察觉到你的异常了吗？」\n\n「周骐瑞找作业的样子，你是真心觉得有趣。」\n\n脑内的声音沉默了。脖子上的力量骤然消失。\n\n「你说服我了。但是，明天就不一定了。」",
+    text: "窒息感越来越强。我必须找到让「我」快乐的理由——否则我就要死在这里。\n\n「想想你的同学。」\n\n「刘宇不是很快就察觉到你的异常了吗？」\n\n「周骐瑞找作业的样子，你是真心觉得有趣。」\n\n脑内的声音沉默了。脖子上的力量骤然消失。\n\n「你说服我了。但是，明天就不一定了。」",
     nextSceneId: "ch4_classroom_rules",
   },
 
@@ -342,6 +381,8 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/bg/classroom_evening.svg",
     speaker: "旁白",
     text: "第二天。\n\n我调查抽屉，发现了一张猩红字迹的规则纸。\n\n「1. 严格遵照课程表上课，禁止交头接耳，禁止离开座位，禁止进食。」\n「8. 学生要听老师的话，禁止忤逆老师。」\n\n另外还有一张试胆活动宣传手册——本周六19:00。",
+    returnToMap: true,
+    mapId: "classroom",
     nextSceneId: "ch4_art_class",
   },
 
@@ -352,6 +393,8 @@ export const scenes: Record<string, Scene> = {
     speaker: "王老师",
     character: "wangTeacher",
     text: "一位将近70岁的老人步伐稳健地走进教室，一双澄澈如水的眼眸锐利地扫过每个人的脸庞。\n\n「在我的课上没有竞争，你们只要成为你们自己就好。」\n\n我唰唰几笔，画了一幅极其抽象的画——四分五裂的傀儡被囚于四分五裂的监牢，监牢外是一套崭新的桌椅，周围萦绕着花瓣和蝴蝶。",
+    returnToMap: true,
+    mapId: "wang_gallery",
     choices: [
       {
         id: "ch4_paint_abstract",
@@ -362,18 +405,20 @@ export const scenes: Record<string, Scene> = {
           truthDesire: 1,
           joyPerception: 1,
         },
+        npcTrustEffects: { wangTeacher: 1 },
         tags: ["展示", "真实"],
         needAIAnalysis: true,
       },
       {
         id: "ch4_paint_conform",
-        text: "画一幅符合"好孩子"标准的画，取悦老师",
+        text: "画一幅符合「好孩子」标准的画，取悦老师",
         nextSceneId: "ch4_wang_judge",
         effects: {
           selfProtection: 2,
           authorityResistance: -1,
           truthDesire: -1,
         },
+        npcTrustEffects: { wangTeacher: 1 },
         tags: ["顺从", "安全"],
         needAIAnalysis: true,
       },
@@ -397,18 +442,20 @@ export const scenes: Record<string, Scene> = {
           authorityResistance: 1,
           selfProtection: -1,
         },
+        npcTrustEffects: { wangTeacher: 1 },
         tags: ["追问", "冒险"],
         needAIAnalysis: true,
       },
       {
         id: "ch4_accept_trade",
-        text: "接受等价交换，询问"镜中尸骸、湖中遗物、书中落叶"",
+        text: "接受等价交换，询问「镜中尸骸、湖中遗物、书中落叶」",
         nextSceneId: "ch4_wang_hint",
         effects: {
           realityJudgment: 2,
           truthDesire: 1,
           selfProtection: 1,
         },
+        npcTrustEffects: { wangTeacher: 2 },
         tags: ["交换", "理性"],
         needAIAnalysis: true,
       },
@@ -442,6 +489,7 @@ export const scenes: Record<string, Scene> = {
           selfProtection: 1,
           empathy: 1,
         },
+        npcTrustEffects: { zhouJunxiu: 2, zhouQirui: 1 },
         tags: ["合作", "信任"],
         needAIAnalysis: true,
       },
@@ -454,6 +502,7 @@ export const scenes: Record<string, Scene> = {
           trust: -1,
           realityJudgment: 1,
         },
+        npcTrustEffects: { zhouJunxiu: -1 },
         tags: ["观望", "自保"],
         needAIAnalysis: true,
       },
@@ -481,6 +530,7 @@ export const scenes: Record<string, Scene> = {
           realityJudgment: 2,
           authorityResistance: 1,
         },
+        npcTrustEffects: { liuyu: 2 },
         tags: ["谈判", "理性合作"],
         needAIAnalysis: true,
       },
@@ -493,6 +543,7 @@ export const scenes: Record<string, Scene> = {
           trust: -1,
           selfProtection: 1,
         },
+        npcTrustEffects: { liuyu: -2 },
         tags: ["威胁", "强硬"],
         needAIAnalysis: true,
       },
@@ -525,6 +576,7 @@ export const scenes: Record<string, Scene> = {
           authorityResistance: -1,
           realityJudgment: 1,
         },
+        npcTrustEffects: { wangTeacher: 1 },
         tags: ["退让", "理性"],
         needAIAnalysis: true,
       },
@@ -537,6 +589,7 @@ export const scenes: Record<string, Scene> = {
           truthDesire: 1,
           selfProtection: -1,
         },
+        npcTrustEffects: { wangTeacher: -1 },
         tags: ["抗争", "冒险"],
         needAIAnalysis: true,
       },
@@ -549,6 +602,8 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/bg/art_room.svg",
     speaker: "旁白",
     text: "我帮周隽秀把画框搬到3班教室。\n\n她说她高二时成绩班级前五，升到高三一落千丈，无法接受。\n\n「没有人告诉我该怎么做。」\n\n她低着头，像是在思考什么。\n\n我拿到了进入3班的许可。",
+    returnToMap: true,
+    mapId: "wang_gallery",
     choices: [
       {
         id: "ch5_enter_class3",
@@ -624,6 +679,80 @@ export const scenes: Record<string, Scene> = {
     ],
   },
 
+  ch6_zhou_qirui: {
+    id: "ch6_zhou_qirui",
+    chapter: "3班教室",
+    background: "/assets/bg/classroom_evening.svg",
+    speaker: "周骐瑞",
+    character: "zhouQirui",
+    text: "周骐瑞翻找着作业本，动作不慌不忙。\n\n「你也注意到午餐的问题了？」\n\n他没有抬头，但语气里有一种奇特的平静。\n\n「这些食物——不是给人吃的。是给零件吃的。」\n\n他把作业本合上，终于看向我：「如果你还想过下去，就别碰它们。」",
+    choices: [
+      {
+        id: "ch6_zhou_thanks",
+        text: "感谢他的提醒，并询问更多信息",
+        nextSceneId: "ch6_class3_exposure",
+        effects: {
+          trust: 1,
+          truthDesire: 2,
+          realityJudgment: 1,
+        },
+        npcTrustEffects: { zhouQirui: 2 },
+        tags: ["合作", "探索"],
+        needAIAnalysis: true,
+      },
+      {
+        id: "ch6_zhou_nod",
+        text: "点头示意，继续自己的调查",
+        nextSceneId: "ch6_class3_exposure",
+        effects: {
+          selfProtection: 1,
+          realityJudgment: 1,
+        },
+        npcTrustEffects: { zhouQirui: 1 },
+        tags: ["谨慎", "自保"],
+        needAIAnalysis: true,
+      },
+    ],
+    returnToMap: true,
+    mapId: "classroom_3",
+  },
+
+  ch6_cheng_xiaoxiao: {
+    id: "ch6_cheng_xiaoxiao",
+    chapter: "3班教室",
+    background: "/assets/bg/classroom_evening.svg",
+    speaker: "程潇潇",
+    character: "chengXiaoxiao",
+    text: "程潇潇趴在桌子上，看起来比周围的学生都要放松。\n\n「喂，你是新来的？」\n\n她歪着头打量我，好像完全没注意到教室里那种诡异的压抑感。\n\n「这周六有个试胆活动，你要来吗？」\n\n她举起一张宣传单——上面画着歪歪扭扭的鬼怪图案。",
+    choices: [
+      {
+        id: "ch6_cheng_agree",
+        text: "答应参加试胆活动，想从这里找到线索",
+        nextSceneId: "ch6_class3_exposure",
+        effects: {
+          trust: 1,
+          truthDesire: 1,
+          joyPerception: 1,
+        },
+        tags: ["接受", "探索"],
+        needAIAnalysis: true,
+      },
+      {
+        id: "ch6_cheng_decline",
+        text: "拒绝——现在的首要任务是找到规则",
+        nextSceneId: "ch6_class3_exposure",
+        effects: {
+          selfProtection: 1,
+          truthDesire: -1,
+        },
+        tags: ["拒绝", "专注"],
+        needAIAnalysis: true,
+      },
+    ],
+    returnToMap: true,
+    mapId: "classroom_3",
+  },
+
   ch6_escape_success: {
     id: "ch6_escape_success",
     chapter: "追杀",
@@ -651,7 +780,7 @@ export const scenes: Record<string, Scene> = {
     choices: [
       {
         id: "ch6_delete_good_child",
-        text: "删除"成为好孩子"规则",
+        text: "删除「成为好孩子」规则",
         nextSceneId: "ch6_delete_rule",
         effects: {
           authorityResistance: 3,
@@ -810,6 +939,8 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/bg/school_gate_night.svg",
     speaker: "旁白",
     text: "（我也没来过这里。但这地方能让我感到快乐吗？）\n\n「看那边。凌晨一点，仍有卡车送货。楼下那家包子店老板每天四点钟起床。」\n\n（你什么意思？）\n\n「还有比你更奔波的人。」",
+    returnToMap: true,
+    mapId: "rooftop",
     choices: [
       {
         id: "ch8_reason_growth",
@@ -926,7 +1057,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "结局裁决",
     background: "/assets/bg/rule_warning.svg",
     speaker: "系统",
-    text: "（嗯。）\n\n脑内的警报声停止，"我"的存在也同时消失。\n\n「恭喜您找到'被遗弃的呐喊碎片2'，副本探索进度20%。」\n\n「家庭区域叛逆值已达35%。」\n\n「混沌磁场范围扩大。」\n\n副本即将结束。AI正在分析您的人格画像，准备裁决您的结局……",
+    text: "（嗯。）\n\n脑内的警报声停止，「我」的存在也同时消失。\n\n「恭喜您找到'被遗弃的呐喊碎片2'，副本探索进度20%。」\n\n「家庭区域叛逆值已达35%。」\n\n「混沌磁场范围扩大。」\n\n副本即将结束。AI正在分析您的人格画像，准备裁决您的结局……",
     aiEvent: "ending_judge",
   },
 

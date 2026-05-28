@@ -99,7 +99,7 @@ export const endings: Record<string, EndingCard> = {
   savior_delusion: {
     id: "savior_delusion",
     title: "救世主幻觉",
-    description: "你想带所有人出去。你太急了，也太不了解"人"了。",
+    description: "你想带所有人出去。你太急了，也太不了解「人」了。",
     layer: "认知层✓ / 行动层-方向错误",
     hint: "empathy > 3 && realityJudgment < 1 && authorityResistance > 2",
     monologue: `我站在天台上，觉得自己终于全看清了。

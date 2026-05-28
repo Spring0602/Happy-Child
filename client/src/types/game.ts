@@ -1,3 +1,5 @@
+export type GameMode = "map" | "story";
+
 export type Trait =
   | "authorityResistance" // 权威抵制度：是否敢质疑老师、父母、规则
   | "truthDesire" // 真相欲望：是否愿意冒险追问本质
@@ -14,6 +16,7 @@ export interface Choice {
   text: string;
   nextSceneId: string;
   effects: Partial<Record<Trait, number>>;
+  npcTrustEffects?: Record<string, number>;  // NPC 角色ID → 信任度变化
   tags?: string[];
   needAIAnalysis?: boolean;
 }
@@ -27,7 +30,9 @@ export interface Scene {
   text: string;
   choices?: Choice[];
   nextSceneId?: string;
+  returnToMap?: boolean;  // 剧情结束后返回地图模式（从NPC交互触发时使用）
   aiEvent?: "npc_dialogue" | "ending_judge";
+  mapId?: string;         // 结束后返回的地图ID（可选，默认当前地图）
 }
 
 export interface CharacterCard {
@@ -43,6 +48,9 @@ export interface EndingCard {
   id: string;
   title: string;
   description: string;
+  layer?: string;
+  hint?: string;
+  monologue?: string;
 }
 
 export interface AITrace {
@@ -50,6 +58,13 @@ export interface AITrace {
   sceneId: string;
   result: string;
   createdAt: string;
+}
+
+export interface ExplorationState {
+  visitedMaps: string[];        // 已访问的地图ID列表
+  visitedTiles: Record<string, boolean[][]>;  // 地图ID → 已探索瓦片矩阵
+  interactions: string[];       // 已完成交互的 ID 列表（NPC对话/调查点）
+  totalExplored: number;        // 累计探索瓦片数
 }
 
 export interface GameState {
@@ -61,4 +76,5 @@ export interface GameState {
   rebellion: number;
   joyProof: number;
   aiTraces: AITrace[];
+  exploreState: ExplorationState;
 }
