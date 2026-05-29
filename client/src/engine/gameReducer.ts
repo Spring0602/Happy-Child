@@ -24,7 +24,7 @@ export const initialGameState: GameState = {
   rebellion: 0,
   joyProof: 0,
   aiTraces: [],
-  currentMapId: "bedroom",
+  currentMapId: "livingroom",
   playerPosition: { x: 0, y: 0 },
   flags: {},
   interactedItems: [],
@@ -41,7 +41,8 @@ export type GameAction =
   | { type: "INTERACT_ITEM"; itemId: string }
   | { type: "UPDATE_POSITION"; position: { x: number; y: number } }
   | { type: "DIALOG_START"; sceneId: string }
-  | { type: "DIALOG_END" };
+  | { type: "DIALOG_END" }
+  | { type: "APPLY_EFFECTS"; effects: Partial<Record<string, number>> };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -90,6 +91,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "DIALOG_END":
       return { ...state, currentSceneId: "" };
+
+    case "APPLY_EFFECTS": {
+      const newTraits = { ...state.traits };
+      for (const key in action.effects) {
+        newTraits[key as keyof Traits] += action.effects[key] ?? 0;
+      }
+      return { ...state, traits: newTraits };
+    }
 
     default:
       return state;

@@ -1,12 +1,12 @@
 {
   "compressionlevel": -1,
-  "height": 24,
+  "height": 20,
   "infinite": false,
   "layers": [
     {
       "name": "ground",
       "type": "imagelayer",
-      "image": "教室.png",
+      "image": "王老师画廊.png",
       "x": 0,
       "y": 0,
       "id": 1,
@@ -31,9 +31,9 @@
       "opacity": 1,
       "objects": [
         { "id": 1, "name": "wall_top", "type": "collision", "x": 0, "y": 0, "width": 1280, "height": 32 },
-        { "id": 2, "name": "wall_bottom", "type": "collision", "x": 0, "y": 736, "width": 1280, "height": 32 },
-        { "id": 3, "name": "wall_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 768 },
-        { "id": 4, "name": "wall_right", "type": "collision", "x": 1248, "y": 0, "width": 32, "height": 768 }
+        { "id": 2, "name": "wall_bottom", "type": "collision", "x": 0, "y": 608, "width": 1280, "height": 32 },
+        { "id": 3, "name": "wall_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 640 },
+        { "id": 4, "name": "wall_right", "type": "collision", "x": 1248, "y": 0, "width": 32, "height": 640 }
       ]
     },
     {
@@ -44,8 +44,7 @@
       "visible": true,
       "opacity": 1,
       "objects": [
-        { "id": 1, "name": "spawn_classroom_door", "type": "spawn", "x": 624, "y": 680, "width": 32, "height": 48 },
-        { "id": 2, "name": "spawn_from_corridor", "type": "spawn", "x": 100, "y": 680, "width": 32, "height": 48 }
+        { "id": 1, "name": "spawn_gallery_door", "type": "spawn", "x": 100, "y": 560, "width": 32, "height": 48 }
       ]
     },
     {
@@ -58,20 +57,11 @@
       "objects": [
         {
           "id": 1, "name": "door_corridor", "type": "door",
-          "x": 60, "y": 650, "width": 80, "height": 80,
+          "x": 60, "y": 520, "width": 80, "height": 80,
           "properties": [
             { "name": "triggerType", "type": "string", "value": "walk" },
             { "name": "targetMap", "type": "string", "value": "corridor" },
-            { "name": "targetSpawn", "type": "string", "value": "spawn_corridor_classroom" }
-          ]
-        },
-        {
-          "id": 2, "name": "door_livingroom", "type": "door",
-          "x": 584, "y": 650, "width": 80, "height": 80,
-          "properties": [
-            { "name": "triggerType", "type": "string", "value": "walk" },
-            { "name": "targetMap", "type": "string", "value": "livingroom" },
-            { "name": "targetSpawn", "type": "string", "value": "spawn_from_classroom" }
+            { "name": "targetSpawn", "type": "string", "value": "spawn_corridor_gallery" }
           ]
         }
       ]
@@ -85,11 +75,11 @@
       "opacity": 1,
       "objects": [
         {
-          "id": 1, "name": "npc_liuyu", "type": "npc",
-          "x": 800, "y": 400, "width": 32, "height": 48,
+          "id": 1, "name": "npc_wang", "type": "npc",
+          "x": 640, "y": 350, "width": 32, "height": 48,
           "properties": [
-            { "name": "npcId", "type": "string", "value": "liuyu" },
-            { "name": "sceneId", "type": "string", "value": "ch3_liuyu_approach" }
+            { "name": "npcId", "type": "string", "value": "wangTeacher" },
+            { "name": "sceneId", "type": "string", "value": "ch5_wang_office" }
           ]
         }
       ]

@@ -16,6 +16,31 @@
     {
       "draworder": "topdown",
       "id": 2,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        { "id": 1, "name": "item_01", "type": "furniture", "x": 64, "y": 64, "width": 256, "height": 256, "properties": [
+          { "name": "interactable", "type": "bool", "value": true },
+          { "name": "interactSceneId", "type": "string", "value": "interact_kitchen_fridge" }
+        ]},
+        { "id": 2, "name": "item_02", "type": "furniture", "x": 352, "y": 64, "width": 256, "height": 256, "properties": [
+          { "name": "interactable", "type": "bool", "value": true },
+          { "name": "interactSceneId", "type": "string", "value": "interact_kitchen_stove" }
+        ]},
+        { "id": 3, "name": "item_03", "type": "furniture", "x": 640, "y": 64, "width": 256, "height": 256 },
+        { "id": 4, "name": "item_04", "type": "furniture", "x": 64, "y": 320, "width": 256, "height": 256 },
+        { "id": 5, "name": "item_05", "type": "furniture", "x": 352, "y": 320, "width": 256, "height": 256 },
+        { "id": 6, "name": "item_06", "type": "furniture", "x": 704, "y": 320, "width": 256, "height": 256, "properties": [
+          { "name": "interactable", "type": "bool", "value": true },
+          { "name": "interactSceneId", "type": "string", "value": "interact_kitchen_table" }
+        ]}
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 3,
       "name": "collision",
       "type": "objectgroup",
       "visible": true,
@@ -29,7 +54,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 3,
+      "id": 4,
       "name": "player_spawn",
       "type": "objectgroup",
       "visible": true,
@@ -40,7 +65,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 4,
+      "id": 5,
       "name": "triggers",
       "type": "objectgroup",
       "visible": true,
@@ -59,7 +84,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 5,
+      "id": 6,
       "name": "npcs",
       "type": "objectgroup",
       "visible": true,
@@ -68,7 +93,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 6,
+      "id": 7,
       "name": "items",
       "type": "objectgroup",
       "visible": true,
@@ -76,8 +101,8 @@
       "objects": []
     }
   ],
-  "nextlayerid": 7,
-  "nextobjectid": 10,
+  "nextlayerid": 8,
+  "nextobjectid": 20,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

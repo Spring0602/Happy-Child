@@ -11,6 +11,16 @@ export function PhaserGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     height: 540,
     pixelArt: true,
     roundPixels: true,
+    backgroundColor: "#050510",
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+    input: {
+      keyboard: true,
+      mouse: true,
+      touch: true,
+    },
     physics: {
       default: "arcade",
       arcade: {

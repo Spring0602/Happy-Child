@@ -1,60 +1,54 @@
+import { MapRegistry } from "./mapRegistry";
+
+/**
+ * 资源清单（单一数据源：从 MapRegistry 派生地图数据）
+ *
+ * ⚠️ 新增地图只需修改 mapRegistry.ts，本文件会自动同步。
+ * sprites 部分是本文件独有的（角色精灵图配置）。
+ */
+
+// ── 仅加载家庭区域地图（排除学校区域用于调试）──
+const FAMILY_MAPS = ["livingroom", "bathroom", "bedroom", "bedroom_parents", "kitchen"];
+
 export const AssetManifest = {
-  maps: {
-    livingroom: {
-      mapKey: "map_livingroom",
-      mapJson: "/assets/maps/livingroom/map.json",
-      groundKey: "ground_livingroom",
-      groundImage: "/assets/maps/livingroom/客厅.png",
-      furnitureImages: [
-        { key: "item_01", path: "/assets/maps/livingroom/客厅物品_sprites/item_01.png" },
-        { key: "item_02", path: "/assets/maps/livingroom/客厅物品_sprites/item_02.png" },
-        { key: "item_03", path: "/assets/maps/livingroom/客厅物品_sprites/item_03.png" },
-        { key: "item_04", path: "/assets/maps/livingroom/客厅物品_sprites/item_04.png" },
-        { key: "item_05", path: "/assets/maps/livingroom/客厅物品_sprites/item_05.png" },
-        { key: "item_06", path: "/assets/maps/livingroom/客厅物品_sprites/item_06.png" },
-        { key: "item_06_flip", path: "/assets/maps/livingroom/客厅物品_sprites/item_06_flip.png" },
-        { key: "item_07", path: "/assets/maps/livingroom/客厅物品_sprites/item_07.png" },
-        { key: "item_08", path: "/assets/maps/livingroom/客厅物品_sprites/item_08.png" },
-        { key: "item_09", path: "/assets/maps/livingroom/客厅物品_sprites/item_09.png" },
-        { key: "item_10", path: "/assets/maps/livingroom/客厅物品_sprites/item_10.png" },
-        { key: "item_11", path: "/assets/maps/livingroom/客厅物品_sprites/item_11.png" },
-        { key: "item_12", path: "/assets/maps/livingroom/客厅物品_sprites/item_12.png" },
-        { key: "item_13", path: "/assets/maps/livingroom/客厅物品_sprites/item_13.png" },
-        { key: "item_14", path: "/assets/maps/livingroom/客厅物品_sprites/item_14.png" },
-        { key: "item_15", path: "/assets/maps/livingroom/客厅物品_sprites/item_15.png" },
-      ],
-    },
-    bathroom: {
-      mapKey: "map_bathroom",
-      mapJson: "/assets/maps/bathroom/map.json",
-      groundKey: "ground_bathroom",
-      groundImage: "/assets/maps/bathroom/卫生间.png",
-    },
-    bedroom: {
-      mapKey: "map_bedroom",
-      mapJson: "/assets/maps/bedroom/map.json",
-      groundKey: "ground_bedroom",
-      groundImage: "/assets/maps/bedroom/主角房间.png",
-    },
-    bedroom_parents: {
-      mapKey: "map_bedroom_parents",
-      mapJson: "/assets/maps/bedroom_parents/map.json",
-      groundKey: "ground_bedroom_parents",
-      groundImage: "/assets/maps/bedroom_parents/父母房间.png",
-    },
-    kitchen: {
-      mapKey: "map_kitchen",
-      mapJson: "/assets/maps/kitchen/map.json",
-      groundKey: "ground_kitchen",
-      groundImage: "/assets/maps/kitchen/厨房.png",
-    },
-  },
+  /** 地图资源 —— 从 MapRegistry 自动派生（临时过滤） */
+  maps: Object.fromEntries(
+    Object.entries(MapRegistry)
+      .filter(([id]) => FAMILY_MAPS.includes(id))
+      .map(([id, entry]) => [
+        id,
+        {
+          mapKey: entry.mapKey,
+          mapJson: entry.mapJson,
+          groundKey: entry.groundKey,
+          groundImage: entry.groundImage,
+          furnitureImages: entry.furnitureImages,
+        },
+      ])
+  ),
+
+  /**
+   * 角色精灵图（独立维护，与地图无关）
+   *
+   * 布局：256×256 px，3行×8列
+   *   行0（前/W）：前跑0~5 + 前站6 + 前坐7
+   *   行1（左/A）：左跑0~5 + 左站14 + 左坐15（右/D = 行1镜像）
+   *   行2（后/S）：后跑0~5 + 后站22 + 后坐23
+   *
+   * frameWidth=32（256/8列），frameHeight≈85（256/3行，底部1px偏差可忽略）
+   */
   sprites: {
     yps: {
       key: "sprite_yps",
       image: "/assets/sprites/yps.png",
-      frameWidth: 32,   // 256/8 = 32（每行8帧: 6跑步+1站立+1坐下）
-      frameHeight: 85,  // 256/3 ≈ 85（3行: 左/上/下朝向）
+      frameWidth: 32,
+      frameHeight: 85,
+    },
+    ly: {
+      key: "sprite_ly",
+      image: "/assets/sprites/ly.png",
+      frameWidth: 32,
+      frameHeight: 85,
     },
   },
 } as const;

@@ -983,4 +983,257 @@ export const scenes: Record<string, Scene> = {
     text: "我在椅子上坐了下来。\n\n（按下任意方向键起身。）",
   },
 
+  // --- 母亲 NPC ---
+  interact_livingroom_mother: {
+    id: "interact_livingroom_mother",
+    chapter: "客厅",
+    speaker: "母亲",
+    text: "「平生啊，今天的补习班老师说你最近状态不太对。」\n\n她端着茶杯，眼神里写满了忧心。\n\n「是不是太累了？要不要跟老师请一天假？」\n\n（她的关心是真的。但在这个副本里……她是真人吗？）",
+    choices: [
+      {
+        id: "mother_talk_yes",
+        text: "「确实有点累，谢谢妈。」",
+        nextSceneId: "interact_livingroom_mother_2",
+        effects: { empathy: 1, selfProtection: 1 },
+        tags: ["回应关心"],
+      },
+      {
+        id: "mother_talk_change",
+        text: "「妈，你今天工作怎么样？」——转移话题",
+        nextSceneId: "interact_livingroom_mother_subject",
+        effects: { realityJudgment: 1, empathy: 1 },
+        tags: ["转移话题"],
+      },
+    ],
+  },
+  interact_livingroom_mother_2: {
+    id: "interact_livingroom_mother_2",
+    chapter: "客厅",
+    speaker: "母亲",
+    text: "她笑了一下，摸了摸我的头。\n\n「那就休息一下。冰箱里有你爱吃的提子。」\n\n我看着她的背影消失在厨房门口。\n\n（如果这一切都是假的——那这份温柔，也是系统计算出来的吗？）",
+  },
+  interact_livingroom_mother_subject: {
+    id: "interact_livingroom_mother_subject",
+    chapter: "客厅",
+    speaker: "母亲",
+    text: "她愣了一下，放下茶杯。\n\n「还好。最近公司在裁员，不过妈妈资历深，应该没事。」\n\n她的语气很轻，但手指不自觉地捏紧了杯柄。\n\n（她在撒谎。但她不想让我担心。）",
+  },
+
+  // --- 父亲 NPC ---
+  interact_livingroom_father: {
+    id: "interact_livingroom_father",
+    chapter: "客厅",
+    speaker: "父亲",
+    text: "父亲坐在沙发上，手里拿着一份报纸，但他的眼神没有落在字上。\n\n「平生，最近成绩怎么样？」\n\n他的声音里有一种刻意维持的平静。",
+    choices: [
+      {
+        id: "father_talk_honest",
+        text: "「还行。爸，你今天……怎么没去上班？」",
+        nextSceneId: "interact_livingroom_father_2",
+        effects: { realityJudgment: 2, truthDesire: 1 },
+        tags: ["直面问题"],
+      },
+      {
+        id: "father_talk_dodge",
+        text: "「挺好的。我自己会注意的。」",
+        nextSceneId: "interact_livingroom_father_close",
+        effects: { selfProtection: 1 },
+        tags: ["回避"],
+      },
+    ],
+  },
+  interact_livingroom_father_close: {
+    id: "interact_livingroom_father_close",
+    chapter: "客厅",
+    background: "",
+    speaker: "叶平生",
+    text: "（有些事情，现在还不是提的时候。）",
+  },
+  interact_livingroom_father_2: {
+    id: "interact_livingroom_father_2",
+    chapter: "客厅",
+    speaker: "父亲",
+    text: "他把报纸放下，看着窗外。沉默了很长时间。\n\n「公司……最近不太景气。爸爸可能要在家里多待一阵子。」\n\n他没有看我的眼睛。\n\n「你好好读书就行。大人的事，你别操心。」",
+    effects: {
+      truthDesire: 1,
+      empathy: 1,
+    },
+  },
+
+  // ══════════════════════════════════════════════
+  // 卧室交互对话（bedroom interactions）
+  // ══════════════════════════════════════════════
+
+  // --- 书桌·计划本（重要主线线索）---
+  interact_bedroom_desk: {
+    id: "interact_bedroom_desk",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "书桌上摊着一本封面温馨的笔记本。\n\n扉页写着：\n\n「考上c9。30岁结婚生子。35岁实现财富自由。」\n\n「作为好孩子，我要关爱亲人，成为爸妈的骄傲……」\n\n计划表最下方有一行红笔批注：「我真的好累。我一点也不快乐。」",
+    choices: [
+      {
+        id: "ch2_read_plan_interact",
+        text: "仔细翻阅计划本中的每一页",
+        nextSceneId: "interact_bedroom_desk_2",
+        effects: { truthDesire: 1, realityJudgment: 1 },
+        tags: ["探索"],
+      },
+      {
+        id: "ch2_ignore_plan",
+        text: "合上计划本",
+        effects: { selfProtection: 1 },
+        tags: ["回避"],
+      },
+    ],
+  },
+  interact_bedroom_desk_2: {
+    id: "interact_bedroom_desk_2",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "计划本的后几页密密麻麻写满了每日时间表。\n\n6:00 起床\n6:30 早读\n7:00 上学\n……\n23:30 睡觉\n\n每一分钟都被安排得明明白白。没有任何一个格子写着「玩」或「休息」。\n\n我把目光落在最后一行红字上——\n\n「讨好别人一点也不快乐，学习一点也不快乐，和爸妈待在一起一点也不快乐。」",
+  },
+  interact_bedroom_desk_chair: {
+    id: "interact_bedroom_desk_chair",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "我在书桌前坐了下来。\n\n桌上堆满了教辅资料和模拟卷。这张桌子上承载了多少个通宵？\n\n（按下任意方向键起身。）",
+  },
+
+  // --- 书架 ---
+  interact_bedroom_bookshelf: {
+    id: "interact_bedroom_bookshelf",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "书架上清一色的教辅资料：《五年高考三年模拟》《王后雄教材完全解读》……\n\n没有任何一本闲书。不对——最底层塞着一本被揉得皱巴巴的漫画。封面角色在笑，但书页上有干涸的泪痕。",
+  },
+
+  // --- 床 ---
+  interact_bedroom_bed: {
+    id: "interact_bedroom_bed",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "床铺得整整齐齐，一丝不苟。\n\n枕头下面压着一本课外书——封面被撕掉的《三体》。可以想象'我'躲在被窝里用手电筒偷看的样子。",
+  },
+
+  // --- 书架 ---
+  interact_bedroom_bookshelf: {
+    id: "interact_bedroom_bookshelf",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "书架上清一色的教辅资料：《五年高考三年模拟》《王后雄教材完全解读》……\n\n没有任何一本闲书。不对——最底层塞着一本被揉得皱巴巴的漫画。封面角色在笑，但书页上有干涸的泪痕。",
+  },
+
+  // --- 行囊 ---
+  interact_bedroom_bag: {
+    id: "interact_bedroom_bag",
+    chapter: "卧室",
+    speaker: "叶平生",
+    text: "我从外面带来的行囊随意摆放在地上。\n\n里面装着水果刀、手电筒、压缩饼干——在这个「快乐小孩」的房间里显得那么格格不入。\n\n（这些东西提醒我：这里不是一个真实的家，而是一个副本。）",
+  },
+
+  // ══════════════════════════════════════════════
+  // 卫生间交互对话（bathroom interactions）
+  // ══════════════════════════════════════════════
+
+  // --- 镜子（关键叙事节点！）---
+  interact_bathroom_mirror: {
+    id: "interact_bathroom_mirror",
+    chapter: "卫生间",
+    speaker: "叶平生",
+    text: "我凑近镜子，盯着自己的镜像。\n\n镜中的'我'看起来很正常——一个普通的高中生，脸上带着恰到好处的疲惫。\n\n但我总觉得……镜子里的人不是我。\n\n他似乎在用一种我看不懂的眼神回望我。",
+    choices: [
+      {
+        id: "bathroom_mirror_touch",
+        text: "将额头贴在镜面上",
+        nextSceneId: "interact_bathroom_mirror_touch",
+        effects: { truthDesire: 2, authorityResistance: 1 },
+        tags: ["探索", "冒险"],
+      },
+      {
+        id: "bathroom_mirror_leave",
+        text: "移开视线，不去深究",
+        effects: { selfProtection: 1 },
+        tags: ["回避"],
+      },
+    ],
+  },
+  interact_bathroom_mirror_touch: {
+    id: "interact_bathroom_mirror_touch",
+    chapter: "卫生间",
+    speaker: "叶平生",
+    text: "额头触碰镜面——\n\n并没有传来硬物感。\n\n我的手居然穿过了镜子……里面一片漆黑。能感受到冷风的吹拂，还有一股淡淡的血腥味。\n\n我猛地收回手。镜面完好无损。\n\n但我的指尖上，沾着一丝血迹。\n\n「恭喜您找到'镜中真相碎片1'，副本探索进度达15%。」",
+    effects: {
+      truthDesire: 3,
+      authorityResistance: 2,
+    },
+  },
+
+  // --- 洗手台 ---
+  interact_bathroom_sink: {
+    id: "interact_bathroom_sink",
+    chapter: "卫生间",
+    speaker: "叶平生",
+    text: "洗手台上的水龙头微微漏着水。\n\n滴答——滴答——滴答——\n\n这种规律的声音，反而让人感到不安。我拧紧了水龙头。\n\n安静了。\n\n但几秒后，水又开始滴了起来。",
+  },
+
+  // ══════════════════════════════════════════════
+  // 厨房交互对话（kitchen interactions）
+  // ══════════════════════════════════════════════
+
+  // --- 冰箱 ---
+  interact_kitchen_fridge: {
+    id: "interact_kitchen_fridge",
+    chapter: "厨房",
+    speaker: "叶平生",
+    text: "冰箱上贴着几张便签，全是母亲的字迹：\n\n「平生记得喝牛奶」「平生今天的补习班换教室了」「平生我晚点回来，饭在锅里」\n\n没有一张便签的内容是关于她自己的。",
+  },
+
+  // --- 灶台 ---
+  interact_kitchen_stove: {
+    id: "interact_kitchen_stove",
+    chapter: "厨房",
+    speaker: "叶平生",
+    text: "灶台上放着一只保温锅。\n\n揭开盖子——里面是热腾腾的番茄炒蛋和米饭。显然母亲出门前刚做的。\n\n「规则要求我必须吃校内的午餐。」\n\n……但这是家的味道。我把锅盖合上，转身离开。",
+  },
+
+  // --- 餐桌 ---
+  interact_kitchen_table: {
+    id: "interact_kitchen_table",
+    chapter: "厨房",
+    speaker: "叶平生",
+    text: "餐桌上摆着三副碗筷。\n\n三副——但父亲今晚似乎不回来吃饭。母亲还在加班。\n\n我一个人的晚餐。和过去无数个夜晚一样。",
+  },
+
+  // ══════════════════════════════════════════════
+  // 父母房间交互对话（bedroom_parents interactions）
+  // ══════════════════════════════════════════════
+
+  // --- 大床 ---
+  interact_bedroom_parents_bed: {
+    id: "interact_bedroom_parents_bed",
+    chapter: "父母卧室",
+    speaker: "叶平生",
+    text: "父母的大床上铺着浅色的被子，枕头摆放整齐。\n\n但是——父亲的枕头比母亲的高出了一截，像是故意隔开了一段距离。\n\n他们有多久没有好好说过话了？",
+  },
+
+  // --- 衣柜 ---
+  interact_bedroom_parents_wardrobe: {
+    id: "interact_bedroom_parents_wardrobe",
+    chapter: "父母卧室",
+    speaker: "叶平生",
+    text: "衣柜半掩着。我拉开柜门——\n\n父亲的西装整齐排列，母亲的连衣裙也熨得一丝不苟。\n\n但在衣柜最底层，压着一件明显小了两号的褪色碎花裙。款式很年轻，像是母亲上大学时穿的。\n\n（她也有过自己的青春吗？）",
+  },
+
+  // --- 抽屉/文件柜 ---
+  interact_bedroom_parents_drawer: {
+    id: "interact_bedroom_parents_drawer",
+    chapter: "父母卧室",
+    speaker: "叶平生",
+    text: "我打开抽屉，里面是一些家庭文件。房产证、保险单、学费收据……\n\n学费收据上写着「叶平生 高三下学期 补习费 12,000元」。\n\n抽屉角落有一张父亲的名片——已经被裁掉了公司名字，只剩下姓名和手机号。\n\n（他被裁了。）",
+    effects: {
+      truthDesire: 1,
+      realityJudgment: 1,
+    },
+  },
+
 };

@@ -15,6 +15,12 @@ const PROTAGONIST_NAMES = ["叶平生"];
 const PORTRAIT_MAP: Record<string, string> = {
   "叶平生": "/assets/portraits/yps_defult.png",
   "刘宇": "/assets/portraits/ly_smile.png",
+  "父亲": "/assets/portraits/yps_defult.png",       // 待替换为父亲立绘
+  "母亲": "/assets/portraits/yps_defult.png",       // 待替换为母亲立绘
+  "王老师": "/assets/portraits/yps_defult.png",     // 待替换为王老师立绘
+  "周骐瑞": "/assets/portraits/ly_smile.png",      // 待替换为周骐瑞立绘
+  "周隽秀": "/assets/portraits/yps_defult.png",    // 待替换为周隽秀立绘
+  "林芷萱": "/assets/portraits/ly_smile.png",      // 待替换为林芷萱立绘
 };
 
 /** 旁白/系统类（不显示立绘） */

@@ -18,7 +18,7 @@ export class InteractionSystem {
   private scene: Phaser.Scene;
   private player: Phaser.GameObjects.Sprite;
   private interactables: Interactable[] = [];
-  private interactKey: Phaser.Input.Keyboard.Key;
+  private interactKey: Phaser.Input.Keyboard.Key | null = null;
   private interactRadius = 48;
   private interactHint: Phaser.GameObjects.Text | null = null;
   private onSitCallback: ((chairY: number, sitInFront: boolean) => void) | null = null;
@@ -26,7 +26,22 @@ export class InteractionSystem {
   constructor(scene: Phaser.Scene, player: Phaser.GameObjects.Sprite) {
     this.scene = scene;
     this.player = player;
-    this.interactKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.initKey();
+  }
+
+  /** 安全初始化交互键（E） */
+  private initKey() {
+    const kb = this.scene.input.keyboard;
+    if (!kb) {
+      this.scene.time.delayedCall(500, () => this.initKey());
+      return;
+    }
+    try {
+      this.interactKey = kb.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    } catch (err) {
+      console.error("[InteractionSystem] E 键绑定失败:", err);
+      this.scene.time.delayedCall(500, () => this.initKey());
+    }
   }
 
   /** 注册坐下回调（由 MapScene 调用） */
@@ -75,7 +90,7 @@ export class InteractionSystem {
     }
 
     // E 键触发
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey) && nearest) {
+    if (this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey) && nearest) {
       // 坐下动作：优先处理，不走对话流程
       if (nearest.sitAction && this.onSitCallback) {
         this.onSitCallback(nearest.chairY ?? nearest.y, nearest.sitInFront ?? true);

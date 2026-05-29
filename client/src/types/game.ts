@@ -21,13 +21,14 @@ export interface Choice {
 export interface Scene {
   id: string;
   chapter: string;
-  background: string;
+  background?: string;
   speaker?: string;
   character?: string;
   text: string;
   choices?: Choice[];
   nextSceneId?: string;
   aiEvent?: "npc_dialogue" | "ending_judge";
+  effects?: Partial<Record<Trait, number>>;
 }
 
 export interface CharacterCard {
@@ -43,6 +44,9 @@ export interface EndingCard {
   id: string;
   title: string;
   description: string;
+  layer: string;
+  hint: string;
+  monologue: string;
 }
 
 export interface AITrace {

@@ -39,8 +39,8 @@ export class TriggerSystem {
 
   update() {
     for (const trigger of this.triggers) {
-      // 一次性触发：已触发则跳过
-      if (trigger.once && trigger.triggered) continue;
+      // 已触发即跳过（防止重复触发，无论是否 once）
+      if (trigger.triggered) continue;
 
       // 检查前置条件 flag
       if (trigger.config.requireFlag) {
@@ -57,9 +57,15 @@ export class TriggerSystem {
         this.player.y >= body.y &&
         this.player.y <= body.y + body.height;
 
-      if (!inZone) continue;
+      if (!inZone) {
+        // 玩家离开触发区后，重置 triggered 状态（允许再次触发，除非 once）
+        if (trigger.config.once !== true) {
+          trigger.triggered = false;
+        }
+        continue;
+      }
 
-      // walk 类型：自动触发
+      // walk / auto 类型：自动触发
       // interact 类型：需要 E 键（由 InteractionSystem 处理）
       if (trigger.config.type !== "walk" && trigger.config.type !== "auto") {
         continue;

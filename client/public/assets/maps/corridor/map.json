@@ -1,0 +1,129 @@
+{
+  "compressionlevel": -1,
+  "height": 20,
+  "infinite": false,
+  "layers": [
+    {
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "走廊.png",
+      "x": 0,
+      "y": 0,
+      "id": 1,
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "draworder": "topdown",
+      "id": 2,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": []
+    },
+    {
+      "draworder": "topdown",
+      "id": 3,
+      "name": "collision",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        { "id": 1, "name": "wall_top", "type": "collision", "x": 0, "y": 0, "width": 3200, "height": 32 },
+        { "id": 2, "name": "wall_bottom", "type": "collision", "x": 0, "y": 608, "width": 3200, "height": 32 },
+        { "id": 3, "name": "wall_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 640 },
+        { "id": 4, "name": "wall_right", "type": "collision", "x": 3168, "y": 0, "width": 32, "height": 640 }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 4,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        { "id": 1, "name": "spawn_corridor_classroom", "type": "spawn", "x": 200, "y": 550, "width": 32, "height": 48 },
+        { "id": 2, "name": "spawn_corridor_classroom_3", "type": "spawn", "x": 800, "y": 550, "width": 32, "height": 48 },
+        { "id": 3, "name": "spawn_corridor_gallery", "type": "spawn", "x": 1600, "y": 550, "width": 32, "height": 48 },
+        { "id": 4, "name": "spawn_corridor_rooftop", "type": "spawn", "x": 3000, "y": 550, "width": 32, "height": 48 }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 5,
+      "name": "triggers",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1, "name": "door_classroom", "type": "door",
+          "x": 160, "y": 500, "width": 80, "height": 80,
+          "properties": [
+            { "name": "triggerType", "type": "string", "value": "walk" },
+            { "name": "targetMap", "type": "string", "value": "classroom" },
+            { "name": "targetSpawn", "type": "string", "value": "spawn_from_corridor" }
+          ]
+        },
+        {
+          "id": 2, "name": "door_classroom_3", "type": "door",
+          "x": 760, "y": 500, "width": 80, "height": 80,
+          "properties": [
+            { "name": "triggerType", "type": "string", "value": "walk" },
+            { "name": "targetMap", "type": "string", "value": "classroom_3" },
+            { "name": "targetSpawn", "type": "string", "value": "spawn_classroom_3_door" }
+          ]
+        },
+        {
+          "id": 3, "name": "door_wang_gallery", "type": "door",
+          "x": 1560, "y": 500, "width": 80, "height": 80,
+          "properties": [
+            { "name": "triggerType", "type": "string", "value": "walk" },
+            { "name": "targetMap", "type": "string", "value": "wang_gallery" },
+            { "name": "targetSpawn", "type": "string", "value": "spawn_gallery_door" }
+          ]
+        },
+        {
+          "id": 4, "name": "door_rooftop", "type": "door",
+          "x": 2960, "y": 500, "width": 80, "height": 80,
+          "properties": [
+            { "name": "triggerType", "type": "string", "value": "walk" },
+            { "name": "targetMap", "type": "string", "value": "rooftop" },
+            { "name": "targetSpawn", "type": "string", "value": "spawn_rooftop_door" }
+          ]
+        }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 6,
+      "name": "npcs",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": []
+    },
+    {
+      "draworder": "topdown",
+      "id": 7,
+      "name": "items",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": []
+    }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 10,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilesets": [],
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 100
+}

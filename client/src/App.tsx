@@ -31,6 +31,10 @@ export default function App() {
   useEffect(() => {
     if (!dialogScene) return;
     if (!dialogScene.nextSceneId && !dialogScene.choices?.length && !dialogScene.aiEvent) {
+      // 对话链自然结束时，应用当前场景的被动效果
+      if (dialogScene.effects) {
+        dispatch({ type: "APPLY_EFFECTS", effects: dialogScene.effects });
+      }
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
     }
@@ -66,6 +70,10 @@ export default function App() {
   }
 
   function handleNext(nextSceneId: string) {
+    // 应用当前场景的 effects（道具发现、真相探索等被动效果）
+    if (dialogScene?.effects) {
+      dispatch({ type: "APPLY_EFFECTS", effects: dialogScene.effects });
+    }
     dispatch({ type: "GO_NEXT", nextSceneId });
   }
 

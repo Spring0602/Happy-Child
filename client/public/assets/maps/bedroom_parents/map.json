@@ -16,6 +16,36 @@
     {
       "draworder": "topdown",
       "id": 2,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        { "id": 1, "name": "item_01", "type": "furniture", "x": 288, "y": 96, "width": 256, "height": 256, "properties": [
+          { "name": "interactable", "type": "bool", "value": true },
+          { "name": "interactSceneId", "type": "string", "value": "interact_bedroom_parents_bed" }
+        ]},
+        { "id": 2, "name": "item_02", "type": "furniture", "x": 576, "y": 96, "width": 256, "height": 256 },
+        { "id": 3, "name": "item_03", "type": "furniture", "x": 288, "y": 224, "width": 256, "height": 256 },
+        { "id": 4, "name": "item_04", "type": "furniture", "x": 576, "y": 224, "width": 256, "height": 256 },
+        { "id": 5, "name": "item_05", "type": "furniture", "x": 160, "y": 160, "width": 256, "height": 256 },
+        { "id": 6, "name": "item_06", "type": "furniture", "x": 752, "y": 160, "width": 256, "height": 256 },
+        { "id": 7, "name": "item_07", "type": "furniture", "x": 32, "y": 320, "width": 256, "height": 256, "properties": [
+          { "name": "interactable", "type": "bool", "value": true },
+          { "name": "interactSceneId", "type": "string", "value": "interact_bedroom_parents_wardrobe" }
+        ]},
+        { "id": 8, "name": "item_08", "type": "furniture", "x": 32, "y": 448, "width": 256, "height": 256, "properties": [
+          { "name": "interactable", "type": "bool", "value": true },
+          { "name": "interactSceneId", "type": "string", "value": "interact_bedroom_parents_drawer" }
+        ]},
+        { "id": 9, "name": "item_09", "type": "furniture", "x": 672, "y": 320, "width": 256, "height": 256 },
+        { "id": 10, "name": "item_10", "type": "furniture", "x": 800, "y": 64, "width": 256, "height": 256 },
+        { "id": 11, "name": "item_11", "type": "furniture", "x": 64, "y": 64, "width": 256, "height": 256 }
+      ]
+    },
+    {
+      "draworder": "topdown",
+      "id": 3,
       "name": "collision",
       "type": "objectgroup",
       "visible": true,
@@ -29,7 +59,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 3,
+      "id": 4,
       "name": "player_spawn",
       "type": "objectgroup",
       "visible": true,
@@ -40,7 +70,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 4,
+      "id": 5,
       "name": "triggers",
       "type": "objectgroup",
       "visible": true,
@@ -59,7 +89,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 5,
+      "id": 6,
       "name": "npcs",
       "type": "objectgroup",
       "visible": true,
@@ -68,7 +98,7 @@
     },
     {
       "draworder": "topdown",
-      "id": 6,
+      "id": 7,
       "name": "items",
       "type": "objectgroup",
       "visible": true,
@@ -76,8 +106,8 @@
       "objects": []
     }
   ],
-  "nextlayerid": 7,
-  "nextobjectid": 10,
+  "nextlayerid": 8,
+  "nextobjectid": 20,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

@@ -1,12 +1,12 @@
 {
   "compressionlevel": -1,
-  "height": 24,
+  "height": 30,
   "infinite": false,
   "layers": [
     {
       "name": "ground",
       "type": "imagelayer",
-      "image": "教室.png",
+      "image": "天台.png",
       "x": 0,
       "y": 0,
       "id": 1,
@@ -30,10 +30,12 @@
       "visible": true,
       "opacity": 1,
       "objects": [
-        { "id": 1, "name": "wall_top", "type": "collision", "x": 0, "y": 0, "width": 1280, "height": 32 },
-        { "id": 2, "name": "wall_bottom", "type": "collision", "x": 0, "y": 736, "width": 1280, "height": 32 },
-        { "id": 3, "name": "wall_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 768 },
-        { "id": 4, "name": "wall_right", "type": "collision", "x": 1248, "y": 0, "width": 32, "height": 768 }
+        { "id": 1, "name": "boundary_top", "type": "collision", "x": 0, "y": 0, "width": 1600, "height": 32 },
+        { "id": 2, "name": "boundary_bottom", "type": "collision", "x": 0, "y": 928, "width": 1600, "height": 32 },
+        { "id": 3, "name": "boundary_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 960 },
+        { "id": 4, "name": "boundary_right", "type": "collision", "x": 1568, "y": 0, "width": 32, "height": 960 },
+        { "id": 5, "name": "railing_left", "type": "collision", "x": 32, "y": 32, "width": 32, "height": 896 },
+        { "id": 6, "name": "railing_right", "type": "collision", "x": 1536, "y": 32, "width": 32, "height": 896 }
       ]
     },
     {
@@ -44,8 +46,8 @@
       "visible": true,
       "opacity": 1,
       "objects": [
-        { "id": 1, "name": "spawn_classroom_door", "type": "spawn", "x": 624, "y": 680, "width": 32, "height": 48 },
-        { "id": 2, "name": "spawn_from_corridor", "type": "spawn", "x": 100, "y": 680, "width": 32, "height": 48 }
+        { "id": 1, "name": "spawn_rooftop_door", "type": "spawn", "x": 100, "y": 850, "width": 32, "height": 48 },
+        { "id": 2, "name": "spawn_rooftop_center", "type": "spawn", "x": 800, "y": 480, "width": 32, "height": 48 }
       ]
     },
     {
@@ -58,20 +60,20 @@
       "objects": [
         {
           "id": 1, "name": "door_corridor", "type": "door",
-          "x": 60, "y": 650, "width": 80, "height": 80,
+          "x": 60, "y": 820, "width": 80, "height": 80,
           "properties": [
             { "name": "triggerType", "type": "string", "value": "walk" },
             { "name": "targetMap", "type": "string", "value": "corridor" },
-            { "name": "targetSpawn", "type": "string", "value": "spawn_corridor_classroom" }
+            { "name": "targetSpawn", "type": "string", "value": "spawn_corridor_rooftop" }
           ]
         },
         {
-          "id": 2, "name": "door_livingroom", "type": "door",
-          "x": 584, "y": 650, "width": 80, "height": 80,
+          "id": 2, "name": "trigger_rooftop_view", "type": "dialogue",
+          "x": 750, "y": 200, "width": 100, "height": 80,
           "properties": [
-            { "name": "triggerType", "type": "string", "value": "walk" },
-            { "name": "targetMap", "type": "string", "value": "livingroom" },
-            { "name": "targetSpawn", "type": "string", "value": "spawn_from_classroom" }
+            { "name": "triggerType", "type": "string", "value": "auto" },
+            { "name": "sceneId", "type": "string", "value": "ch8_rooftop_prepare" },
+            { "name": "once", "type": "bool", "value": true }
           ]
         }
       ]
@@ -83,16 +85,7 @@
       "type": "objectgroup",
       "visible": true,
       "opacity": 1,
-      "objects": [
-        {
-          "id": 1, "name": "npc_liuyu", "type": "npc",
-          "x": 800, "y": 400, "width": 32, "height": 48,
-          "properties": [
-            { "name": "npcId", "type": "string", "value": "liuyu" },
-            { "name": "sceneId", "type": "string", "value": "ch3_liuyu_approach" }
-          ]
-        }
-      ]
+      "objects": []
     },
     {
       "draworder": "topdown",
@@ -114,5 +107,5 @@
   "tilewidth": 32,
   "type": "map",
   "version": "1.10",
-  "width": 40
+  "width": 50
 }
