@@ -24,7 +24,7 @@ export const initialGameState: GameState = {
   rebellion: 0,
   joyProof: 0,
   aiTraces: [],
-  currentMapId: "bedroom",
+  currentMapId: "livingroom",
   playerPosition: { x: 0, y: 0 },
   flags: {},
   interactedItems: [],

@@ -40,6 +40,13 @@ export class PreloadScene extends Phaser.Scene {
       this.load.tilemapTiledJSON(map.mapKey, map.mapJson);
     }
 
+    // 加载占位 tileset（Phaser tilemap 要求必须有关联 tileset）
+    for (const map of Object.values(AssetManifest.maps)) {
+      if ("tilesetKey" in map && map.tilesetKey && "tilesetImage" in map && map.tilesetImage) {
+        this.load.image(map.tilesetKey, map.tilesetImage);
+      }
+    }
+
     // 加载地面底图（Image Layer）
     for (const map of Object.values(AssetManifest.maps)) {
       this.load.image(map.groundKey, map.groundImage);
@@ -47,7 +54,7 @@ export class PreloadScene extends Phaser.Scene {
 
     // 加载家具独立图片
     for (const map of Object.values(AssetManifest.maps)) {
-      if (map.furnitureImages) {
+      if ("furnitureImages" in map && map.furnitureImages) {
         for (const img of map.furnitureImages) {
           this.load.image(img.key, img.path);
         }

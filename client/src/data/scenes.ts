@@ -938,6 +938,7 @@ export const scenes: Record<string, Scene> = {
   interact_livingroom_trash: {
     id: "interact_livingroom_trash",
     chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "垃圾桶里塞满了废纸团。我翻了一下，发现一张被揉皱的纸条。\n\n上面写着：「规则第③条——家庭区域内，禁止在22:00后离开卧室。」\n\n字迹潦草，像是匆匆写下的。",
     nextSceneId: "interact_livingroom_trash_2",
@@ -945,6 +946,7 @@ export const scenes: Record<string, Scene> = {
   interact_livingroom_trash_2: {
     id: "interact_livingroom_trash_2",
     chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "（这张纸条……是父亲写的？还是妈妈？）\n\n我把纸条折好，塞进口袋。也许之后会有用。",
   },
@@ -953,6 +955,7 @@ export const scenes: Record<string, Scene> = {
   interact_livingroom_table: {
     id: "interact_livingroom_table",
     chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "茶几上摆着几本杂志和一只空茶杯。\n\n都是些过期的家居周刊。封面上的家庭看起来总是那么完美。",
   },
@@ -961,6 +964,7 @@ export const scenes: Record<string, Scene> = {
   interact_livingroom_tv: {
     id: "interact_livingroom_tv",
     chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "电视关着，屏幕上映出我模糊的影子。\n\n遥控器不知道放哪去了。算了，也没什么好看的。",
   },
@@ -969,6 +973,7 @@ export const scenes: Record<string, Scene> = {
   interact_livingroom_plant: {
     id: "interact_livingroom_plant",
     chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "一盆绿萝，叶片有些发黄。\n\n看来很久没人浇水了。它和我们家一样，都在努力活着。",
   },
@@ -979,6 +984,7 @@ export const scenes: Record<string, Scene> = {
   interact_livingroom_chair: {
     id: "interact_livingroom_chair",
     chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
     speaker: "叶平生",
     text: "我在椅子上坐了下来。\n\n（按下任意方向键起身。）",
   },

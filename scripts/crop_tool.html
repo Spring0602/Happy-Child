@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>物品分割工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#bar{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 10px;background:#16213e;border-bottom:1px solid #0f3460;font-size:13px}
+#bar button{padding:4px 12px;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#e0e0e0;cursor:pointer;font-size:12px}
+#bar button:hover{background:#0f3460}
+#bar button.pri{background:#e94560;border-color:#e94560;color:#fff}
+#bar button.pri:hover{background:#c73652}
+#bar .sep{width:1px;height:22px;background:#0f3460;margin:0 4px}
+#bar .info{color:#707080;font-size:11px;margin-left:6px}
+#work{display:flex;flex:1;overflow:hidden}
+#ca{flex:1;overflow:auto;background:#0d0d1a;position:relative}
+canvas{display:block;cursor:crosshair}
+#side{width:260px;background:#16213e;border-left:1px solid #0f3460;display:flex;flex-direction:column;overflow:hidden}
+#side h3{font-size:12px;padding:6px 10px 4px;color:#e94560;border-bottom:1px solid #0f346008}
+#list{flex:1;overflow-y:auto;padding:2px 0}
+#list::-webkit-scrollbar{width:5px}
+#list::-webkit-scrollbar-thumb{background:#0f3460;border-radius:3px}
+.it{display:flex;align-items:center;gap:6px;padding:4px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid #0f346008}
+.it:hover{background:#0f3460}
+.it.sel{background:#0f3460;border-left:3px solid #e94560}
+.it img{width:32px;height:32px;object-fit:contain;background:#0d0d1a;border-radius:3px}
+.it .n{color:#e0e0e0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .s{color:#707080;font-size:10px}
+#log{flex:0 0 auto;height:130px;overflow-y:auto;padding:4px 8px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:10px;font-family:"Consolas","Courier New",monospace}
+#log::-webkit-scrollbar{width:5px}
+#log::-webkit-scrollbar-thumb{background:#0f3460;border-radius:3px}
+.l{white-space:pre-wrap;word-break:break-all;padding:1px 0;border-bottom:1px solid #ffffff05}
+.lo{color:#4ade80}
+.le{color:#f87171}
+.li{color:#60a5fa}
+.lw{color:#fbbf24}
+#status{display:flex;gap:10px;padding:2px 10px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:10px;color:#707080;align-items:center}
+#modal{position:fixed;inset:0;background:#000000aa;display:none;align-items:center;justify-content:center;z-index:1000}
+#modal > div{background:#16213e;border:1px solid #0f3460;border-radius:8px;padding:16px;min-width:300px}
+#modal h3{margin-bottom:10px;color:#e94560;font-size:14px}
+#modal input{width:100%;padding:6px 8px;background:#0d0d1a;border:1px solid #0f3460;border-radius:4px;color:#e0e0e0;font-size:13px;margin-bottom:10px}
+#modal .btns{display:flex;gap:6px;justify-content:flex-end}
+#modal .btns button{padding:5px 14px;border-radius:4px;cursor:pointer;font-size:12px;border:1px solid #0f3460}
+.bc{background:#e94560;color:#fff;border-color:#e94560 !important}
+.bx{background:#2a2a3e;color:#e0e0e0}
+#preview-modal{position:fixed;inset:0;background:#000000cc;display:none;align-items:center;justify-content:center;z-index:1001}
+#preview-modal > div{background:#16213e;border:1px solid #0f3460;border-radius:8px;padding:16px;max-width:92vw;max-height:90vh;overflow:auto}
+#preview-modal h3{color:#e94560;margin-bottom:10px}
+#pv-area{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+#pv-area > div{text-align:center;background:#0d0d1a;padding:6px;border-radius:4px}
+#pv-area img{max-width:180px;max-height:180px;object-fit:contain}
+#pv-area .cap{font-size:11px;color:#e0e0e0;margin-top:4px}
+#pv-area .sz{font-size:10px;color:#707080}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <button onclick="openImg()" title="Ctrl+O">📂 打开图片</button>
+  <input type="file" id="fi" accept=".png,.jpg,.jpeg,.webp,.bmp" style="display:none" onchange="onImgSelected(event)">
+  <span class="sep"></span>
+  <button onclick="cropSave()" class="pri" title="Enter">✂ 裁剪保存</button>
+  <button onclick="quickSave()" title="Ctrl+S">⚡ 快速保存</button>
+  <button onclick="delRect()" title="Delete">🗑 删框</button>
+  <span class="sep"></span>
+  <button onclick="undoCrop()" title="Ctrl+Z">↩ 撤销</button>
+  <button onclick="genJSON()">📋 生成JSON</button>
+  <button onclick="previewAll()">👁 预览全部</button>
+  <span class="sep"></span>
+  <span class="info" id="zml">缩放: 100%</span>
+  <span class="info" id="cur">坐标: (-,-)</span>
+</div>
+
+<div id="work">
+  <div id="ca"><canvas id="cv"></canvas></div>
+  <div id="side">
+    <h3>📦 已保存物品 (<span id="icnt">0</span>)</h3>
+    <div id="list"></div>
+    <div id="log"></div>
+  </div>
+</div>
+
+<div id="status">
+  <span id="stmsg">就绪 — 请打开背景图片</span>
+  <span style="margin-left:auto">操作: 拖拽框选 → Enter保存 → 在Tiled中调整坐标</span>
+</div>
+
+<div id="modal">
+  <div>
+    <h3 id="modal-title">输入物品名称</h3>
+    <input type="text" id="name-inp" placeholder="留空使用自动编号" onkeydown="if(event.key==='Enter')doName()">
+    <div class="btns">
+      <button class="bx" onclick="cancelName()">取消</button>
+      <button class="bc" onclick="doName()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="preview-modal">
+  <div>
+    <h3 id="pv-title">预览</h3>
+    <div id="pv-area"></div>
+    <div class="btns" style="margin-top:10px"><button class="bx" onclick="closePreview()">关闭</button></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+const ca = $('ca');
+
+let img = null, imgW = 0, imgH = 0;
+let scale = 1, minSc = 0.05, maxSc = 8;
+let rects = [], curRect = null, drawing = false;
+let cropHist = [], saved = [], nextId = 1;
+let pendingRect = null, isQuick = false;
+
+// ── 日志 ─────────────────────────────
+function log(msg, t){
+  const d = $('log'), ln = document.createElement('div');
+  ln.className = 'l l' + (t||'i');
+  ln.textContent = msg;
+  d.appendChild(ln);
+  d.scrollTop = d.scrollHeight;
+  console.log('['+(t||'i')+'] '+msg);
+}
+
+// ── 图片加载 ─────────────────────────
+function openImg(){
+  $('fi').click();
+}
+function onImgSelected(ev){
+  const f = ev.target.files[0]; if(!f) return;
+  const u = URL.createObjectURL(f), im = new Image();
+  im.onload = ()=>{
+    img = im; imgW = im.width; imgH = im.height;
+    rects = []; curRect = null; drawing = false;
+    cropHist = []; saved = []; nextId = 1;
+    fitView();
+    updList();
+    log('✅ 已加载: '+f.name+' ('+imgW+'×'+imgH+'px)', 'o');
+    log('📁 请在浏览器下载栏选择保存位置，或勾选"自动下载"', 'i');
+    log('─'.repeat(48),'i');
+    log('操作: 拖拽框选 → 按Enter裁剪保存','i');
+    $('stmsg').textContent = '已加载 '+f.name+' ('+imgW+'×'+imgH+')';
+  };
+  im.src = u;
+}
+
+// ── 渲染 ─────────────────────────────
+function render(){
+  if(!img) return;
+  cv.width = Math.ceil(imgW * scale);
+  cv.height = Math.ceil(imgH * scale);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, 0, 0, cv.width, cv.height);
+  // 已确认框
+  rects.forEach((r,i)=>{
+    const c = i===rects.length-1 ? '#00ff88' : '#ffd93d';
+    const x1 = r.x1*scale, y1 = r.y1*scale;
+    const x2 = r.x2*scale, y2 = r.y2*scale;
+    ctx.strokeStyle = c; ctx.lineWidth = 2/scale; ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+    ctx.fillStyle = c; ctx.font = (11/scale)+'px Arial';
+    ctx.fillText('#'+(i+1), x1+3/scale, y1+14/scale);
+  });
+  // 拖拽框
+  if(drawing && curRect){
+    const x1 = curRect.sx*scale, y1 = curRect.sy*scale;
+    const x2 = curRect.ex*scale, y2 = curRect.ey*scale;
+    ctx.strokeStyle = '#ff6b6b'; ctx.lineWidth = 2/scale;
+    ctx.setLineDash([5/scale,3/scale]); ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+    ctx.setLineDash([]);
+  }
+}
+
+function fitView(){
+  if(!img) return;
+  const aw = ca.clientWidth, ah = ca.clientHeight;
+  scale = Math.min(aw/imgW, ah/imgH)*0.9;
+  scale = Math.max(minSc, Math.min(maxSc, scale));
+  render();
+  updZoom();
+  ca.scrollLeft = (cv.width - ca.clientWidth)/2;
+  ca.scrollTop = (cv.height - ca.clientHeight)/2;
+}
+function updZoom(){ $('zml').textContent = '缩放: '+Math.round(scale*100)+'%'; }
+
+// ── 坐标转换 ────────────────────────
+function toImg(cx,cy){ return [(cx)/scale, (cy)/scale]; }
+function toCv(ix,iy){ return [ix*scale, iy*scale]; }
+
+// ── 鼠标事件 ───────────────────────
+let panning = false, panSx = 0, panSy = 0, scSx = 0, scSy = 0;
+
+ca.addEventListener('mousedown', e=>{
+  if(e.button===1 || (e.button===0 && e.altKey)){
+    panning=true; panSx=e.clientX; panSy=e.clientY;
+    scSx=ca.scrollLeft; scSy=ca.scrollTop;
+    cv.style.cursor='grabbing'; e.preventDefault(); return;
+  }
+  if(e.button!==0) return;
+  const r = ca.getBoundingClientRect();
+  const [ix,iy] = toImg(e.clientX-r.left+ca.scrollLeft, e.clientY-r.top+ca.scrollTop);
+  curRect = {sx:ix, sy:iy, ex:ix, ey:iy};
+  drawing = true; cv.style.cursor='crosshair';
+});
+ca.addEventListener('mousemove', e=>{
+  const r = ca.getBoundingClientRect();
+  const [ix,iy] = toImg(e.clientX-r.left+ca.scrollLeft, e.clientY-r.top+ca.scrollTop);
+  $('cur').textContent = '坐标: ('+Math.round(ix)+','+Math.round(iy)+')';
+  if(panning){ ca.scrollLeft=scSx-(e.clientX-panSx); ca.scrollTop=scSy-(e.clientY-panSy); return; }
+  if(!drawing) return;
+  curRect.ex = ix; curRect.ey = iy;
+  render();
+});
+ca.addEventListener('mouseup', e=>{
+  if(panning){ panning=false; cv.style.cursor='crosshair'; return; }
+  if(!drawing) return;
+  drawing=false;
+  if(!curRect) return;
+  let {sx,sy,ex,ey}=curRect;
+  sx=Math.min(sx,ex); ex=Math.max(sx,ex);
+  sy=Math.min(sy,ey); ey=Math.max(sy,ey);
+  if(ex-sx<5 || ey-sy<5){ log('⚠ 框选区域太小，已忽略','w'); curRect=null; render(); return; }
+  rects.push({x1:sx,y1:sy,x2:ex,y2:ey});
+  log('➕ 已添加框选 #'+rects.length+': ('+Math.round(sx)+','+Math.round(sy)+')→('+Math.round(ex)+','+Math.round(ey)+') '+Math.round(ex-sx)+'×'+Math.round(ey-sy)+'px','i');
+  curRect=null; render();
+});
+ca.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const f = e.deltaY<0 ? 1.12 : 0.89;
+  const r = ca.getBoundingClientRect();
+  const mx = e.clientX-r.left+ca.scrollLeft;
+  const my = e.clientY-r.top+ca.scrollTop;
+  const os = scale;
+  scale = Math.max(minSc, Math.min(maxSc, scale*f));
+  ca.scrollLeft = mx*(scale/os) - (e.clientX-r.left);
+  ca.scrollTop = my*(scale/os) - (e.clientY-r.top);
+  render(); updZoom();
+},{passive:false});
+
+// ── 裁剪保存 ───────────────────────
+function getNxt(){
+  const ex = saved.map(f=>{ const m=f.name.match(/_(\d+)\.png$/); return m?parseInt(m[1]):0; });
+  return ex.length?Math.max(...ex)+1:1;
+}
+function cropSave(){ if(!img){log('⚠ 请先打开背景图片','e');return;} if(!rects.length){log('⚠ 没有可保存的框选区域','w');return;} pendingRect=rects[rects.length-1]; isQuick=false; showModal(); }
+function quickSave(){ if(!img){log('⚠ 请先打开背景图片','e');return;} if(!rects.length){log('⚠ 没有可保存的框选区域','w');return;} pendingRect=rects[rects.length-1]; isQuick=true; doSave(null); }
+function showModal(){
+  $('modal').style.display='flex'; const inp=$('name-inp');
+  inp.value='item_'+String(getNxt()).padStart(2,'0');
+  inp.select(); inp.focus();
+}
+function doName(){ const v=$('name-inp').value.trim(); closeModal(); doSave(v===''?null:v); }
+function cancelName(){ closeModal(); log('❌ 用户取消保存','w'); }
+function closeModal(){ $('modal').style.display='none'; }
+
+async function doSave(uname){
+  if(!pendingRect) return;
+  let {x1,y1,x2,y2} = pendingRect;
+  x1=Math.min(x1,x2); x2=Math.max(x1,x2);
+  y1=Math.min(y1,y2); y2=Math.max(y1,y2);
+  const pad=4;
+  x1=Math.max(0,x1-pad); y1=Math.max(0,y1-pad);
+  x2=Math.min(imgW,x2+pad); y2=Math.min(imgH,y2+pad);
+  // 裁剪
+  const tc=document.createElement('canvas'); tc.width=x2-x1; tc.height=y2-y1;
+  tc.getContext('2d').drawImage(img, x1,y1,x2-x1,y2-y1, 0,0,x2-x1,y2-y1);
+  // 缩放到256x256
+  const fc=document.createElement('canvas'); fc.width=256; fc.height=256;
+  const fctx=fc.getContext('2d'); fctx.clearRect(0,0,256,256);
+  const r=Math.min(256/(x2-x1), 256/(y2-y1));
+  const nw=Math.round((x2-x1)*r), nh=Math.round((y2-y1)*r);
+  const ox=Math.round((256-nw)/2), oy=Math.round((256-nh)/2);
+  fctx.drawImage(tc, ox, oy, nw, nh);
+  // 下载
+  const blob = await new Promise(res=>fc.toBlob(res,'image/png'));
+  if(!blob){log('❌ 保存失败: 无法生成PNG','e');return;}
+  let fname = uname===null ? 'item_'+String(getNxt()).padStart(2,'0') : (uname.startsWith('item_')?uname:('item_'+uname));
+  fname = fname.replace(/\.png$/i,'')+'.png';
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=fname; a.click(); URL.revokeObjectURL(url);
+  const rec={name:fname, size:blob.size, url:url};
+  saved.push(rec); cropHist.push({file:rec,rect:{x1,y1,x2,y2}});
+  rects.pop(); pendingRect=null; render(); updList();
+  log('✅ 已保存并下载: '+fname+' ('+Math.round(x2-x1)+'×'+Math.round(y2-y1)+'px → 256×256px)','o');
+  log('   Tiled object 建议 name: "'+fname.replace('.png','')+'"','i');
+  $('stmsg').textContent = '已保存 '+fname+'，已触发下载';
+}
+
+// ── 撤销 / 删框 ──────────────────
+function delRect(){ if(rects.length){ rects.pop(); render(); log('🗑 已删除最后一个框选区域','w'); } else { log('⚠ 没有可删除的框选区域','w'); } }
+function undoCrop(){
+  if(!cropHist.length){log('⚠ 没有可撤销的操作','w');return;}
+  const ls=cropHist.pop();
+  saved = saved.filter(f=>f.name!==ls.file.name);
+  rects.push(ls.rect); render(); updList();
+  log('↩ 已撤销裁剪，框选区域已恢复（已下载的文件需手动删除）','i');
+}
+
+// ── 物品列表 ───────────────────────
+function updList(){
+  const ls=$('list'); ls.innerHTML=''; $('icnt').textContent=saved.length;
+  [...saved].reverse().forEach((f,i)=>{
+    const d=document.createElement('div'); d.className='it';
+    d.innerHTML='<img src="'+f.url+'"><div><div class="n">'+f.name+'</div><div class="s">'+(Math.round(f.size/1024))+'KB · 256×256px</div></div>';
+    d.onclick=()=>{ document.querySelectorAll('.it').forEach(x=>x.classList.remove('sel')); d.classList.add('sel'); };
+    ls.appendChild(d);
+  });
+}
+
+// ── 生成 Tiled JSON ─────────────────
+function genJSON(){
+  if(!saved.length){log('⚠ 还没有保存任何物品sprite','w');return;}
+  const objs=saved.map(f=>{
+    const nm=f.name.replace(/\.png$/i,'');
+    return {name:nm, type:"furniture", x:0, y:0, width:256, height:256, visible:true,
+      properties:[{name:"itemId",type:"string",value:nm},{name:"interactable",type:"bool",value:true}]};
+  });
+  const js=JSON.stringify(objs,null,2);
+  navigator.clipboard.writeText(js).then(()=>{
+    log('📋 已生成 '+objs.length+' 个物品对象定义，已复制到剪贴板','o');
+    log('   JSON 内容：','i');
+    objs.forEach(o=>log('   {name:"'+o.name+'", x:0, y:0, 256×256}','i'));
+    log('─'.repeat(48),'i');
+    log('📝 下一步：在Tiled编辑器中打开地图，将以上对象粘贴到furniture_objects层','i');
+    alert('已生成 '+objs.length+' 个物品对象定义，JSON已复制到剪贴板。\n\n注意：x/y坐标为占位值(0,0)，请在Tiled编辑器中手动拖拽调整每个物品的位置。');
+  }).catch(()=>{
+    const bl=new Blob([js],{type:'text/plain'}), u=URL.createObjectURL(bl);
+    const a=document.createElement('a'); a.href=u; a.download='furniture_objects.json'; a.click();
+    URL.revokeObjectURL(u);
+    log('📋 已生成 '+objs.length+' 个物品对象，已下载JSON文件','o');
+  });
+}
+
+// ── 预览全部 ───────────────────────
+function previewAll(){
+  if(!saved.length){log('⚠ 还没有保存任何物品sprite','w');return;}
+  const pm=$('preview-modal'); pm.style.display='flex';
+  $('pv-title').textContent='预览全部物品 ('+saved.length+'个)';
+  const pa=$('pv-area'); pa.innerHTML='';
+  saved.forEach(f=>{
+    const d=document.createElement('div');
+    d.innerHTML='<img src="'+f.url+'"><div class="cap">'+f.name+'</div><div class="sz">256×256px</div>';
+    pa.appendChild(d);
+  });
+}
+function closePreview(){ $('preview-modal').style.display='none'; }
+
+// ── 键盘快捷键 ─────────────────────
+document.addEventListener('keydown', e=>{
+  if($('modal').style.display==='flex'){ if(e.key==='Escape')cancelName(); if(e.key==='Enter')doName(); return; }
+  if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();cropSave();}
+  if(e.key===' '&&!e.ctrlKey&&!e.metaKey){e.preventDefault();cropSave();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();quickSave();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoCrop();}
+  if(e.key==='Delete'||e.key==='Backspace'){if(!e.ctrlKey&&!e.metaKey&&document.activeElement.tagName!=='INPUT'){delRect();}}
+  if(e.key==='Escape'){ if(drawing){drawing=false;curRect=null;render();log('❌ 已取消当前框选','w');} }
+  if((e.ctrlKey||e.metaKey)&&e.key==='o'){e.preventDefault();openImg();}
+});
+
+// ── 拖拽打开 ───────────────────────
+document.body.addEventListener('dragover',e=>{e.preventDefault();});
+document.body.addEventListener('drop',e=>{
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/')){ $('fi').files=e.dataTransfer.files; onImgSelected({target:$('fi')}); }
+});
+
+// ── 窗口resize ──────────────────────
+window.addEventListener('resize',()=>{});
+
+log('🎮 物品分割工具已就绪','o');
+log('操作说明:','i');
+log('  1. 点击「📂 打开图片」或拖拽图片到窗口','i');
+log('  2. 在图片上拖拽框选物品区域','i');
+log('  3. 按Enter或点击「✂ 裁剪保存」输入名称保存','i');
+log('  4. 按Ctrl+S快速保存（自动编号）','i');
+log('  5. 保存的PNG会自动触发浏览器下载','i');
+log('  6. 点击「📋 生成JSON」获取Tiled对象定义','i');
+</script>
+</body>
+</html>
