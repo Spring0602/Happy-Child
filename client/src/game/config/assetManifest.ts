@@ -49,12 +49,15 @@ export const AssetManifest = {
       groundImage: "/assets/maps/kitchen/厨房.png",
     },
   },
-  sprites: {
+  /** 玩家帧动画素材（yps = 叶平生，主角） */
+  frames: {
     yps: {
-      key: "sprite_yps",
-      image: "/assets/sprites/yps.png",
-      frameWidth: 32,   // 256/8 = 32（每行8帧: 6跑步+1站立+1坐下）
-      frameHeight: 85,  // 256/3 ≈ 85（3行: 左/上/下朝向）
+      basePath: "assets/sprites/frames/yps_frames",
+      // 跑步方向（每个方向6帧）
+      run: ["left", "right", "front", "back"],
+      // 单帧方向（坐下/站立各方向）
+      sit: ["sit_left", "sit_right", "sit_front", "sit_back"],
+      stand: ["stand_left", "stand_right", "stand_front", "stand_back"],
     },
   },
 } as const;

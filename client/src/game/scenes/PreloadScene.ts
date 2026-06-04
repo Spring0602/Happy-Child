@@ -54,12 +54,36 @@ export class PreloadScene extends Phaser.Scene {
       }
     }
 
-    // 加载角色精灵图（spritesheet）
-    for (const sprite of Object.values(AssetManifest.sprites)) {
-      this.load.spritesheet(sprite.key, sprite.image, {
-        frameWidth: sprite.frameWidth,
-        frameHeight: sprite.frameHeight,
-      });
+    // 加载角色精灵图帧（从GIF提取的PNG序列帧）
+    // 目录结构：/assets/sprites/frames/{角色}_frames/{角色}_frames_{动作方向}/frame_XX.png
+    // 帧键名：{角色}_frames_{动作方向}_{帧号}  (如 yps_frames_left_0)
+    const charDirs = ["ly_frames", "yps_frames"];
+    // 跑步方向（每个方向6帧，帧号00-05）
+    const runDirs = ["left", "right", "front", "back"];
+    // 坐下/站立方向（每个方向1帧，帧号00）
+    const staticDirs = [
+      "sit_left", "sit_right", "sit_front", "sit_back",
+      "stand_left", "stand_right", "stand_front", "stand_back",
+    ];
+
+    for (const charDir of charDirs) {
+      const baseDir = `assets/sprites/frames/${charDir}`;
+      // 跑步帧
+      for (const dir of runDirs) {
+        const subDir = `${charDir}_${dir}`;
+        for (let i = 0; i < 6; i++) {
+          const frameKey = `${charDir}_${dir}_${i}`;
+          const filePath = `${baseDir}/${subDir}/frame_${i.toString().padStart(2, "0")}.png`;
+          this.load.image(frameKey, filePath);
+        }
+      }
+      // 坐下/站立帧
+      for (const dir of staticDirs) {
+        const subDir = `${charDir}_${dir}`;
+        const frameKey = `${charDir}_${dir}_0`;
+        const filePath = `${baseDir}/${subDir}/frame_00.png`;
+        this.load.image(frameKey, filePath);
+      }
     }
   }
 

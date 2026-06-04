@@ -75,10 +75,14 @@ export class MapScene extends Phaser.Scene {
     const collisionLayer = this.map.getObjectLayer("collision");
     if (collisionLayer) {
       for (const obj of collisionLayer.objects) {
-        const body = this.physics.add.staticBody(
-          obj.x!, obj.y!, obj.width ?? 32, obj.height ?? 32
+        const zone = this.add.zone(
+          obj.x! + (obj.width ?? 32) / 2,
+          obj.y! + (obj.height ?? 32) / 2,
+          obj.width ?? 32,
+          obj.height ?? 32
         );
-        this.collisionGroup.add(body);
+        this.physics.add.existing(zone, true);
+        this.collisionGroup.add(zone);
       }
     }
 
@@ -97,10 +101,9 @@ export class MapScene extends Phaser.Scene {
           sprite.setDepth((obj.y ?? 0) / entry.height);
           // 条件创建碰撞（可穿越的家具跳过）
           if (props.walkable !== "true") {
-            const body = this.physics.add.staticBody(
-              obj.x!, obj.y!, obj.width ?? 128, obj.height ?? 128
-            );
-            this.collisionGroup.add(body);
+            const zone = this.add.zone(sx, sy, obj.width ?? 128, obj.height ?? 128);
+            this.physics.add.existing(zone, true);
+            this.collisionGroup.add(zone);
           }
           // 条件注册交互（E键）
           if (props.interactable === "true") {
@@ -158,11 +161,15 @@ export class MapScene extends Phaser.Scene {
           0.6
         );
         rect.setDepth((obj.y ?? 0) / (this.map.heightInPixels || entry.height));
-        // NPC 碰撞体
-        const body = this.physics.add.staticBody(
-          obj.x!, obj.y!, obj.width ?? 32, obj.height ?? 32
+        // NPC 碰撞体（用 zone + physics 替代 staticBody 直接添加）
+        const npcZone = this.add.zone(
+          obj.x! + (obj.width ?? 32) / 2,
+          obj.y! + (obj.height ?? 32) / 2,
+          obj.width ?? 32,
+          obj.height ?? 32
         );
-        this.collisionGroup.add(body);
+        this.physics.add.existing(npcZone, true);
+        this.collisionGroup.add(npcZone);
         // 注册为可交互对象
         this.interactionSys?.registerInteractable({
           x: obj.x! + (obj.width ?? 32) / 2,
@@ -204,12 +211,14 @@ export class MapScene extends Phaser.Scene {
       }
     }
 
-    this.player = this.add.sprite(sx, sy, "sprite_yps");
+    // 用第一帧纹理（朝下站立）创建玩家 sprite
+    // 后续动画 play() 会自动切换纹理帧
+    this.player = this.add.sprite(sx, sy, "yps_frames_stand_front_0");
     this.physics.add.existing(this.player);
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setCollideWorldBounds(true);
-    body.setSize(22, 40);
-    body.setOffset(7, 24);
+    body.setSize(20, 38);
+    body.setOffset(6, 26);
 
     // 初始待机动画（默认朝下）
     this.player.play("yps_idle_down");
