@@ -40,7 +40,7 @@ export class TriggerSystem {
   update() {
     for (const trigger of this.triggers) {
       // 一次性触发：已触发则跳过
-      if (trigger.once && trigger.triggered) continue;
+      if (trigger.config.once && trigger.triggered) continue;
 
       // 检查前置条件 flag
       if (trigger.config.requireFlag) {

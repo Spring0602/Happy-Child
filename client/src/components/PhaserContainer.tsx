@@ -20,14 +20,27 @@ export function PhaserContainer({ dispatch, currentMapId, onDialogueTrigger }: P
     const config = PhaserGameConfig(containerRef.current);
     gameRef.current = new Phaser.Game(config);
 
-    // 监听 Phaser 触发对话 → 打开 DialogOverlay
+    // 监听 Phaser → React: 触发对话（npc 或 item 交互）
     gameBridge.onPhaserEvent("TRIGGER_DIALOGUE", (event) => {
+      if (event.type !== "TRIGGER_DIALOGUE") return;
+      console.log(`[PhaserContainer] 📥 收到 TRIGGER_DIALOGUE: sceneId=${event.sceneId}`);
       gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
       onDialogueTrigger(event.sceneId);
     });
 
+    // 监听 Phaser → React: item 交互（独立事件，按开发文档 §7.2）
+    gameBridge.onPhaserEvent("TRIGGER_ITEM", (event) => {
+      if (event.type !== "TRIGGER_ITEM") return;
+      console.log(`[PhaserContainer] 📥 收到 TRIGGER_ITEM: itemId=${event.itemId}`);
+      // item 交互也走对话叠层，用 itemId 作为 sceneId
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      onDialogueTrigger(event.itemId);
+    });
+
     // 监听门触发 → 切换地图
     gameBridge.onPhaserEvent("TRIGGER_DOOR", (event) => {
+      if (event.type !== "TRIGGER_DOOR") return;
+      console.log(`[PhaserContainer] 📥 收到 TRIGGER_DOOR: targetMap=${event.targetMap}`);
       dispatch({
         type: "CHANGE_MAP",
         mapId: event.targetMap,
@@ -41,7 +54,10 @@ export function PhaserContainer({ dispatch, currentMapId, onDialogueTrigger }: P
       });
     });
 
+    console.log("[PhaserContainer] ✅ Phaser 初始化完成，GameBridge 监听器已注册");
+
     return () => {
+      console.log("[PhaserContainer] 🧹 清理 Phaser ...");
       gameRef.current?.destroy(true);
       gameRef.current = null;
       gameBridge.removeAllListeners();

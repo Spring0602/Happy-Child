@@ -46,27 +46,38 @@ export class MapScene extends Phaser.Scene {
 
     // === 2. 解析 tilemap JSON（仅用于读取对象层） ===
     this.map = this.make.tilemap({ key: entry.mapKey });
+    // 添加占位 tileset（Phaser 要求 tilemap 必须有关联 tileset，即使不渲染 tile 图层）
+    if (entry.tilesetKey && entry.tilesetNameInTiled) {
+      this.map.addTilesetImage(
+        entry.tilesetNameInTiled,
+        entry.tilesetKey,
+        entry.tileWidth,
+        entry.tileHeight,
+        0,
+        0
+      );
+    }
 
-    // === 3. 处理对象层 ===
-    this.collisionGroup = this.physics.add.staticGroup();
-    this.processObjectLayers(entry, spawnId || entry.defaultSpawn);
-
-    // === 4. 创建玩家 ===
+    // === 3. 创建玩家（需要先于子系统创建） ===
     this.createPlayer(entry, spawnId || entry.defaultSpawn);
 
-    // === 5. 设置世界边界 & 相机 ===
+    // === 4. 设置世界边界 & 相机 ===
     this.physics.world.setBounds(0, 0, entry.width, entry.height);
     this.cameras.main.setBounds(0, 0, entry.width, entry.height);
     const lerp = entry.width > 2000 ? 0.05 : 0.08;
     this.cameras.main.startFollow(this.player, true, lerp, lerp);
 
-    // === 6. 初始化子系统 ===
+    // === 5. 初始化子系统（必须在 processObjectLayers 之前） ===
     this.playerCtrl = new PlayerController(this, this.player);
     this.interactionSys = new InteractionSystem(this, this.player);
     this.interactionSys.setOnSit((chairY, sitInFront) => {
-      this.playerCtrl?.sit(chairY, sitInFront);
+      this.playerCtrl?.sit(chairY, sitInFront, entry.height);
     });
     this.triggerSys = new TriggerSystem(this, this.player);
+
+    // === 6. 处理对象层（注册碰撞、交互、触发器 — 依赖上面的子系统） ===
+    this.collisionGroup = this.physics.add.staticGroup();
+    this.processObjectLayers(entry, spawnId || entry.defaultSpawn);
   }
 
   /** 处理 Tiled 对象层 */
@@ -87,26 +98,47 @@ export class MapScene extends Phaser.Scene {
     }
 
     // --- furniture_objects ---
+    // 渲染独立家具精灵图，用于实现 Y 轴深度排序（玩家 ← 家具前后遮挡）
+    // 家具 PNG 是透明裁切图，覆盖在底图同类家具上，视觉上无缝衔接
     const furnitureLayer = this.map.getObjectLayer("furniture_objects");
+    console.log(`[MapScene] 📦 furniture_objects layer: ${furnitureLayer ? `found (${furnitureLayer.objects.length} objects)` : "NOT FOUND!"}`);
+    console.log(`[MapScene] 🖼️  furnitureImages: ${entry.furnitureImages ? `${entry.furnitureImages.length} entries` : "undefined"}`);
+    let registeredCount = 0;
+    let renderedCount = 0;
     if (furnitureLayer && entry.furnitureImages) {
       for (const obj of furnitureLayer.objects) {
         const name = obj.name;
         const match = entry.furnitureImages.find((f) => f.key === name);
         if (match) {
           const props = this.getProps(obj.properties);
-          const sx = obj.x! + (obj.width ?? 128) / 2;
-          const sy = obj.y! + (obj.height ?? 128) / 2;
-          const sprite = this.add.image(sx, sy, match.key);
-          // Y 排序：y 坐标越大越靠前
-          sprite.setDepth((obj.y ?? 0) / entry.height);
-          // 条件创建碰撞（可穿越的家具跳过）
+          const objW = obj.width ?? 256;
+          const objH = obj.height ?? 256;
+          const sx = obj.x! + objW / 2;
+          const sy = obj.y! + objH / 2;
+          // 家具深度 = 底部 Y 坐标归一化（让家具与玩家按 Y 轴正确排序）
+          const furnDepth = (obj.y! + objH) / entry.height;
+
+          // 渲染家具精灵图（覆盖底图家具，实现 Y 轴深度前后遮挡）
+          // 精灵图均为 256×256 透明裁切，渲染时保持原始比例不拉伸
+          const furnImg = this.add.image(sx, sy, match.key);
+          furnImg.setDepth(furnDepth);
+          renderedCount++;
+
+          // 条件创建碰撞（可穿越的家具跳过，如 walkable=true 的椅子）
           if (props.walkable !== "true") {
-            const zone = this.add.zone(sx, sy, obj.width ?? 128, obj.height ?? 128);
+            const zone = this.add.zone(sx, sy, objW, objH);
             this.physics.add.existing(zone, true);
             this.collisionGroup.add(zone);
           }
-          // 条件注册交互（E键）
+
+          // 可交互物品：渲染半透明高亮边框，让玩家能识别
           if (props.interactable === "true") {
+            registeredCount++;
+            console.log(`[MapScene]   ✅ 可交互: ${name} → sceneId=${props.interactSceneId}, sitAction=${props.sitAction}, pos=(${Math.round(sx)},${Math.round(sy)}), size=(${objW},${objH})`);
+            const highlight = this.add.rectangle(sx, sy, objW + 8, objH + 8, 0xffcc00, 0);
+            highlight.setStrokeStyle(2, 0xffcc00, 0.35);
+            highlight.setDepth(furnDepth + 0.001);
+            // 注册交互
             this.interactionSys?.registerInteractable({
               x: sx,
               y: sy,
@@ -114,12 +146,15 @@ export class MapScene extends Phaser.Scene {
               id: props.interactSceneId || name,
               sceneId: props.interactSceneId || name,
               sitAction: props.sitAction === "true",
-              sitInFront: props.sitInFront !== "false", // 默认坐椅子前面
-              chairY: obj.y! + (obj.height ?? 256),
+              sitInFront: props.sitInFront !== "false",
+              chairY: obj.y! + objH,
             });
+          } else {
+            console.log(`[MapScene]   📍 装饰品: ${name} at (${Math.round(sx)},${Math.round(sy)}), walkable=${props.walkable}`);
           }
         }
       }
+      console.log(`[MapScene] 📊 furniture 总数: 渲染=${renderedCount}, 可交互注册=${registeredCount}`);
     }
 
     // --- triggers ---
@@ -127,6 +162,7 @@ export class MapScene extends Phaser.Scene {
     if (triggerLayer) {
       for (const obj of triggerLayer.objects) {
         const props = this.getProps(obj.properties);
+        const triggerType = props.triggerType || props.type || "door";
         const zone = this.add.zone(
           obj.x! + (obj.width ?? 64) / 2,
           obj.y! + (obj.height ?? 64) / 2,
@@ -134,16 +170,31 @@ export class MapScene extends Phaser.Scene {
           obj.height ?? 64
         );
         this.physics.add.existing(zone, true);
-        this.triggerSys?.registerTrigger(zone as unknown as Phaser.GameObjects.Zone, {
-          type: props.triggerType || props.type || "door",
-          sceneId: props.sceneId,
-          targetMap: props.targetMap,
-          spawnId: props.targetSpawn || props.spawnId,
-          itemId: props.itemId,
-          requireFlag: props.requireFlag,
-          setFlag: props.setFlag,
-          once: props.once === "true",
-        });
+
+        // walk/auto 类型 → 注册到 TriggerSystem（自动触发）
+        if (triggerType === "walk" || triggerType === "auto") {
+          this.triggerSys?.registerTrigger(zone as unknown as Phaser.GameObjects.Zone, {
+            type: triggerType,
+            sceneId: props.sceneId,
+            targetMap: props.targetMap,
+            spawnId: props.targetSpawn || props.spawnId,
+            itemId: props.itemId,
+            requireFlag: props.requireFlag,
+            setFlag: props.setFlag,
+            once: props.once === "true",
+          });
+        }
+
+        // interact 类型 → 注册到 InteractionSystem（E 键交互）
+        if (triggerType === "interact") {
+          this.interactionSys?.registerInteractable({
+            x: zone.x,
+            y: zone.y,
+            type: "item",
+            id: props.itemId || obj.name,
+            sceneId: props.sceneId,
+          });
+        }
       }
     }
 
@@ -152,28 +203,24 @@ export class MapScene extends Phaser.Scene {
     if (npcLayer) {
       for (const obj of npcLayer.objects) {
         const props = this.getProps(obj.properties);
+        const cx = obj.x! + (obj.width ?? 32) / 2;
+        const cy = obj.y! + (obj.height ?? 32) / 2;
+        // NPC 暂时用矩形占位（后续替换为角色精灵图）
         const rect = this.add.rectangle(
-          obj.x! + (obj.width ?? 32) / 2,
-          obj.y! + (obj.height ?? 32) / 2,
-          obj.width ?? 32,
-          obj.height ?? 32,
+          cx, cy,
+          (obj.width ?? 32) * 2, (obj.height ?? 48) * 2,
           0x4488ff,
           0.6
         );
-        rect.setDepth((obj.y ?? 0) / (this.map.heightInPixels || entry.height));
-        // NPC 碰撞体（用 zone + physics 替代 staticBody 直接添加）
-        const npcZone = this.add.zone(
-          obj.x! + (obj.width ?? 32) / 2,
-          obj.y! + (obj.height ?? 32) / 2,
-          obj.width ?? 32,
-          obj.height ?? 32
-        );
+        rect.setDepth(cy / (this.map.heightInPixels || entry.height));
+        // NPC 碰撞体
+        const npcZone = this.add.zone(cx, cy, obj.width ?? 32, obj.height ?? 48);
         this.physics.add.existing(npcZone, true);
         this.collisionGroup.add(npcZone);
         // 注册为可交互对象
         this.interactionSys?.registerInteractable({
-          x: obj.x! + (obj.width ?? 32) / 2,
-          y: obj.y! + (obj.height ?? 32) / 2,
+          x: cx,
+          y: cy,
           type: "npc",
           id: props.npcId || obj.name,
           sceneId: props.sceneId,
@@ -212,11 +259,13 @@ export class MapScene extends Phaser.Scene {
     }
 
     // 用第一帧纹理（朝下站立）创建玩家 sprite
-    // 后续动画 play() 会自动切换纹理帧
+    // 精灵原生尺寸 32×64，3x 缩放后在 1692×929 地图上可见约 96×192 像素
     this.player = this.add.sprite(sx, sy, "yps_frames_stand_front_0");
+    this.player.setScale(3);
     this.physics.add.existing(this.player);
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setCollideWorldBounds(true);
+    // 碰撞体（本地坐标 32×64，会随 scale=3 自动缩放为 60×114）
     body.setSize(20, 38);
     body.setOffset(6, 26);
 

@@ -43,6 +43,9 @@ export interface EndingCard {
   id: string;
   title: string;
   description: string;
+  layer?: string;
+  hint?: string;
+  monologue?: string;
 }
 
 export interface AITrace {
