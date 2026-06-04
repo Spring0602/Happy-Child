@@ -5,6 +5,8 @@ export const AssetManifest = {
       mapJson: "/assets/maps/livingroom/map.json",
       groundKey: "ground_livingroom",
       groundImage: "/assets/maps/livingroom/客厅.png",
+      tilesetKey: "tileset_livingroom",
+      tilesetImage: "/assets/maps/livingroom/tileset.png",
       furnitureImages: [
         { key: "item_01", path: "/assets/maps/livingroom/客厅物品_sprites/item_01.png" },
         { key: "item_02", path: "/assets/maps/livingroom/客厅物品_sprites/item_02.png" },
@@ -29,24 +31,32 @@ export const AssetManifest = {
       mapJson: "/assets/maps/bathroom/map.json",
       groundKey: "ground_bathroom",
       groundImage: "/assets/maps/bathroom/卫生间.png",
+      tilesetKey: "tileset_bathroom",
+      tilesetImage: "/assets/maps/bathroom/tileset.png",
     },
     bedroom: {
       mapKey: "map_bedroom",
       mapJson: "/assets/maps/bedroom/map.json",
       groundKey: "ground_bedroom",
       groundImage: "/assets/maps/bedroom/主角房间.png",
+      tilesetKey: "tileset_bedroom",
+      tilesetImage: "/assets/maps/bedroom/tileset.png",
     },
     bedroom_parents: {
       mapKey: "map_bedroom_parents",
       mapJson: "/assets/maps/bedroom_parents/map.json",
       groundKey: "ground_bedroom_parents",
       groundImage: "/assets/maps/bedroom_parents/父母房间.png",
+      tilesetKey: "tileset_bedroom_parents",
+      tilesetImage: "/assets/maps/bedroom_parents/tileset.png",
     },
     kitchen: {
       mapKey: "map_kitchen",
       mapJson: "/assets/maps/kitchen/map.json",
       groundKey: "ground_kitchen",
       groundImage: "/assets/maps/kitchen/厨房.png",
+      tilesetKey: "tileset_kitchen",
+      tilesetImage: "/assets/maps/kitchen/tileset.png",
     },
   },
   /** 玩家帧动画素材（yps = 叶平生，主角） */
@@ -56,6 +66,12 @@ export const AssetManifest = {
       // 跑步方向（每个方向6帧）
       run: ["left", "right", "front", "back"],
       // 单帧方向（坐下/站立各方向）
+      sit: ["sit_left", "sit_right", "sit_front", "sit_back"],
+      stand: ["stand_left", "stand_right", "stand_front", "stand_back"],
+    },
+    ly: {
+      basePath: "assets/sprites/frames/ly_frames",
+      run: ["left", "right", "front", "back"],
       sit: ["sit_left", "sit_right", "sit_front", "sit_back"],
       stand: ["stand_left", "stand_right", "stand_front", "stand_back"],
     },

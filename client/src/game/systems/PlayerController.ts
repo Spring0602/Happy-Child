@@ -6,7 +6,7 @@ export class PlayerController {
   private wasd: Record<string, Phaser.Input.Keyboard.Key>;
   private player: Phaser.GameObjects.Sprite;
   private body: Phaser.Physics.Arcade.Body;
-  private speed = 120;
+  private speed = 180;
   private frozen = false;
   private isSitting = false;
   private lastDirection: Direction = "down";
@@ -150,13 +150,14 @@ export class PlayerController {
    * 让角色坐下（与椅子交互时调用）
    * @param chairY 椅子底部的 Y 坐标，用于判断角色应该在椅子前面还是后面
    * @param sitInFront true=角色坐在椅子前面，false=角色坐在椅子后面
+   * @param mapHeight 当前地图高度（像素），用于深度归一化
    */
-  sit(chairY: number, sitInFront: boolean) {
+  sit(chairY: number, sitInFront: boolean, mapHeight: number) {
     this.isSitting = true;
     this.body.setVelocity(0, 0);
     this.playSitAnimation(this.lastDirection);
     // 深度排序：坐在椅子前面时深度高于椅子，后面时低于椅子
-    this.player.setDepth(sitInFront ? (chairY + 1) / 768 : (chairY - 1) / 768);
+    this.player.setDepth(sitInFront ? (chairY + 1) / mapHeight : (chairY - 1) / mapHeight);
   }
 
   /** 站起来（按任意方向键时调用） */

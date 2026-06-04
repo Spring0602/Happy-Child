@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>美术教室物体分割预览</title>
+<style>
+  body { margin:0; padding:20px; background:#222; color:#eee; font-family: 'Microsoft YaHei', sans-serif; }
+  .container { max-width:1400px; margin:0 auto; }
+  h1 { color:#ffcc00; }
+  .info { margin:10px 0; color:#aaa; }
+  .main-area { position:relative; display:inline-block; border:2px solid #555; margin-bottom:30px; }
+  .main-area img { display:block; }
+  canvas { position:absolute; top:0; left:0; pointer-events:none; }
+  .controls { margin:15px 0; }
+  button { padding:8px 16px; margin:4px; cursor:pointer; border:none; border-radius:4px; font-size:14px; }
+  .btn-export { background:#28a745; color:white; }
+  .btn-show { background:#007bff; color:white; }
+  .btn-hide { background:#6c757d; color:white; }
+  .preview-list { display:grid; grid-template-columns:repeat(auto-fill, 200px); gap:10px; margin-top:20px; }
+  .preview-item { background:#333; border:1px solid #555; border-radius:4px; padding:8px; text-align:center; }
+  .preview-item img { width:180px; height:180px; object-fit:contain; background:#444; border-radius:3px; image-rendering:pixelated; }
+  .preview-item .label { font-size:12px; margin-top:5px; color:#ccc; }
+  .preview-item .desc { font-size:11px; color:#888; }
+  .color-box { display:inline-block; width:12px; height:12px; border-radius:2px; margin-right:4px; vertical-align:middle; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎨 美术教室 - 物体分割预览</h1>
+  <div class="info">
+    图片尺寸: 1376×768 | 目标精灵尺寸: 256×256 (RGBA) | 命名规范: item_01 ~ item_24
+  </div>
+  <div class="controls">
+    <button class="btn-show" onclick="toggleBoxes()">显示/隐藏分割框</button>
+    <button class="btn-export" onclick="exportConfig()">导出分割配置</button>
+    <span style="color:#aaa; margin-left:10px;">提示: 先确认各物体的裁剪框是否正确</span>
+  </div>
+  <div class="main-area" id="mainArea">
+    <img id="mainImg" src="../../client/public/assets/maps/wang_gallery/美术教室.png" alt="美术教室">
+    <canvas id="overlay"></canvas>
+  </div>
+  <h2 id="previewTitle">📦 物体预览 (共24个)</h2>
+  <div class="preview-list" id="previewList"></div>
+</div>
+
+<script>
+// 物体定义
+const objects = [
+  {name:"item_01", x1:23,y1:103,x2:227,y2:711, desc:"左侧墙体/层架区域"},
+  {name:"item_02", x1:96,y1:129,x2:200,y2:385, desc:"层架堆积画材"},
+  {name:"item_03", x1:69,y1:390,x2:201,y2:717, desc:"办公桌(含桌面物品)"},
+  {name:"item_04", x1:96,y1:518,x2:168,y2:712, desc:"桌下垃圾桶/收纳箱"},
+  {name:"item_05", x1:172,y1:478,x2:247,y2:717, desc:"办公椅/凳子"},
+  {name:"item_06", x1:69,y1:94,x2:205,y2:164, desc:"墙上时钟"},
+  {name:"item_07", x1:232,y1:200,x2:384,y2:717, desc:"通道散落画材"},
+  {name:"item_08", x1:256,y1:258,x2:384,y2:452, desc:"画材堆"},
+  {name:"item_09", x1:480,y1:96,x2:680,y2:370, desc:"双开木质储物柜(上)"},
+  {name:"item_10", x1:480,y1:374,x2:680,y2:717, desc:"储物柜下方抽屉"},
+  {name:"item_11", x1:696,y1:192,x2:832,y2:767, desc:"中央通道"},
+  {name:"item_12", x1:840,y1:32,x2:1008,y2:297, desc:"右侧画框-上方"},
+  {name:"item_13", x1:840,y1:304,x2:1008,y2:717, desc:"右侧画框-下方"},
+  {name:"item_14", x1:1016,y1:24,x2:1168,y2:297, desc:"画架1-带画布"},
+  {name:"item_15", x1:1016,y1:304,x2:1168,y2:580, desc:"画架1-支架"},
+  {name:"item_16", x1:1176,y1:24,x2:1304,y2:296, desc:"画架2-带画布"},
+  {name:"item_17", x1:1176,y1:304,x2:1304,y2:580, desc:"画架2-支架"},
+  {name:"item_18", x1:840,y1:440,x2:920,y2:717, desc:"颜料管/调色盘"},
+  {name:"item_19", x1:928,y1:440,x2:1008,y2:717, desc:"颜料罐"},
+  {name:"item_20", x1:1016,y1:584,x2:1176,y2:717, desc:"地面纸团(左)"},
+  {name:"item_21", x1:1184,y1:584,x2:1304,y2:717, desc:"地面纸团(右)"},
+  {name:"item_22", x1:224,y1:0,x2:480,y2:96, desc:"顶窗/天窗区域"},
+  {name:"item_23", x1:488,y1:0,x2:600,y2:96, desc:"顶部灯具"},
+  {name:"item_24", x1:840,y1:0,x2:1008,y2:32, desc:"顶部风扇/灯具"},
+];
+
+const colors = [
+  "#ff4444","#44ff44","#4444ff","#ffff44","#ff44ff","#44ffff",
+  "#ff8800","#8800ff","#00ff88","#ff0088","#0088ff","#88ff00",
+  "#cc3333","#33cc33","#3333cc","#cccc33","#cc33cc","#33cccc",
+  "#ff6644","#66ff44","#4466ff","#ff4466","#66ff66","#446644",
+];
+
+// Draw overlay
+const img = document.getElementById('mainImg');
+const canvas = document.getElementById('overlay');
+const ctx = canvas.getContext('2d');
+let showBoxes = true;
+
+img.onload = function() {
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  drawBoxes();
+};
+
+function drawBoxes() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!showBoxes) return;
+  
+  objects.forEach((obj, i) => {
+    const w = obj.x2 - obj.x1;
+    const h = obj.y2 - obj.y1;
+    const color = colors[i % colors.length];
+    
+    // Draw rectangle
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(obj.x1, obj.y1, w, h);
+    
+    // Fill with transparency
+    ctx.fillStyle = color + '22';
+    ctx.fillRect(obj.x1, obj.y1, w, h);
+    
+    // Label
+    ctx.fillStyle = color;
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(obj.name, obj.x1+4, obj.y1+18);
+    ctx.fillText(`${w}x${h}`, obj.x1+4, obj.y1+34);
+  });
+}
+
+function toggleBoxes() {
+  showBoxes = !showBoxes;
+  drawBoxes();
+}
+
+// Generate preview thumbnails
+function generatePreviews() {
+  const list = document.getElementById('previewList');
+  list.innerHTML = '';
+  
+  objects.forEach((obj, i) => {
+    const color = colors[i % colors.length];
+    const w = obj.x2 - obj.x1;
+    const h = obj.y2 - obj.y1;
+    
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    div.innerHTML = `
+      <div style="width:180px;height:180px;background:#444;position:relative;overflow:hidden;border-radius:3px;image-rendering:pixelated;">
+        <img src="../../client/public/assets/maps/wang_gallery/美术教室.png" 
+             style="position:absolute;left:-${obj.x1}px;top:-${obj.y1}px;width:auto;height:auto;image-rendering:pixelated;"
+             alt="${obj.name}">
+      </div>
+      <div class="label"><span class="color-box" style="background:${color}"></span>${obj.name}</div>
+      <div class="desc">${obj.desc}</div>
+      <div class="desc" style="font-family:monospace">${w}×${h}px → 256×256</div>
+    `;
+    list.appendChild(div);
+  });
+  
+  document.getElementById('previewTitle').textContent = `📦 物体预览 (共${objects.length}个)`;
+}
+
+function exportConfig() {
+  const config = objects.map(({name, x1, y1, x2, y2, desc}) => ({name, x1, y1, x2, y2, desc}));
+  const json = JSON.stringify(config, null, 2);
+  
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sprites_config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  alert('配置已导出为 sprites_config.json');
+}
+
+// Init
+generatePreviews();
+if (img.complete) img.onload();
+</script>
+</body>
+</html>
