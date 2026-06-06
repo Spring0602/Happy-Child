@@ -24,10 +24,11 @@ export const initialGameState: GameState = {
   rebellion: 0,
   joyProof: 0,
   aiTraces: [],
-  currentMapId: "livingroom",
+  currentMapId: "dormitory",
   playerPosition: { x: 0, y: 0 },
   flags: {},
   interactedItems: [],
+  endingReached: false,
 };
 
 export type GameAction =
@@ -41,7 +42,8 @@ export type GameAction =
   | { type: "INTERACT_ITEM"; itemId: string }
   | { type: "UPDATE_POSITION"; position: { x: number; y: number } }
   | { type: "DIALOG_START"; sceneId: string }
-  | { type: "DIALOG_END" };
+  | { type: "DIALOG_END" }
+  | { type: "ENDING_REACHED" };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -60,8 +62,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         aiTraces: [...state.aiTraces, action.trace],
       };
 
-    case "LOAD":
-      return action.state;
+    case "LOAD": {
+      // 兼容旧存档：补全缺失的字段
+      const loaded = action.state;
+      return {
+        ...initialGameState,
+        ...loaded,
+        traits: { ...initialGameState.traits, ...loaded.traits },
+        npcTrust: { ...initialGameState.npcTrust, ...loaded.npcTrust },
+        flags: { ...initialGameState.flags, ...loaded.flags },
+      };
+    }
 
     case "RESET":
       return initialGameState;
@@ -90,6 +101,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "DIALOG_END":
       return { ...state, currentSceneId: "" };
+
+    case "ENDING_REACHED":
+      return { ...state, endingReached: true };
 
     default:
       return state;

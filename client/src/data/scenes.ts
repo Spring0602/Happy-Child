@@ -18,15 +18,108 @@ import type { Scene } from "../types/game";
 export const scenes: Record<string, Scene> = {
 
   // ══════════════════════════════════════════════
-  // 第1章 · 序章 · 前兆
+  // 第1章 · 前兆（参考小说原文，旁白第一人称）
+  // 流程：CG idea界面 → 宿舍(sleep) 暗屏+聚光 → 室友对话 → 白天 → 邮件 → 商店 → 候场区
   // ══════════════════════════════════════════════
 
   start: {
     id: "start",
     chapter: "序章",
-    background: "/assets/bg/dorm_rain.svg",
+    background: "/assets/CG/前兆/idea界面.png",
+    speaker: "旁白",
+    text: "终于解决完所有的bug了。光标停留在5154行的位置，一股强烈的满足感涌上心头。我合上笔记本电脑，伸了个懒腰。\n\n现在是04：46。我，叶平生，一个平平无奇的计算机专业大学生，终于完成了我的个人项目。",
+    nextSceneId: "ch1_think_balcony",
+    cgMode: true,
+  },
+
+  // 主角心理活动 → 想透气，显示立绘
+  ch1_think_balcony: {
+    id: "ch1_think_balcony",
+    chapter: "序章",
+    background: "/assets/CG/前兆/idea界面.png",
     speaker: "叶平生",
-    text: "终于解决完所有的bug了。\n\n光标停留在5154行，一股满足感涌上心头。我合上电脑，走到阳台，深吸一口气。\n\n外面正下着雨，无风，直直垂下。凌晨四点四十六分。\n\n我本以为这只是普通的一夜。",
+    text: "好累啊，真想到阳台去透透气。",
+    cgMode: true,
+    // 心理活动结束后进入宿舍RPG，玩家操控角色走向窗户交互进入阳台
+    onCgEnd: "enter_dormitory_playable",
+  },
+
+  // 进入宿舍后，玩家可操控角色走向窗户（触发 window trigger）
+  // 窗户交互后进入阳台，触发阳台场景对话
+  ch1_go_balcony: {
+    id: "ch1_go_balcony",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/sleep.png",
+    speaker: "旁白",
+    text: "我轻脚走到阳台，深吸一口气。\n\n外面正下着雨，无风作扰，直直垂下，宛如帘幕。",
+    nextSceneId: "ch1_cg_project_done",
+    onCgEnd: "enter_balcony",
+  },
+
+  // 阳台场景对话（玩家进入阳台后自动触发）
+  ch1_cg_project_done: {
+    id: "ch1_cg_project_done",
+    chapter: "序章",
+    background: "/assets/maps/balcony/阳台_白天.png",
+    speaker: "叶平生",
+    text: "放空大脑听听窗外的雨声，我竟有一种想冲进雨中的冲动。\n\n但也只是想想罢了。\n\n明天还有课，早点睡吧。",
+    nextSceneId: "ch1_enter_dormitory",
+  },
+
+  // 玩家从阳台回到宿舍（自动触发）
+  ch1_enter_dormitory: {
+    id: "ch1_enter_dormitory",
+    chapter: "序章",
+    background: "/assets/bg/dorm_dark.svg",
+    speaker: "旁白",
+    text: "关上阳台的门窗，我回到寝室，正要拿放在桌柜上的洗漱用品，却惊奇地发现笔记本电脑幽幽泛着白光，在黑暗中格外惹眼。\n\n怎么回事？我记得已经把电脑关机了。",
+    nextSceneId: "ch1_computer_glow",
+    onCgEnd: "enter_dormitory",
+  },
+
+  ch1_computer_glow: {
+    id: "ch1_computer_glow",
+    chapter: "序章",
+    background: "/assets/bg/dorm_dark.svg",
+    speaker: "叶平生",
+    text: "诶，可能是熬夜熬得太晚，导致记忆混乱了吧。\n\n我没太把这件事放在心上，关上电脑，洗漱完就上床睡觉了。过度疲倦带来的浓烈睡意占据大脑，几乎是沾枕就睡。",
+    nextSceneId: "ch1_stand_up",
+  },
+
+  // 第二天，电脑再次自动开机
+  ch1_stand_up: {
+    id: "ch1_stand_up",
+    chapter: "序章",
+    background: "/assets/bg/dorm_dark.svg",
+    speaker: "旁白",
+    text: "闹钟在07：00准时响起。我迷迷糊糊地收拾床铺，却被入眼的白光吓得瞬间清醒。\n\n这次应该不是因为我忘记关电脑了，而是电脑自动打开了。",
+    nextSceneId: "ch1_ask_roommates",
+  },
+
+  ch1_ask_roommates: {
+    id: "ch1_ask_roommates",
+    chapter: "序章",
+    background: "/assets/bg/dorm_dark.svg",
+    speaker: "叶平生",
+    text: "我吞了口唾沫，转头问室友：「你们昨晚有谁打开了我的电脑吗？」\n\n室友像听了什么笑话一样：「ber，哥们你卷糊涂了吧，我们自己有电脑，为啥要用你的。」\n\n我仍不死心：「那快天亮的时候你们有听到什么动静吗？」\n\n「没，我都困得要死。」",
+    nextSceneId: "ch1_chenyuhao",
+  },
+
+  ch1_chenyuhao: {
+    id: "ch1_chenyuhao",
+    chapter: "序章",
+    background: "/assets/bg/dorm_dark.svg",
+    speaker: "旁白",
+    text: "陈煜浩是唯一一个比我还卷的室友，他平时睡眠也不是很好。\n\n他一边收拾书包一边摇了摇头：「昨晚是你打开了电脑，并不是其他人。」\n\n我顿时汗毛倒竖。\n\n「见鬼……怎么可能？」\n\n「应该是你梦游了。」他淡淡解释道。",
+    nextSceneId: "ch1_afternoon",
+  },
+
+  ch1_afternoon: {
+    id: "ch1_afternoon",
+    chapter: "序章",
+    background: "/assets/bg/dorm_dark.svg",
+    speaker: "旁白",
+    text: "整个白天，电脑都没有再徒生变故。难道昨晚的事件真的是我的错觉？\n\n晚上23：00，我写完当天的作业，正打算拿起手机玩游戏，就发现自己收到了一封匿名邮件。接着，我的电脑，就这样明目张胆地开机了。\n\n这次绝对不是我的错觉——它在我眼皮子底下开机了。",
     nextSceneId: "ch1_email",
   },
 
@@ -35,7 +128,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "/assets/bg/dorm_dark.svg",
     speaker: "系统邮件",
-    text: "亲爱的预备参赛者：\n\n由于系统检测到您在'人类'智慧群体中资质出众，您将成为第一批进入'人类进化计划'筛选的参赛者。\n\n【赛前准备】\n1. 按需准备15日的能量摄入来源\n2. 依据个人身体素质准备强度不一的防身武器\n3. 尽量保持稳定的磁场紊乱状态\n\n初赛：无确切内容，无具体规则。唯一规则：任何违反规则的参赛者将被即刻抹除。\n\n严禁将比赛信息泄露给无关人员。",
+    text: "亲爱的预备参赛者：\n\n由于系统检测到您在「人类」智慧群体中资质出众，您将成为第一批进入「人类进化计划」筛选的参赛者。此邮件作为新手引导，以下内容请您仔细阅读。\n\n初赛将于00：00准时开启，您可以按照下列提示进行赛前准备：\n1. 按需准备15日的能量摄入来源。\n2. 依据个人身体素质准备强度不一的防身武器。\n3. 尽量保持稳定的磁场紊乱状态。\n\n关于初赛信息：\n无确切内容，无具体规则。唯一规则：任何违反规则的参赛者将被即刻抹除。\n\n请您遵守保密协议：严禁将比赛信息泄露给无关人员，若有违反，系统将即刻抹除您的存在。\n\n祝您比赛顺利~",
     choices: [
       {
         id: "ch1_prepare_full",
@@ -81,7 +174,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "/assets/bg/school_gate_night.svg",
     speaker: "旁白",
-    text: "23:32。\n\n厨房用品店里排着4个人——1女3男，这个时间出现在这里，他们大概率和我一样。\n\n我拿了一盒水果刀排在队伍末尾。\n\n队伍前面的女生回头看了我一眼。",
+    text: "现在是23：32。\n\n我骑着小电驴来到了离校最近的厨房用品店。柜台前已经排了4个人——1女3男。往常这个时候，店里应该基本没人才对。\n\n除非他们也是和我一样的「变数」。\n\n我拿上店里还未售罄的水果刀，排在了队伍末尾。店里的菜刀和削皮刀已经售罄。队伍前面的女生回头看了我一眼。",
     choices: [
       {
         id: "ch1_contact_liuyu",
@@ -113,8 +206,8 @@ export const scenes: Record<string, Scene> = {
     id: "ch1_store_deal",
     chapter: "序章",
     background: "/assets/bg/school_gate_night.svg",
-    speaker: "林芷萱",
-    text: "她看到我的问题后，脸上纯良的表情逐渐变得狠戾。\n\n【我们的规则是什么？】\n\n「没有具体规则。」\n\n她顿了顿，反问：【你怎么理解第三条提示？】\n\n需要我先展示诚意。",
+    speaker: "旁白",
+    text: "我拍了拍她的肩膀，将手机举到她面前。看到第一个问题后，她脸上纯良的表情逐渐变得狠戾。\n\n我：【我们的规则是什么？】\n\n女生：【没有具体规则。】\n\n赌对了。\n\n她顿了顿，反问：【你怎么理解第三条提示？】\n\n她需要我先展示诚意。",
     choices: [
       {
         id: "ch1_share_analysis",
@@ -148,7 +241,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "/assets/bg/dorm_dark.svg",
     speaker: "旁白",
-    text: "23:55。\n\n我火急火燎地收拾行囊。室友说我是\u300C真·高速小马达\u300D。\n\n00:00。\n\n我眼前一黑——\n\n下一瞬，置身于一片星海。四周星辰点点，而我漂浮于宇宙中，并无失重感。\n\n「欢迎参赛者来到'人类进化计划'候场区~」",
+    text: "回到寝室已经是23：55。\n\n极限五分钟！我火急火燎地收拾行囊，柜子都来不及关上。室友惊呼：「我靠……真·高速小马达。」\n\n我顾不上和室友顶嘴。开赛前30秒，我终于换好了一身运动装，背上了行囊。\n\n00：00。\n\n我眼前一黑——下一瞬，置身于仿佛一个小型宇宙的空间中。四周星辰点点，星云摇曳，而我漂浮于宇宙中，并无失重感。\n\n「欢迎参赛者来到'人类进化计划'候场区~」",
     nextSceneId: "ch2_skill_extract",
   },
 

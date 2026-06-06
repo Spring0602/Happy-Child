@@ -122,6 +122,8 @@ export class MapScene extends Phaser.Scene {
           // 精灵图均为 256×256 透明裁切，渲染时保持原始比例不拉伸
           const furnImg = this.add.image(sx, sy, match.key);
           furnImg.setDepth(furnDepth);
+          // 叠图精灵统一降低亮度，与底图色调融合
+          furnImg.setTint(0xcccccc);
           renderedCount++;
 
           // 条件创建碰撞（可穿越的家具跳过，如 walkable=true 的椅子）
@@ -169,7 +171,12 @@ export class MapScene extends Phaser.Scene {
           obj.width ?? 64,
           obj.height ?? 64
         );
-        this.physics.add.existing(zone, true);
+
+        // walk/auto 类型需要物理碰撞检测 → 添加 static body
+        // interact 类型不需要碰撞体（仅 E 键交互范围，玩家可穿越）
+        if (triggerType === "walk" || triggerType === "auto" || triggerType === "door") {
+          this.physics.add.existing(zone, true);
+        }
 
         // walk/auto 类型 → 注册到 TriggerSystem（自动触发）
         if (triggerType === "walk" || triggerType === "auto") {
@@ -185,8 +192,8 @@ export class MapScene extends Phaser.Scene {
           });
         }
 
-        // interact 类型 → 注册到 InteractionSystem（E 键交互）
-        if (triggerType === "interact") {
+        // interact/door 类型 → 注册到 InteractionSystem（E 键交互）
+        if (triggerType === "interact" || triggerType === "door") {
           this.interactionSys?.registerInteractable({
             x: zone.x,
             y: zone.y,
@@ -289,6 +296,106 @@ export class MapScene extends Phaser.Scene {
     gameBridge.onReactCommand("UNFREEZE_PLAYER", () => {
       this.playerCtrl?.unfreeze();
     });
+    gameBridge.onReactCommand("STORY_EVENT", (cmd) => {
+      if (cmd.type !== "STORY_EVENT") return;
+      this.handleStoryEvent(cmd.eventId, cmd.payload);
+    });
+  }
+
+  /** 处理剧情事件 */
+  private handleStoryEvent(eventId: string, payload?: Record<string, unknown>) {
+    console.log(`[MapScene] 📖 剧情事件: ${eventId}`, payload);
+    switch (eventId) {
+      case "player_sit_down": {
+        // 玩家在当前位置坐下（朝前）
+        this.playerCtrl?.sit(this.player.y, false, this.map.heightInPixels || 600);
+        break;
+      }
+      case "player_stand_up": {
+        this.playerCtrl?.standUp();
+        break;
+      }
+      case "teleport_to_spawn": {
+        // 传送到指定出生点
+        const spawnId = payload?.spawnId as string;
+        if (!spawnId) break;
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (spawnLayer) {
+          const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
+          if (spawn) {
+            this.player.x = spawn.x! + (spawn.width ?? 32) / 2;
+            this.player.y = spawn.y! + (spawn.height ?? 32) / 2;
+          }
+        }
+        break;
+      }
+      case "flash_screen": {
+        // 屏幕闪光效果
+        const duration = (payload?.duration as number) || 300;
+        const flash = this.add.rectangle(
+          this.cameras.main.width / 2,
+          this.cameras.main.height / 2,
+          this.cameras.main.width,
+          this.cameras.main.height,
+          0xffffff, 1
+        ).setDepth(10000).setScrollFactor(0);
+        this.tweens.add({
+          targets: flash,
+          alpha: 0,
+          duration,
+          onComplete: () => flash.destroy(),
+        });
+        break;
+      }
+      case "darken_overlay": {
+        // 叠加变暗效果
+        const alpha = (payload?.alpha as number) || 0.6;
+        const overlay = this.add.rectangle(
+          this.cameras.main.width / 2,
+          this.cameras.main.height / 2,
+          this.cameras.main.width,
+          this.cameras.main.height,
+          0x000000, alpha
+        ).setDepth(9999).setScrollFactor(0);
+        // 保存在 registry 中以便后续移除
+        this.registry.set("darkOverlay", overlay);
+        break;
+      }
+      case "remove_dark_overlay": {
+        const overlay = this.registry.get("darkOverlay") as Phaser.GameObjects.Rectangle | undefined;
+        if (overlay) {
+          this.tweens.add({
+            targets: overlay,
+            alpha: 0,
+            duration: 500,
+            onComplete: () => overlay.destroy(),
+          });
+          this.registry.remove("darkOverlay");
+        }
+        break;
+      }
+      case "spotlight_player": {
+        // 玩家位置聚光效果（电脑屏幕照亮面部）
+        const overlay = this.registry.get("darkOverlay") as Phaser.GameObjects.Rectangle | undefined;
+        if (!overlay) break;
+        // 用圆形蒙版在玩家位置挖一个亮孔（简化：在玩家上方加一个半透明亮圈）
+        const glow = this.add.ellipse(
+          this.player.x, this.player.y - 40,
+          120, 80,
+          0xffdd88, 0.15
+        ).setDepth(10000).setScrollFactor(0);
+        this.registry.set("playerGlow", glow);
+        break;
+      }
+      case "update_glow_position": {
+        // 更新聚光位置跟随玩家
+        const glow = this.registry.get("playerGlow") as Phaser.GameObjects.Ellipse | undefined;
+        if (glow) {
+          glow.setPosition(this.player.x, this.player.y - 40);
+        }
+        break;
+      }
+    }
   }
 
   /** 地图切换（淡入淡出） */
@@ -316,6 +423,11 @@ export class MapScene extends Phaser.Scene {
     this.playerCtrl?.update(delta);
     this.interactionSys?.update();
     this.triggerSys?.update();
+    // 更新聚光位置（跟随玩家）
+    const glow = this.registry.get("playerGlow") as Phaser.GameObjects.Ellipse | undefined;
+    if (glow) {
+      glow.setPosition(this.player.x, this.player.y - 40);
+    }
     // Y 排序（坐下时保持坐下设定的深度，不重新计算）
     if (!this.playerCtrl?.sitting) {
       if (this.map && this.map.heightInPixels) {
