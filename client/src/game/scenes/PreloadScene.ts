@@ -97,7 +97,7 @@ export class PreloadScene extends Phaser.Scene {
   create() {
     // 注册角色动画
     createPlayerAnimations(this);
-    // 进入地图场景（默认客厅）
-    this.scene.start("MapScene", { mapId: "livingroom" });
+    // 进入地图场景（默认宿舍 sleep 场景，等待 CG 结束后激活）
+    this.scene.start("MapScene", { mapId: "dormitory" });
   }
 }

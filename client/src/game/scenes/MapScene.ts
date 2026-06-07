@@ -99,7 +99,7 @@ export class MapScene extends Phaser.Scene {
 
     // --- furniture_objects ---
     // 渲染独立家具精灵图，用于实现 Y 轴深度排序（玩家 ← 家具前后遮挡）
-    // 家具 PNG 是透明裁切图，覆盖在底图同类家具上，视觉上无缝衔接
+    // 家具 PNG 是 256×256 透明裁切图，按 Tiled 对象框尺寸精确缩放后覆盖在底图对应家具上
     const furnitureLayer = this.map.getObjectLayer("furniture_objects");
     console.log(`[MapScene] 📦 furniture_objects layer: ${furnitureLayer ? `found (${furnitureLayer.objects.length} objects)` : "NOT FOUND!"}`);
     console.log(`[MapScene] 🖼️  furnitureImages: ${entry.furnitureImages ? `${entry.furnitureImages.length} entries` : "undefined"}`);
@@ -118,13 +118,20 @@ export class MapScene extends Phaser.Scene {
           // 家具深度 = 底部 Y 坐标归一化（让家具与玩家按 Y 轴正确排序）
           const furnDepth = (obj.y! + objH) / entry.height;
 
-          // 渲染家具精灵图（覆盖底图家具，实现 Y 轴深度前后遮挡）
-          // 精灵图均为 256×256 透明裁切，渲染时保持原始比例不拉伸
+          // 渲染家具精灵图：严格按 Tiled 对象框尺寸缩放，与底图家具无缝对齐
           const furnImg = this.add.image(sx, sy, match.key);
+          furnImg.setDisplaySize(objW, objH);
+          // 同步 Tiled 对象旋转（弧度）
+          if (obj.rotation !== undefined && obj.rotation !== 0) {
+            furnImg.setRotation(Phaser.Math.DegToRad(obj.rotation));
+          }
           furnImg.setDepth(furnDepth);
+          // 叠图精灵统一降低亮度，与底图色调融合
+          furnImg.setTint(0xcccccc);
           renderedCount++;
 
           // 条件创建碰撞（可穿越的家具跳过，如 walkable=true 的椅子）
+          // 碰撞区域严格等于 Tiled 对象框尺寸，与缩放后的视觉完全一致
           if (props.walkable !== "true") {
             const zone = this.add.zone(sx, sy, objW, objH);
             this.physics.add.existing(zone, true);
@@ -134,7 +141,7 @@ export class MapScene extends Phaser.Scene {
           // 可交互物品：渲染半透明高亮边框，让玩家能识别
           if (props.interactable === "true") {
             registeredCount++;
-            console.log(`[MapScene]   ✅ 可交互: ${name} → sceneId=${props.interactSceneId}, sitAction=${props.sitAction}, pos=(${Math.round(sx)},${Math.round(sy)}), size=(${objW},${objH})`);
+            console.log(`[MapScene]   ✅ 可交互: ${name} → sceneId=${props.interactSceneId}, sitAction=${props.sitAction}, pos=(${Math.round(sx)},${Math.round(sy)}), size=(${Math.round(objW)},${Math.round(objH)})`);
             const highlight = this.add.rectangle(sx, sy, objW + 8, objH + 8, 0xffcc00, 0);
             highlight.setStrokeStyle(2, 0xffcc00, 0.35);
             highlight.setDepth(furnDepth + 0.001);
@@ -150,11 +157,40 @@ export class MapScene extends Phaser.Scene {
               chairY: obj.y! + objH,
             });
           } else {
-            console.log(`[MapScene]   📍 装饰品: ${name} at (${Math.round(sx)},${Math.round(sy)}), walkable=${props.walkable}`);
+            console.log(`[MapScene]   📍 装饰品: ${name} at (${Math.round(sx)},${Math.round(sy)}), size=(${Math.round(objW)},${Math.round(objH)}), walkable=${props.walkable}`);
           }
         }
       }
       console.log(`[MapScene] 📊 furniture 总数: 渲染=${renderedCount}, 可交互注册=${registeredCount}`);
+    }
+
+    // --- foreground（前景遮挡层：始终渲染在角色上方）---
+    // 用于墙上装饰（全家福、挂钟）、悬挂物等需要遮挡角色的物件
+    // 深度固定为 1.0，不受 Y 坐标影响，确保始终覆盖在角色之上
+    // 图片以 Tiled 对象框高度为基准等比缩放（保持宽高比），中心对齐
+    const foregroundLayer = this.map.getObjectLayer("foreground");
+    if (foregroundLayer && entry.furnitureImages) {
+      for (const obj of foregroundLayer.objects) {
+        const match = entry.furnitureImages.find((f) => f.key === obj.name);
+        if (match) {
+          const objW = obj.width ?? 64;
+          const objH = obj.height ?? 64;
+          const sx = obj.x! + objW / 2;
+          const sy = obj.y! + objH / 2;
+          const fgImg = this.add.image(sx, sy, match.key);
+          // 按 Tiled 框高度等比缩放，保持宽高比（避免 setDisplaySize 压扁）
+          const texH = fgImg.height;
+          if (texH > 0 && objH > 0) {
+            fgImg.setScale(objH / texH);
+          }
+          fgImg.setDepth(1.0);
+          // 调试红框
+          const debugRect = this.add.rectangle(sx, sy, objW, objH, 0x00ff00, 0);
+          debugRect.setStrokeStyle(2, 0x00ff00, 0.6);
+          debugRect.setDepth(1.001);
+          console.log(`[MapScene] 🖼️ fg ${obj.name}: boxCenter=(${Math.round(sx)},${Math.round(sy)}) boxSize=${Math.round(objW)}x${Math.round(objH)} display=(${Math.round(fgImg.displayWidth)}x${Math.round(fgImg.displayHeight)})`);
+        }
+      }
     }
 
     // --- triggers ---
@@ -169,7 +205,12 @@ export class MapScene extends Phaser.Scene {
           obj.width ?? 64,
           obj.height ?? 64
         );
-        this.physics.add.existing(zone, true);
+
+        // walk/auto 类型需要物理碰撞检测 → 添加 static body
+        // interact 类型不需要碰撞体（仅 E 键交互范围，玩家可穿越）
+        if (triggerType === "walk" || triggerType === "auto" || triggerType === "door") {
+          this.physics.add.existing(zone, true);
+        }
 
         // walk/auto 类型 → 注册到 TriggerSystem（自动触发）
         if (triggerType === "walk" || triggerType === "auto") {
@@ -185,15 +226,35 @@ export class MapScene extends Phaser.Scene {
           });
         }
 
-        // interact 类型 → 注册到 InteractionSystem（E 键交互）
-        if (triggerType === "interact") {
+        // interact/door 类型 → 注册到 InteractionSystem（E 键交互）
+        if (triggerType === "interact" || triggerType === "door") {
           this.interactionSys?.registerInteractable({
-            x: zone.x,
-            y: zone.y,
+            x: sx,
+            y: sy,
             type: "item",
             id: props.itemId || obj.name,
             sceneId: props.sceneId,
           });
+
+          // 渲染精灵图（仅当该物件未被 foreground 层渲染时才在此处显示）
+          if (entry.furnitureImages) {
+            const spriteMatch =
+              entry.furnitureImages.find((f) => f.key === props.itemId) ||
+              entry.furnitureImages.find((f) => f.key === obj.name);
+            if (spriteMatch) {
+              // 检查是否已被 foreground 层覆盖
+              const foregroundLayer = this.map.getObjectLayer("foreground");
+              const isForeground = foregroundLayer?.objects.some(
+                (fg) => fg.name === props.itemId || fg.name === obj.name
+              );
+              if (!isForeground) {
+                const trigDepth = sy / entry.height;
+                const trigImg = this.add.image(sx, sy, spriteMatch.key);
+                trigImg.setDisplaySize(objW, objH);
+                trigImg.setDepth(trigDepth);
+              }
+            }
+          }
         }
       }
     }
@@ -289,6 +350,106 @@ export class MapScene extends Phaser.Scene {
     gameBridge.onReactCommand("UNFREEZE_PLAYER", () => {
       this.playerCtrl?.unfreeze();
     });
+    gameBridge.onReactCommand("STORY_EVENT", (cmd) => {
+      if (cmd.type !== "STORY_EVENT") return;
+      this.handleStoryEvent(cmd.eventId, cmd.payload);
+    });
+  }
+
+  /** 处理剧情事件 */
+  private handleStoryEvent(eventId: string, payload?: Record<string, unknown>) {
+    console.log(`[MapScene] 📖 剧情事件: ${eventId}`, payload);
+    switch (eventId) {
+      case "player_sit_down": {
+        // 玩家在当前位置坐下（朝前）
+        this.playerCtrl?.sit(this.player.y, false, this.map.heightInPixels || 600);
+        break;
+      }
+      case "player_stand_up": {
+        this.playerCtrl?.standUp();
+        break;
+      }
+      case "teleport_to_spawn": {
+        // 传送到指定出生点
+        const spawnId = payload?.spawnId as string;
+        if (!spawnId) break;
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (spawnLayer) {
+          const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
+          if (spawn) {
+            this.player.x = spawn.x! + (spawn.width ?? 32) / 2;
+            this.player.y = spawn.y! + (spawn.height ?? 32) / 2;
+          }
+        }
+        break;
+      }
+      case "flash_screen": {
+        // 屏幕闪光效果
+        const duration = (payload?.duration as number) || 300;
+        const flash = this.add.rectangle(
+          this.cameras.main.width / 2,
+          this.cameras.main.height / 2,
+          this.cameras.main.width,
+          this.cameras.main.height,
+          0xffffff, 1
+        ).setDepth(10000).setScrollFactor(0);
+        this.tweens.add({
+          targets: flash,
+          alpha: 0,
+          duration,
+          onComplete: () => flash.destroy(),
+        });
+        break;
+      }
+      case "darken_overlay": {
+        // 叠加变暗效果
+        const alpha = (payload?.alpha as number) || 0.6;
+        const overlay = this.add.rectangle(
+          this.cameras.main.width / 2,
+          this.cameras.main.height / 2,
+          this.cameras.main.width,
+          this.cameras.main.height,
+          0x000000, alpha
+        ).setDepth(9999).setScrollFactor(0);
+        // 保存在 registry 中以便后续移除
+        this.registry.set("darkOverlay", overlay);
+        break;
+      }
+      case "remove_dark_overlay": {
+        const overlay = this.registry.get("darkOverlay") as Phaser.GameObjects.Rectangle | undefined;
+        if (overlay) {
+          this.tweens.add({
+            targets: overlay,
+            alpha: 0,
+            duration: 500,
+            onComplete: () => overlay.destroy(),
+          });
+          this.registry.remove("darkOverlay");
+        }
+        break;
+      }
+      case "spotlight_player": {
+        // 玩家位置聚光效果（电脑屏幕照亮面部）
+        const overlay = this.registry.get("darkOverlay") as Phaser.GameObjects.Rectangle | undefined;
+        if (!overlay) break;
+        // 用圆形蒙版在玩家位置挖一个亮孔（简化：在玩家上方加一个半透明亮圈）
+        const glow = this.add.ellipse(
+          this.player.x, this.player.y - 40,
+          120, 80,
+          0xffdd88, 0.15
+        ).setDepth(10000).setScrollFactor(0);
+        this.registry.set("playerGlow", glow);
+        break;
+      }
+      case "update_glow_position": {
+        // 更新聚光位置跟随玩家
+        const glow = this.registry.get("playerGlow") as Phaser.GameObjects.Ellipse | undefined;
+        if (glow) {
+          glow.setPosition(this.player.x, this.player.y - 40);
+        }
+        break;
+      }
+    }
   }
 
   /** 地图切换（淡入淡出） */
@@ -316,16 +477,17 @@ export class MapScene extends Phaser.Scene {
     this.playerCtrl?.update(delta);
     this.interactionSys?.update();
     this.triggerSys?.update();
+    // 更新聚光位置（跟随玩家）
+    const glow = this.registry.get("playerGlow") as Phaser.GameObjects.Ellipse | undefined;
+    if (glow) {
+      glow.setPosition(this.player.x, this.player.y - 40);
+    }
     // Y 排序（坐下时保持坐下设定的深度，不重新计算）
     if (!this.playerCtrl?.sitting) {
-      if (this.map && this.map.heightInPixels) {
-        this.player.setDepth(this.player.y / this.map.heightInPixels);
-      } else {
-        const entry = MapRegistry[this.currentMapId];
-        if (entry) {
-          this.player.setDepth(this.player.y / entry.height);
-        }
-      }
+      const mapH = this.map?.heightInPixels || MapRegistry[this.currentMapId]?.height || 929;
+      // 用脚底 Y（中心 + 半高）与家具底部对齐，确保前后遮挡正确
+      const feetY = this.player.y + (this.player.body as Phaser.Physics.Arcade.Body).halfHeight;
+      this.player.setDepth(feetY / mapH);
     }
   }
 }

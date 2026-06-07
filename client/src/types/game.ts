@@ -28,6 +28,10 @@ export interface Scene {
   choices?: Choice[];
   nextSceneId?: string;
   aiEvent?: "npc_dialogue" | "ending_judge";
+  /** CG 模式：全屏大图 + 底部对话，speaker为"旁白"时不显示立绘 */
+  cgMode?: boolean;
+  /** CG 模式下触发后置效果：nextSceneId 的场景加载完成后执行 */
+  onCgEnd?: "enter_dormitory" | "enter_balcony" | "enter_dormitory_playable" | string;
 }
 
 export interface CharacterCard {
@@ -71,4 +75,7 @@ export interface GameState {
   playerPosition: { x: number; y: number };
   flags: Record<string, boolean>;
   interactedItems: string[];
+
+  // ====== 结局标记（结局后才显示画像和AI分析） ======
+  endingReached: boolean;
 }

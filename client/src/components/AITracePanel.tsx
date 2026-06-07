@@ -9,11 +9,22 @@ export function AITracePanel({ traces }: Props) {
 
   return (
     <div className="ai-trace-panel">
-      <h3>AI 分析输出</h3>
+      <div className="ai-trace-header">
+        <h3>AI 分析记录</h3>
+        <button
+          className="ai-trace-close"
+          onClick={() => {
+            // 通过事件冒泡由 App 控制关闭
+            window.dispatchEvent(new CustomEvent("close-ai-trace"));
+          }}
+        >
+          ✕
+        </button>
+      </div>
       {lastTrace ? (
         <pre>{lastTrace.result}</pre>
       ) : (
-        <p>暂无 AI 分析。选择带有 needAIAnalysis 的选项后会出现结果。</p>
+        <p>暂无 AI 分析记录。</p>
       )}
     </div>
   );

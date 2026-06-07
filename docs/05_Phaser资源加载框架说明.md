@@ -50,15 +50,22 @@ client/
         bathroom/map.json
         bathroom/卫生间.png
       sprites/
-        yps_frames/           # 叶平生GIF源文件
-        ly_frames/            # 刘宇GIF源文件
-        frames/               # GIF提取的PNG帧（运行时加载）
-          yps_frames/
-            yps_frames_left/frame_00.png ~ frame_05.png  # 6帧跑步
-            yps_frames_stand_left/frame_00.png           # 1帧站立
-            yps_frames_sit_left/frame_00.png             # 1帧坐下
+        cyh.png
+        roommateA.png
+        roommateB.png
+        shop_assistant_female.png
+        shop_assistant_male.png
+        frames/               # 角色PNG帧（运行时加载）
+          cyh_frames/
+            cyh_frames_left/frame_00.png ~ frame_05.png  # 6帧跑步
+            cyh_frames_right/frame_00.png ~ frame_05.png # 6帧跑步（向右）
+            cyh_frames_stand_left/frame_00.png           # 1帧站立
+            cyh_frames_stand_right/frame_00.png          # 1帧站立（向右）
             ...
-          ly_frames/
+          roommateA_frames/
+            ...
+          yps_frames/
+            yps_frames_left/frame_00.png ~ frame_05.png
             ...
       portraits/yps_defult.png
       portraits/ly_smile.png
@@ -68,10 +75,12 @@ client/
 ```
 
 > **已删除**：`bg/` 和 `characters/` 文件夹。场景背景改用 Phaser 像素地图，角色改用 `portraits/` 立绘。
+> 
+> **工作流程**：角色PNG帧由AI美术工具直接分割生成，无需通过GIF中间格式。每个角色在 `sprites/frames/` 下有自己的目录，包含各方向的PNG帧。
 
 ## 3. AssetManifest 示例
 
-> **当前方案（v8.1）**：角色动画使用GIF提取的独立PNG帧，无需spritesheet，在PreloadScene中通过循环动态加载。
+> **当前方案（v8.2）**：角色动画使用AI工具直接分割的独立PNG帧，无需spritesheet或GIF中间格式，在PreloadScene中通过循环动态加载。
 
 ```ts
 export const AssetManifest = {
@@ -130,7 +139,7 @@ export const AssetManifest = {
 
 - 加载 Tiled 地图 JSON
 - 加载 tileset 图片
-- 加载角色精灵帧（GIF提取的独立PNG帧，每帧单独加载）
+- 加载角色精灵帧（独立PNG帧，每帧单独加载）
 - 加载立绘、UI、特效、音频
 - 显示加载进度
 - 加载完成后注册动画，进入主地图
@@ -146,8 +155,8 @@ export class PreloadScene extends Phaser.Scene {
   preload() {
     // ... 加载地图等资源 ...
 
-    // 加载角色精灵帧（从GIF提取的PNG）
-    const charDirs = ["ly_frames", "yps_frames"];
+    // 加载角色精灵帧（独立PNG帧）
+    const charDirs = ["cyh_frames", "roommateA_frames", "roommateB_frames", "shop_assistant_female_frames", "shop_assistant_male_frames", "yps_frames"];
     const runDirections = ["left", "right", "front", "back"];    // 6帧跑步
     const staticDirections = ["sit_left", "sit_right", ...];     // 1帧坐下/站立
     
@@ -207,12 +216,12 @@ export const MapRegistry = {
 
 ## 6. AnimationRegistry 示例
 
-> **当前方案（v8.1）**：使用GIF提取的独立PNG帧，每个方向独立GIF，帧键名清晰可读。
+> **当前方案（v8.2）**：使用AI工具分割的独立PNG帧，每个方向独立目录，帧键名清晰可读。
 > 
 > - 跑步：6帧循环（`frameRate=10, repeat=-1`）
 > - 站立：1帧静态（`frameRate=1, repeat=0`）
 > - 坐下：1帧静态（`frameRate=1, repeat=0`）
-> - 向右：使用向左动画 + `setFlipX(true)`（镜像方案）
+> - 向右：可使用独立PNG帧注册动画，或使用向左动画 + `setFlipX(true)`（镜像方案）
 
 ```ts
 // 辅助函数：生成帧引用
@@ -239,8 +248,10 @@ export function createPlayerAnimations(scene: Phaser.Scene) {
   scene.anims.create({ key: "yps_idle_down", frames: [{ key: "yps_frames_stand_front_0" }], frameRate: 1, repeat: 0 });
   scene.anims.create({ key: "yps_sit_down", frames: [{ key: "yps_frames_sit_front_0" }], frameRate: 1, repeat: 0 });
 
-  // 向右：使用向左动画 + setFlipX(true)，不注册独立动画
-  // yps_run_left + setFlipX(true) = 向右跑
+  // 向右：可使用独立PNG帧注册动画（如下），或使用向左动画 + setFlipX(true)（镜像方案）
+  // yps_run_right: 使用 yps_frames_right 帧
+  scene.anims.create({ key: "yps_run_right", frames: createFrames("yps", "right", 6), frameRate: 10, repeat: -1 });
+  scene.anims.create({ key: "yps_idle_right", frames: [{ key: "yps_frames_stand_right_0" }], frameRate: 1, repeat: 0 });
 }
 ```
 

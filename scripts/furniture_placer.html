@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>宿舍物品放置工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 10px;background:#16213e;border-bottom:1px solid #0f3460;font-size:13px}
+#bar button{padding:5px 12px;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#e0e0e0;cursor:pointer;font-size:12px}
+#bar button:hover{background:#0f3460}
+#bar button.pri{background:#e94560;border-color:#e94560;color:#fff}
+#bar button.pri:hover{background:#c73652}
+#bar button.col{background:#2563eb;border-color:#2563eb;color:#fff}
+#bar button.col:hover{background:#1d4ed8}
+#bar .sep{width:1px;height:22px;background:#0f3460;margin:0 4px}
+#bar .info{color:#707080;font-size:11px;margin-left:6px}
+#bar .tab{display:flex;margin:0 8px;border-radius:4px;overflow:hidden;border:1px solid #0f3460}
+#bar .tab button{padding:4px 14px;border:none;border-radius:0;font-size:12px}
+#bar .tab button.act{background:#0f3460;color:#fff}
+#work{display:flex;flex:1;overflow:hidden}
+#ca{flex:1;overflow:auto;background:#0d0d1a;position:relative}
+canvas{display:block}
+#side{width:300px;background:#16213e;border-left:1px solid #0f3460;display:flex;flex-direction:column;overflow:hidden}
+#side h3{font-size:12px;padding:8px 10px 4px;color:#e94560;border-bottom:1px solid #0f346008}
+#list{flex:1;overflow-y:auto;padding:4px 0}
+#list::-webkit-scrollbar{width:5px}
+#list::-webkit-scrollbar-thumb{background:#0f3460;border-radius:3px}
+.it{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid #0f346008}
+.it:hover{background:#0f3460}
+.it.sel{background:#0f3460;border-left:3px solid #e94560}
+.it.sel-col{background:#1e3a5f;border-left:3px solid #2563eb}
+.it img{width:48px;height:48px;object-fit:contain;background:#0d0d1a;border-radius:3px}
+.it .info{flex:1;min-width:0}
+.it .n{color:#e0e0e0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .s{color:#707080;font-size:10px}
+.it .tag{padding:1px 5px;border-radius:3px;font-size:9px;margin-left:4px}
+.it .tag-sp{background:#e9456020;color:#e94560}
+.it .tag-col{background:#2563eb20;color:#60a5fa}
+#log{flex:0 0 auto;height:100px;overflow-y:auto;padding:4px 8px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:10px;font-family:"Consolas","Courier New",monospace}
+#log::-webkit-scrollbar{width:5px}
+#log::-webkit-scrollbar-thumb{background:#0f3460;border-radius:3px}
+.l{padding:1px 0;border-bottom:1px solid #ffffff05;white-space:pre-wrap;word-break:break-all}
+.lo{color:#4ade80}.le{color:#f87171}.li{color:#60a5fa}.lw{color:#fbbf24}
+#status{display:flex;gap:10px;padding:3px 10px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:10px;color:#707080;align-items:center}
+#prop-panel{flex:0 0 auto;padding:6px 10px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:11px;display:none}
+#prop-panel label{display:flex;align-items:center;gap:4px;margin:3px 0;cursor:pointer}
+#prop-panel input[type=text]{flex:1;padding:2px 4px;background:#1a1a2e;border:1px solid #0f3460;border-radius:3px;color:#e0e0e0;font-size:11px;width:120px}
+#prop-panel input[type=number]{width:60px;padding:2px 4px;background:#1a1a2e;border:1px solid #0f3460;border-radius:3px;color:#e0e0e0;font-size:11px}
+#prop-panel input[type=checkbox]{accent-color:#e94560}
+#prop-panel .row{display:flex;align-items:center;gap:8px;margin:3px 0;flex-wrap:wrap}
+#prop-panel .lbl{color:#707080;font-size:10px;min-width:50px}
+#prop-panel .hint{color:#60a5fa;font-size:10px}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <button onclick="openBaseMap()" title="加载底图">📂 加载底图</button>
+  <input type="file" id="fi" accept=".png,.jpg,.jpeg,.webp,.bmp" style="display:none" onchange="onBaseMapSelected(event)">
+  <span class="sep"></span>
+  <div class="tab">
+    <button id="tab-sp" class="act" onclick="switchTab('sprite')">🖼 叠图层 (4个)</button>
+    <button id="tab-col" onclick="switchTab('collision')">🔲 纯碰撞 (20个)</button>
+  </div>
+  <button onclick="loadSprites()">📥 加载精灵</button>
+  <input type="file" id="fs" accept=".png" multiple style="display:none" onchange="onSpritesSelected(event)">
+  <button onclick="addCollisionBox()" class="col">➕ 添加碰撞框</button>
+  <span class="sep"></span>
+  <button onclick="exportMapJSON()" class="pri">💾 导出 map.json</button>
+  <button onclick="copyJSON()">📋 复制 JSON</button>
+  <span class="sep"></span>
+  <button onclick="autoLayout()">🤖 自动排列</button>
+  <span class="sep"></span>
+  <span class="info" id="zml">缩放: 100%</span>
+  <span class="info" id="cur">坐标: (-,-)</span>
+</div>
+
+<div id="work">
+  <div id="ca"><canvas id="cv"></canvas></div>
+  <div id="side">
+    <h3>📦 物品列表 (<span id="icnt">0</span>) — 点击选中，拖拽移动</h3>
+    <div id="list"></div>
+    <div id="prop-panel">
+      <div class="row">
+        <span class="lbl">名称:</span>
+        <input type="text" id="p-name" onchange="updateProp()">
+        <span class="lbl">层级:</span>
+        <select id="p-layer" onchange="updateProp()" style="background:#1a1a2e;border:1px solid #0f3460;color:#e0e0e0;font-size:11px;padding:2px 4px;border-radius:3px">
+          <option value="sprite">🖼 叠图层 (furniture_objects)</option>
+          <option value="collision">🔲 纯碰撞 (collision)</option>
+        </select>
+      </div>
+      <div class="row">
+        <span class="lbl">X:</span><input type="number" id="p-x" onchange="updateProp()">
+        <span class="lbl">Y:</span><input type="number" id="p-y" onchange="updateProp()">
+        <span class="lbl">W:</span><input type="number" id="p-w" onchange="updateProp()">
+        <span class="lbl">H:</span><input type="number" id="p-h" onchange="updateProp()">
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="p-walkable" onchange="updateProp()"> 可穿越 (无碰撞)</label>
+      </div>
+      <div class="row" id="sprite-props">
+        <label><input type="checkbox" id="p-interactable" onchange="updateProp()"> 可交互</label>
+        <label><input type="checkbox" id="p-sit" onchange="updateProp()"> 可坐下</label>
+      </div>
+      <div class="row" id="interact-row" style="display:none">
+        <span class="lbl">交互场景:</span>
+        <input type="text" id="p-sceneId" placeholder="interact_scene_id" onchange="updateProp()">
+      </div>
+      <div class="row" id="collision-hint" style="display:none">
+        <span class="hint">💡 纯碰撞框：底图已有画面，只需碰撞区域</span>
+      </div>
+    </div>
+    <div id="log"></div>
+  </div>
+</div>
+
+<div id="status">
+  <span id="stmsg">就绪 — 先加载底图，再用左右标签切换叠图层/纯碰撞模式</span>
+  <span style="margin-left:auto">操作: 列表选中 → 底图拖拽 → 导出 map.json</span>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+const ca = $('ca');
+
+let baseImg = null, baseW = 0, baseH = 0;
+let scale = 1, minSc = 0.05, maxSc = 8;
+// items: { name, img?, x, y, w, h, layer: 'sprite'|'collision', walkable, interactable, sitAction, interactSceneId, originalSpriteUrl }
+let furnitureItems = [];
+let selectedIdx = -1;
+let dragging = false, dragStartX = 0, dragStartY = 0, dragOrigX = 0, dragOrigY = 0;
+let currentTab = 'sprite'; // 当前筛选标签
+
+// ── 日志 ─────────────────────────────
+function log(msg, t){
+  const d = $('log'), ln = document.createElement('div');
+  ln.className = 'l l'+(t||'i');
+  ln.textContent = msg;
+  d.appendChild(ln);
+  d.scrollTop = d.scrollHeight;
+  console.log('['+(t||'i')+'] '+msg);
+}
+
+// ── 标签切换 ─────────────────────────
+function switchTab(tab){
+  currentTab = tab;
+  $('tab-sp').className = tab === 'sprite' ? 'act' : '';
+  $('tab-col').className = tab === 'collision' ? 'act' : '';
+  updList();
+  if(furnitureItems.length > 0){
+    // 自动选中当前标签下第一个物品
+    const filtered = getFilteredItems();
+    if(filtered.length > 0){
+      const realIdx = furnitureItems.indexOf(filtered[0]);
+      selectItem(realIdx);
+    } else {
+      selectedIdx = -1;
+      render();
+    }
+  }
+}
+
+function getFilteredItems(){
+  return furnitureItems.filter(it => it.layer === currentTab);
+}
+
+// ── 加载底图 ─────────────────────────
+function openBaseMap(){ $('fi').click(); }
+function onBaseMapSelected(ev){
+  const f = ev.target.files[0]; if(!f) return;
+  const u = URL.createObjectURL(f), im = new Image();
+  im.onload = ()=>{
+    baseImg = im; baseW = im.width; baseH = im.height;
+    fitView();
+    log('✅ 底图: '+f.name+' ('+baseW+'×'+baseH+'px)', 'o');
+    $('stmsg').textContent = '底图已加载: '+f.name+' ('+baseW+'×'+baseH+')';
+    if(furnitureItems.length > 0) render();
+  };
+  im.src = u;
+}
+
+// ── 加载物品精灵（仅叠图层物品需要） ──
+function loadSprites(){ $('fs').click(); }
+function onSpritesSelected(ev){
+  const files = Array.from(ev.target.files);
+  if(!files.length) return;
+  log('📥 正在加载 '+files.length+' 个物品精灵...', 'i');
+  
+  let loaded = 0;
+  files.forEach(f => {
+    const u = URL.createObjectURL(f);
+    const im = new Image();
+    im.onload = ()=>{
+      let name = f.name.replace(/\.png$/i, '');
+      const exist = furnitureItems.find(it => it.name === name);
+      if(exist){
+        exist.img = im;
+        exist.w = im.width;
+        exist.h = im.height;
+        exist.originalSpriteUrl = u;
+      } else {
+        furnitureItems.push({
+          name, img: im, x: 100 + loaded * 30, y: 100 + loaded * 30,
+          w: im.width, h: im.height,
+          layer: 'sprite',
+          walkable: false, interactable: false, sitAction: false,
+          interactSceneId: '', originalSpriteUrl: u
+        });
+      }
+      loaded++;
+      if(loaded === files.length){
+        updList();
+        if(baseImg) render();
+        log('✅ 已加载 '+loaded+' 个叠图层物品精灵', 'o');
+      }
+    };
+    im.src = u;
+  });
+}
+
+// ── 添加纯碰撞框 ─────────────────────
+function addCollisionBox(){
+  const name = prompt('碰撞框名称（如 item_01）：', 'collision_item');
+  if(!name) return;
+  const w = parseInt(prompt('宽度 (px)：', '64')) || 64;
+  const h = parseInt(prompt('高度 (px)：', '64')) || 64;
+  furnitureItems.push({
+    name, img: null, x: 200, y: 200,
+    w, h,
+    layer: 'collision',
+    walkable: false, interactable: false, sitAction: false,
+    interactSceneId: '', originalSpriteUrl: null
+  });
+  switchTab('collision');
+  selectItem(furnitureItems.length - 1);
+  log('➕ 已添加纯碰撞框: '+name+' ('+w+'×'+h+')', 'o');
+}
+
+// ── 渲染 ─────────────────────────────
+function render(){
+  if(!baseImg) return;
+  cv.width = Math.ceil(baseW * scale);
+  cv.height = Math.ceil(baseH * scale);
+  ctx.imageSmoothingEnabled = false;
+  // 底图
+  ctx.drawImage(baseImg, 0, 0, cv.width, cv.height);
+  
+  // 物品（按 Y 排序）
+  const sorted = [...furnitureItems].sort((a,b) => (a.y + a.h) - (b.y + b.h));
+  sorted.forEach(item => {
+    const idx = furnitureItems.indexOf(item);
+    const cx = item.x * scale;
+    const cy = item.y * scale;
+    const cw = item.w * scale;
+    const ch = item.h * scale;
+    
+    // 叠图层物品：绘制精灵图
+    if(item.layer === 'sprite' && item.img){
+      ctx.drawImage(item.img, cx, cy, cw, ch);
+    }
+    
+    const isSel = idx === selectedIdx;
+    
+    // 纯碰撞框：填充半透明色
+    if(item.layer === 'collision'){
+      ctx.fillStyle = isSel ? 'rgba(37,99,235,0.3)' : 'rgba(37,99,235,0.12)';
+      ctx.fillRect(cx, cy, cw, ch);
+      // 对角线标识
+      ctx.strokeStyle = isSel ? 'rgba(37,99,235,0.8)' : 'rgba(37,99,235,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx+cw, cy+ch); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx+cw, cy); ctx.lineTo(cx, cy+ch); ctx.stroke();
+    }
+    
+    // 边框
+    if(isSel){
+      const color = item.layer === 'sprite' ? '#00ff88' : '#60a5fa';
+      ctx.strokeStyle = color; ctx.lineWidth = 3;
+      ctx.strokeRect(cx, cy, cw, ch);
+      ctx.fillStyle = color;
+      [{x:cx, y:cy},{x:cx+cw-8, y:cy},{x:cx, y:cy+ch-8},{x:cx+cw-8, y:cy+ch-8}].forEach(p => {
+        ctx.fillRect(p.x, p.y, 8, 8);
+      });
+    } else {
+      const color = item.layer === 'sprite' ? 'rgba(255,255,255,0.3)' : 'rgba(37,99,235,0.35)';
+      ctx.strokeStyle = color; ctx.lineWidth = item.layer === 'sprite' ? 1 : 2;
+      ctx.setLineDash(item.layer === 'collision' ? [5,5] : []);
+      ctx.strokeRect(cx, cy, cw, ch);
+      ctx.setLineDash([]);
+    }
+    
+    // 名称标签
+    const labelColor = isSel ? (item.layer === 'sprite' ? '#00ff88' : '#60a5fa') : 'rgba(255,255,255,0.5)';
+    ctx.fillStyle = labelColor;
+    ctx.font = Math.max(10, 11/scale)+'px "Microsoft YaHei",Arial';
+    ctx.fillText(item.name, cx + 2/scale, cy - 4/scale);
+  });
+}
+
+// ── 适应窗口 ─────────────────────────
+function fitView(){
+  if(!baseImg) return;
+  const aw = ca.clientWidth, ah = ca.clientHeight;
+  scale = Math.min(aw/baseW, ah/baseH)*0.9;
+  scale = Math.max(minSc, Math.min(maxSc, scale));
+  render();
+  updZoom();
+  ca.scrollLeft = (cv.width - ca.clientWidth)/2;
+  ca.scrollTop = (cv.height - ca.clientHeight)/2;
+}
+function updZoom(){ $('zml').textContent = '缩放: '+Math.round(scale*100)+'%'; }
+
+// ── 坐标转换 ────────────────────────
+function toImg(cx,cy){ return [cx/scale, cy/scale]; }
+
+// ── 物品列表 ────────────────────────
+function updList(){
+  const ls = $('list'); ls.innerHTML = '';
+  const filtered = getFilteredItems();
+  $('icnt').textContent = filtered.length;
+  filtered.forEach(item => {
+    const realIdx = furnitureItems.indexOf(item);
+    const d = document.createElement('div');
+    const selClass = item.layer === 'sprite' ? 'sel' : 'sel-col';
+    d.className = 'it' + (realIdx === selectedIdx ? ' '+selClass : '');
+    const tagHtml = item.layer === 'sprite'
+      ? '<span class="tag tag-sp">叠图层</span>'
+      : '<span class="tag tag-col">纯碰撞</span>';
+    const imgHtml = item.originalSpriteUrl
+      ? `<img src="${item.originalSpriteUrl}" onerror="this.style.display='none'">`
+      : `<div style="width:48px;height:48px;background:#1e3a5f;border-radius:3px;display:flex;align-items:center;justify-content:center;color:#60a5fa;font-size:9px">碰撞</div>`;
+    d.innerHTML = `
+      ${imgHtml}
+      <div class="info">
+        <div class="n">${item.name} ${tagHtml}</div>
+        <div class="s">(${Math.round(item.x)},${Math.round(item.y)}) ${item.w}×${item.h}</div>
+      </div>`;
+    d.onclick = () => selectItem(realIdx);
+    ls.appendChild(d);
+  });
+}
+
+function selectItem(idx){
+  selectedIdx = idx;
+  if(idx >= 0){
+    // 自动切到对应标签
+    const item = furnitureItems[idx];
+    if(item.layer !== currentTab){
+      currentTab = item.layer;
+      $('tab-sp').className = currentTab === 'sprite' ? 'act' : '';
+      $('tab-col').className = currentTab === 'collision' ? 'act' : '';
+    }
+  }
+  updList();
+  showProps(idx);
+  render();
+  if(idx >= 0){
+    const item = furnitureItems[idx];
+    ca.scrollLeft = item.x * scale - ca.clientWidth/2;
+    ca.scrollTop = item.y * scale - ca.clientHeight/2;
+  }
+}
+
+// ── 属性面板 ────────────────────────
+function showProps(idx){
+  const panel = $('prop-panel');
+  if(idx < 0 || idx >= furnitureItems.length){
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+  const item = furnitureItems[idx];
+  $('p-name').value = item.name;
+  $('p-layer').value = item.layer;
+  $('p-x').value = Math.round(item.x);
+  $('p-y').value = Math.round(item.y);
+  $('p-w').value = item.w;
+  $('p-h').value = item.h;
+  $('p-walkable').checked = item.walkable;
+  
+  if(item.layer === 'sprite'){
+    $('sprite-props').style.display = 'flex';
+    $('collision-hint').style.display = 'none';
+    $('p-interactable').checked = item.interactable;
+    $('p-sit').checked = item.sitAction;
+    $('p-sceneId').value = item.interactSceneId || '';
+    $('interact-row').style.display = item.interactable ? 'flex' : 'none';
+  } else {
+    $('sprite-props').style.display = 'none';
+    $('collision-hint').style.display = 'block';
+    $('interact-row').style.display = 'none';
+  }
+}
+
+function updateProp(){
+  if(selectedIdx < 0) return;
+  const item = furnitureItems[selectedIdx];
+  const oldLayer = item.layer;
+  item.name = $('p-name').value || item.name;
+  item.layer = $('p-layer').value;
+  item.x = parseFloat($('p-x').value) || item.x;
+  item.y = parseFloat($('p-y').value) || item.y;
+  item.w = parseFloat($('p-w').value) || item.w;
+  item.h = parseFloat($('p-h').value) || item.h;
+  item.walkable = $('p-walkable').checked;
+  
+  if(item.layer === 'sprite'){
+    item.interactable = $('p-interactable').checked;
+    item.sitAction = $('p-sit').checked;
+    item.interactSceneId = $('p-sceneId').value;
+    $('interact-row').style.display = item.interactable ? 'flex' : 'none';
+    $('sprite-props').style.display = 'flex';
+    $('collision-hint').style.display = 'none';
+  } else {
+    item.interactable = false;
+    item.sitAction = false;
+    item.interactSceneId = '';
+    $('interact-row').style.display = 'none';
+    $('sprite-props').style.display = 'none';
+    $('collision-hint').style.display = 'block';
+  }
+  
+  // 如果层级变了，刷新标签
+  if(oldLayer !== item.layer){
+    currentTab = item.layer;
+    $('tab-sp').className = currentTab === 'sprite' ? 'act' : '';
+    $('tab-col').className = currentTab === 'collision' ? 'act' : '';
+  }
+  
+  updList();
+  render();
+}
+
+// ── 鼠标事件：拖拽物品 ──────────────
+function getClickItem(ex, ey){
+  const [ix, iy] = toImg(ex, ey);
+  for(let i = furnitureItems.length - 1; i >= 0; i--){
+    const item = furnitureItems[i];
+    if(ix >= item.x && ix <= item.x + item.w && iy >= item.y && iy <= item.y + item.h){
+      return i;
+    }
+  }
+  return -1;
+}
+
+let panning = false, panSx = 0, panSy = 0, scSx = 0, scSy = 0;
+
+ca.addEventListener('mousedown', e => {
+  const r = ca.getBoundingClientRect();
+  const cx = e.clientX - r.left + ca.scrollLeft;
+  const cy = e.clientY - r.top + ca.scrollTop;
+  
+  if(e.button === 1 || (e.button === 0 && e.altKey)){
+    panning = true; panSx = e.clientX; panSy = e.clientY;
+    scSx = ca.scrollLeft; scSy = ca.scrollTop;
+    cv.style.cursor = 'grabbing'; e.preventDefault(); return;
+  }
+  if(e.button !== 0) return;
+  
+  const idx = getClickItem(cx, cy);
+  if(idx >= 0){
+    selectItem(idx);
+    dragging = true;
+    dragStartX = e.clientX; dragStartY = e.clientY;
+    dragOrigX = furnitureItems[idx].x;
+    dragOrigY = furnitureItems[idx].y;
+    cv.style.cursor = 'grabbing';
+  } else {
+    selectItem(-1);
+  }
+});
+
+ca.addEventListener('mousemove', e => {
+  const r = ca.getBoundingClientRect();
+  const [ix, iy] = toImg(e.clientX - r.left + ca.scrollLeft, e.clientY - r.top + ca.scrollTop);
+  $('cur').textContent = '坐标: ('+Math.round(ix)+','+Math.round(iy)+')';
+  
+  if(panning){ ca.scrollLeft = scSx - (e.clientX - panSx); ca.scrollTop = scSy - (e.clientY - panSy); return; }
+  if(!dragging || selectedIdx < 0) return;
+  
+  const dx = (e.clientX - dragStartX) / scale;
+  const dy = (e.clientY - dragStartY) / scale;
+  const item = furnitureItems[selectedIdx];
+  item.x = dragOrigX + dx;
+  item.y = dragOrigY + dy;
+  render();
+});
+
+ca.addEventListener('mouseup', e => {
+  if(panning){ panning = false; cv.style.cursor = 'default'; return; }
+  if(dragging){
+    dragging = false;
+    cv.style.cursor = 'default';
+    if(selectedIdx >= 0) showProps(selectedIdx);
+    updList();
+    render();
+  }
+});
+
+ca.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f = e.deltaY < 0 ? 1.12 : 0.89;
+  const r = ca.getBoundingClientRect();
+  const mx = e.clientX - r.left + ca.scrollLeft;
+  const my = e.clientY - r.top + ca.scrollTop;
+  const os = scale;
+  scale = Math.max(minSc, Math.min(maxSc, scale * f));
+  ca.scrollLeft = mx * (scale/os) - (e.clientX - r.left);
+  ca.scrollTop = my * (scale/os) - (e.clientY - r.top);
+  render(); updZoom();
+}, {passive: false});
+
+// ── 键盘操作 ────────────────────────
+document.addEventListener('keydown', e => {
+  if(document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') return;
+  if(selectedIdx < 0) return;
+  const item = furnitureItems[selectedIdx];
+  const step = e.shiftKey ? 10 : 1;
+  switch(e.key){
+    case 'ArrowLeft':  item.x -= step; e.preventDefault(); break;
+    case 'ArrowRight': item.x += step; e.preventDefault(); break;
+    case 'ArrowUp':    item.y -= step; e.preventDefault(); break;
+    case 'ArrowDown':  item.y += step; e.preventDefault(); break;
+    case 'Delete':
+    case 'Backspace':
+      furnitureItems.splice(selectedIdx, 1);
+      selectedIdx = Math.min(selectedIdx, furnitureItems.length - 1);
+      e.preventDefault(); break;
+    default: return;
+  }
+  showProps(selectedIdx);
+  updList();
+  render();
+});
+
+// ── 自动排列 ────────────────────────
+function autoLayout(){
+  if(!furnitureItems.length){ log('⚠ 没有物品可排列','w'); return; }
+  const cols = Math.ceil(Math.sqrt(furnitureItems.length));
+  const spacing = 20;
+  furnitureItems.forEach((item, i) => {
+    const col = i % cols, row = Math.floor(i / cols);
+    item.x = 20 + col * 120;
+    item.y = 20 + row * 120;
+    if(item.w > 100) item.w = 100;
+    if(item.h > 100) item.h = 100;
+  });
+  selectedIdx = -1;
+  updList();
+  render();
+  log('🤖 已自动排列 '+furnitureItems.length+' 个物品', 'o');
+}
+
+// ── 导出 map.json ────────────────────
+function exportMapJSON(){
+  if(!baseImg){ log('⚠ 请先加载底图','w'); return; }
+  if(!furnitureItems.length){ log('⚠ 没有物品','w'); return; }
+  
+  // 分离两种物品
+  const spriteItems = furnitureItems.filter(it => it.layer === 'sprite');
+  const collisionItems = furnitureItems.filter(it => it.layer === 'collision');
+  
+  // 构建 furniture_objects（叠图层）
+  let fid = 1;
+  const furnitureObjects = spriteItems.map(item => {
+    const obj = {
+      id: fid++,
+      name: item.name,
+      type: "furniture",
+      x: Math.round(item.x),
+      y: Math.round(item.y),
+      width: item.w,
+      height: item.h
+    };
+    const props = [];
+    if(item.walkable) props.push({name:"walkable", type:"bool", value:true});
+    if(item.interactable){
+      props.push({name:"interactable", type:"bool", value:true});
+      props.push({name:"interactSceneId", type:"string", value:item.interactSceneId || item.name});
+      if(item.sitAction) props.push({name:"sitAction", type:"bool", value:true});
+    }
+    if(props.length) obj.properties = props;
+    return obj;
+  });
+  
+  // 构建 collision 对象（纯碰撞框，叠加到已有的 wall 碰撞后面）
+  let cid = 5; // wall 碰撞用了 1-4
+  const collisionObjects = collisionItems.filter(it => !it.walkable).map(item => ({
+    id: cid++,
+    name: item.name,
+    type: "",
+    x: Math.round(item.x),
+    y: Math.round(item.y),
+    width: item.w,
+    height: item.h
+  }));
+  
+  // 保持已有的 wall 碰撞
+  const existingCollision = [
+    {id:1,name:"wall_top",x:0,y:0,width:baseW,height:32},
+    {id:2,name:"wall_bottom",x:0,y:baseH-32,width:baseW,height:32},
+    {id:3,name:"wall_left",x:0,y:0,width:32,height:baseH},
+    {id:4,name:"wall_right",x:baseW-32,y:0,width:32,height:baseH}
+  ];
+  
+  const mapData = {
+    compressionlevel: -1,
+    height: Math.ceil(baseH / 32),
+    infinite: false,
+    layers: [
+      {
+        id: 1, name: "ground", type: "imagelayer",
+        image: "sleep.png", x: 0, y: 0,
+        width: baseW, height: baseH
+      },
+      {
+        id: 2, name: "collision", type: "objectgroup", draworder: "topdown",
+        objects: [...existingCollision, ...collisionObjects]
+      },
+      {
+        id: 3, name: "furniture_objects", type: "objectgroup", draworder: "topdown",
+        objects: furnitureObjects
+      },
+      {
+        id: 4, name: "triggers", type: "objectgroup", draworder: "topdown",
+        objects: [
+          {id:100,name:"trigger_window",x:400,y:200,width:200,height:300,
+            properties:[
+              {name:"triggerType",type:"string",value:"interact"},
+              {name:"sceneId",type:"string",value:"ch1_go_balcony"}
+            ]},
+          {id:101,name:"trigger_sit_area",x:450,y:800,width:300,height:200,
+            properties:[
+              {name:"triggerType",type:"string",value:"walk"},
+              {name:"sceneId",type:"string",value:"ch1_stand_up"},
+              {name:"once",type:"bool",value:true}
+            ]}
+        ]
+      },
+      {
+        id: 5, name: "player_spawn", type: "objectgroup", draworder: "topdown",
+        objects: [
+          {id:200,name:"spawn_sit_desk",x:570,y:950,width:32,height:32},
+          {id:201,name:"spawn_stand_by_chair",x:650,y:940,width:32,height:32},
+          {id:202,name:"spawn_dorm_entrance",x:100,y:1200,width:32,height:32}
+        ]
+      },
+      {id:6,name:"npcs",type:"objectgroup",draworder:"topdown",objects:[]},
+      {id:7,name:"items",type:"objectgroup",draworder:"topdown",objects:[]}
+    ],
+    nextlayerid: 8,
+    nextobjectid: 300,
+    orientation: "orthogonal",
+    renderorder: "right-down",
+    tiledversion: "1.10.2",
+    tileheight: 32,
+    tilewidth: 32,
+    type: "map",
+    version: "1.10",
+    width: Math.ceil(baseW / 32)
+  };
+  
+  const jsonStr = JSON.stringify(mapData, null, 2);
+  const blob = new Blob([jsonStr], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'map.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  log('💾 已导出 map.json', 'o');
+  log('  🖼 叠图层 (furniture_objects): '+furnitureObjects.length+' 个', 'i');
+  log('  🔲 纯碰撞 (collision): '+collisionObjects.length+' 个', 'i');
+  log('📝 复制此文件到 client/public/assets/maps/dormitory/map.json', 'i');
+}
+
+function copyJSON(){
+  if(!furnitureItems.length){ log('⚠ 没有物品','w'); return; }
+  const spriteItems = furnitureItems.filter(it => it.layer === 'sprite');
+  const collisionItems = furnitureItems.filter(it => it.layer === 'collision' && !it.walkable);
+  
+  let fid = 1, cid = 5;
+  const result = {
+    furniture_objects: spriteItems.map(item => {
+      const obj = {id:fid++,name:item.name,x:Math.round(item.x),y:Math.round(item.y),width:item.w,height:item.h};
+      const props = [];
+      if(item.walkable) props.push({name:"walkable",type:"bool",value:true});
+      if(item.interactable){props.push({name:"interactable",type:"bool",value:true});props.push({name:"interactSceneId",type:"string",value:item.interactSceneId||item.name});if(item.sitAction)props.push({name:"sitAction",type:"bool",value:true});}
+      if(props.length) obj.properties = props;
+      return obj;
+    }),
+    collision_additions: collisionItems.map(item => ({id:cid++,name:item.name,x:Math.round(item.x),y:Math.round(item.y),width:item.w,height:item.h}))
+  };
+  
+  navigator.clipboard.writeText(JSON.stringify(result, null, 2)).then(() => {
+    log('📋 已复制 JSON', 'o');
+  }).catch(() => log('⚠ 复制失败', 'w'));
+}
+
+// ── 拖拽打开 ────────────────────────
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  const files = Array.from(e.dataTransfer.files);
+  const imgFiles = files.filter(f => f.type.startsWith('image/'));
+  if(!imgFiles.length) return;
+  
+  if(!baseImg){
+    const f = imgFiles.shift();
+    $('fi').files = new DataTransfer().files;
+    const dt = new DataTransfer(); dt.items.add(f);
+    $('fi').files = dt.files;
+    onBaseMapSelected({target: $('fi')});
+  }
+  
+  if(imgFiles.length){
+    const dt = new DataTransfer();
+    imgFiles.forEach(f => dt.items.add(f));
+    $('fs').files = dt.files;
+    onSpritesSelected({target: $('fs')});
+  }
+});
+
+// ── 窗口resize ──────────────────────
+window.addEventListener('resize', () => {});
+
+log('🏠 宿舍物品放置工具已就绪','o');
+log('','i');
+log('📌 两种模式：','i');
+log('  🖼 叠图层 (item_14~17) — 加载精灵图，拖到对应位置','i');
+log('  🔲 纯碰撞 (其余) — 点击「➕ 添加碰撞框」创建矩形碰撞','i');
+log('','i');
+log('操作流程:','i');
+log('  1. 点击「📂 加载底图」打开 sleep.png','i');
+log('  2. 🖼 模式下：点击「📥 加载精灵」选 item_14~17','i');
+log('  3. 🔲 模式下：点「➕ 添加碰撞框」逐一添加其余物品碰撞','i');
+log('  4. 拖拽物品到正确位置 → 💾 导出 map.json','i');
+</script>
+</body>
+</html>

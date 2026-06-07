@@ -1,0 +1,501 @@
+{
+  "compressionlevel": -1,
+  "height": 43,
+  "infinite": false,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "sleep.png",
+      "x": 0,
+      "y": 0,
+      "width": 1149,
+      "height": 1369
+    },
+    {
+      "id": 2,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "wall_top",
+          "x": 0,
+          "y": 0,
+          "width": 1149,
+          "height": 32
+        },
+        {
+          "id": 2,
+          "name": "wall_bottom",
+          "x": 0,
+          "y": 1337,
+          "width": 1149,
+          "height": 32
+        },
+        {
+          "id": 3,
+          "name": "wall_left",
+          "x": 0,
+          "y": 0,
+          "width": 32,
+          "height": 1369
+        },
+        {
+          "id": 4,
+          "name": "wall_right",
+          "x": 1117,
+          "y": 0,
+          "width": 32,
+          "height": 1369
+        },
+        {
+          "id": 5,
+          "name": "collision_item01",
+          "x": 82,
+          "y": 669,
+          "width": 353,
+          "height": 362
+        },
+        {
+          "id": 6,
+          "name": "collision_item02",
+          "x": 91,
+          "y": 178,
+          "width": 349,
+          "height": 335
+        },
+        {
+          "id": 7,
+          "name": "collision_item03",
+          "x": 715,
+          "y": 180,
+          "width": 366,
+          "height": 333
+        },
+        {
+          "id": 8,
+          "name": "collision_item04",
+          "x": 716,
+          "y": 675,
+          "width": 365,
+          "height": 360
+        },
+        {
+          "id": 9,
+          "name": "collision_item05",
+          "x": 330,
+          "y": 1014,
+          "width": 106,
+          "height": 56
+        },
+        {
+          "id": 10,
+          "name": "collision_item06",
+          "x": 86,
+          "y": 1014,
+          "width": 44,
+          "height": 64
+        },
+        {
+          "id": 11,
+          "name": "collision_item07",
+          "x": 436,
+          "y": 986,
+          "width": 64,
+          "height": 70
+        },
+        {
+          "id": 12,
+          "name": "collision_item09_left",
+          "x": 328,
+          "y": 478,
+          "width": 110,
+          "height": 75
+        },
+        {
+          "id": 13,
+          "name": "collision_item09_right",
+          "x": 955,
+          "y": 476,
+          "width": 108,
+          "height": 64
+        },
+        {
+          "id": 14,
+          "name": "collision_item10",
+          "x": 716,
+          "y": 500,
+          "width": 52,
+          "height": 64
+        },
+        {
+          "id": 15,
+          "name": "collision_item11",
+          "x": 963,
+          "y": 1002,
+          "width": 101,
+          "height": 64
+        },
+        {
+          "id": 16,
+          "name": "collision_item12",
+          "x": 716,
+          "y": 1013,
+          "width": 49,
+          "height": 64
+        },
+        {
+          "id": 17,
+          "name": "collision_item14",
+          "x": 658,
+          "y": 906,
+          "width": 64,
+          "height": 68
+        },
+        {
+          "id": 18,
+          "name": "collision_item15",
+          "x": 655,
+          "y": 469,
+          "width": 64,
+          "height": 64
+        },
+        {
+          "id": 19,
+          "name": "collision_item16",
+          "x": 434,
+          "y": 497,
+          "width": 64,
+          "height": 36
+        },
+        {
+          "id": 20,
+          "name": "collision_item17",
+          "x": 201,
+          "y": 498,
+          "width": 90,
+          "height": 105
+        },
+        {
+          "id": 21,
+          "name": "collision_item18",
+          "x": 842,
+          "y": 498,
+          "width": 90,
+          "height": 108
+        },
+        {
+          "id": 22,
+          "name": "collision_item20",
+          "x": 35,
+          "y": 10,
+          "width": 1057,
+          "height": 350
+        },
+        {
+          "id": 23,
+          "name": "collision_item21_right",
+          "x": 1070,
+          "y": -12,
+          "width": 64,
+          "height": 1366
+        },
+        {
+          "id": 24,
+          "name": "collision_item21_left",
+          "x": 19,
+          "y": 43,
+          "width": 64,
+          "height": 1350
+        },
+        {
+          "id": 25,
+          "name": "collision_item22",
+          "x": 75,
+          "y": 1240,
+          "width": 404,
+          "height": 64
+        },
+        {
+          "id": 26,
+          "name": "collision_item23",
+          "x": 684,
+          "y": 1241,
+          "width": 400,
+          "height": 64
+        },
+        {
+          "id": 27,
+          "name": "collision_pc_desk",
+          "x": 217,
+          "y": 906,
+          "width": 79,
+          "height": 89
+        },
+        {
+          "id": 28,
+          "name": "collision_cpp_book",
+          "x": 843,
+          "y": 944,
+          "width": 70,
+          "height": 47
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "item_14",
+          "type": "furniture",
+          "x": 211,
+          "y": 1015,
+          "width": 83,
+          "height": 106,
+          "properties": [
+            {
+              "name": "interactable",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "interactSceneId",
+              "type": "string",
+              "value": "item_14"
+            },
+            {
+              "name": "sitAction",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "item_15",
+          "type": "furniture",
+          "x": 833,
+          "y": 1011,
+          "width": 86,
+          "height": 109
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "triggers",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 100,
+          "name": "trigger_window",
+          "x": 400,
+          "y": 200,
+          "width": 200,
+          "height": 300,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch1_go_balcony"
+            }
+          ]
+        },
+        {
+          "id": 101,
+          "name": "trigger_sit_area",
+          "x": 450,
+          "y": 800,
+          "width": 300,
+          "height": 200,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "walk"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "ch1_stand_up"
+            },
+            {
+              "name": "once",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "name": "trigger_pc",
+          "x": 217,
+          "y": 906,
+          "width": 79,
+          "height": 89,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "查看电脑"
+            }
+          ]
+        },
+        {
+          "id": 103,
+          "name": "trigger_cpp_book",
+          "x": 843,
+          "y": 944,
+          "width": 70,
+          "height": 47,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "c++程序设计书"
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "name": "trigger_balcony_door",
+          "x": 404,
+          "y": 101,
+          "width": 335,
+          "height": 263,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "door"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "是否前往阳台"
+            }
+          ]
+        },
+        {
+          "id": 105,
+          "name": "trigger_clock",
+          "x": 218,
+          "y": 1191,
+          "width": 93,
+          "height": 64,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "时钟"
+            }
+          ]
+        },
+        {
+          "id": 106,
+          "name": "trigger_exit_door",
+          "x": 486,
+          "y": 1259,
+          "width": 183,
+          "height": 44,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "出门"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 200,
+          "name": "spawn_sit_desk",
+          "x": 570,
+          "y": 950,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 201,
+          "name": "spawn_stand_by_chair",
+          "x": 650,
+          "y": 940,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 202,
+          "name": "spawn_dorm_entrance",
+          "x": 100,
+          "y": 1200,
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "npcs",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    },
+    {
+      "id": 7,
+      "name": "items",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 300,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 36
+}
