@@ -118,14 +118,14 @@ body {
   pointer-events: none; /* 上方区域透传鼠标事件 */
 }
 
-/* 选项区域 — 对话框上方，紧凑排列 */
+/* 选项区域 — 对话框上方，紧挨对话框 */
 .dialog-choices {
   pointer-events: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px 4px;
+  padding: 0 16px 6px;
   margin: 0 8%;
 }
 
@@ -481,10 +481,10 @@ body {
   display: block;
 }
 
-/* CG 选项 */
+/* CG 选项 — 紧挨底部对话框 */
 .cg-choices {
   position: absolute;
-  bottom: 26%;
+  bottom: 14%;
   left: 10%;
   right: 10%;
   z-index: 3;
@@ -562,6 +562,41 @@ body {
 /* CG 旁白模式：行距缩小 */
 .cg-dialog-text.narrator {
   line-height: 1.35;
+}
+
+/* ══════════════════════════════════════════════
+   睁眼效果 — 眨眼动画 + 最终睁开
+   ══════════════════════════════════════════════ */
+.eye-open-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #000000;
+  pointer-events: none;
+}
+
+/* 眨眼动画：快速闭眼 3 次后最后睁开 */
+@keyframes eyeBlink {
+  /* 第一次闭眼 */
+  0%   { opacity: 1; }
+  10%  { opacity: 1; }
+  15%  { opacity: 0.15; }
+  20%  { opacity: 1; }
+  /* 第二次闭眼 */
+  25%  { opacity: 1; }
+  30%  { opacity: 0.15; }
+  35%  { opacity: 1; }
+  /* 第三次闭眼 */
+  40%  { opacity: 1; }
+  45%  { opacity: 0.15; }
+  50%  { opacity: 1; }
+  /* 缓缓睁开 */
+  70%  { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+.eye-open-overlay.blinking {
+  animation: eyeBlink 2s ease-in-out forwards;
 }
 
 

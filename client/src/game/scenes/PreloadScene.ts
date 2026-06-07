@@ -92,6 +92,14 @@ export class PreloadScene extends Phaser.Scene {
         this.load.image(frameKey, filePath);
       }
     }
+
+    // 加载 NPC 精灵图（宿舍第三幕等）
+    this.load.image("npc_cyh", "assets/sprites/cyh.png");
+    this.load.image("npc_roommateA", "assets/sprites/roommateA.png");
+    this.load.image("npc_roommateB", "assets/sprites/roommateB.png");
+
+    // 加载音效
+    this.load.audio("alarm_clock", "assets/audio/sfx/alarm_clock.mp3");
   }
 
   create() {

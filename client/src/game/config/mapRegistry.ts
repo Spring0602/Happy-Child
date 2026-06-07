@@ -144,4 +144,19 @@ export const MapRegistry: Record<string, MapEntry> = {
     tileWidth: 32,
     tileHeight: 32,
   },
+  /** 宿舍白天版（复用 dormitory map.json + 白天底图，用于第三章） */
+  dormitory_day: {
+    mapKey: "map_dormitory_day",
+    mapJson: "/assets/maps/dormitory/map.json",
+    groundKey: "ground_dormitory_day",
+    groundImage: "/assets/maps/dormitory/宿舍.png",
+    tilesetKey: "tileset_dormitory_day",
+    tilesetImage: "/assets/maps/dormitory/tileset.png",
+    tilesetNameInTiled: "dummy",
+    defaultSpawn: "spawn_stand_chair_right",
+    width: 1149,
+    height: 1369,
+    tileWidth: 32,
+    tileHeight: 32,
+  },
 };

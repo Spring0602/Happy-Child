@@ -7,7 +7,7 @@
       "id": 1,
       "name": "ground",
       "type": "imagelayer",
-      "image": "sleep.png",
+      "image": "宿舍.png",
       "x": 0,
       "y": 0,
       "width": 1149,
@@ -551,8 +551,8 @@
           "id": 5,
           "name": "occlusion_49",
           "type": "furniture",
-          "x": 74,
-          "y": 801,
+          "x": 76,
+          "y": 814,
           "width": 0,
           "height": 0,
           "polygon": [
@@ -771,8 +771,8 @@
           "id": 9,
           "name": "occlusion_53",
           "type": "furniture",
-          "x": 201,
-          "y": 495,
+          "x": 202,
+          "y": 501,
           "width": 0,
           "height": 0,
           "polygon": [
@@ -1153,6 +1153,30 @@
           "y": 370,
           "width": 32,
           "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_53",
+          "x": 772,
+          "y": 1086,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 205,
+          "name": "spawn_spawn_54",
+          "x": 763,
+          "y": 578,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 206,
+          "name": "spawn_spawn_55",
+          "x": 340,
+          "y": 578,
+          "width": 32,
+          "height": 32
         }
       ]
     },
@@ -1172,7 +1196,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 254,
+  "nextobjectid": 257,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

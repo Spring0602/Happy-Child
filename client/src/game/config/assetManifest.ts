@@ -120,6 +120,15 @@ export const AssetManifest = {
       tilesetKey: "tileset_balcony_night",
       tilesetImage: "/assets/maps/balcony/tileset.png",
     },
+    /** 宿舍白天版（复用 dormitory map.json + 白天底图） */
+    dormitory_day: {
+      mapKey: "map_dormitory_day",
+      mapJson: "/assets/maps/dormitory/map.json",
+      groundKey: "ground_dormitory_day",
+      groundImage: "/assets/maps/dormitory/宿舍.png",
+      tilesetKey: "tileset_dormitory_day",
+      tilesetImage: "/assets/maps/dormitory/tileset.png",
+    },
   },
   /** 玩家帧动画素材（yps = 叶平生，主角） */
   frames: {

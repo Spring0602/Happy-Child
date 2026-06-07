@@ -1272,4 +1272,280 @@ export const scenes: Record<string, Scene> = {
     text: "都这么晚了，先把电脑关了睡觉吧。",
   },
 
+  // ========== 宿舍第三幕：次日清晨 ==========
+
+  // 夜晚结束后的反思独白（黑屏）
+  dorm_act3_reflection: {
+    id: "dorm_act3_reflection",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "那时我并不知道，前方有多少未知在虎视眈眈地盯着我，但我能肯定，未知每天都在我的生活中流淌，无论这个世界如何变化，它都在那里。",
+    nextSceneId: "dorm_act3_alarm",
+  },
+
+  // 闹钟响起（黑屏 + 闹铃音效）
+  dorm_act3_alarm: {
+    id: "dorm_act3_alarm",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "闹钟在07：00准时响起，我烦躁地翻了个身，精准地抓住不听话的手机把铃声快速关掉。",
+    nextSceneId: "dorm_act3_wake",
+  },
+
+  // 挣扎起床（黑屏）
+  dorm_act3_wake: {
+    id: "dorm_act3_wake",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "我在床上苦苦挣扎了一分钟，最后终于说服自己睁开了眼。",
+    nextSceneId: "dorm_act3_getup",
+  },
+
+  // 下床（天花板 CG）
+  dorm_act3_getup: {
+    id: "dorm_act3_getup",
+    chapter: "序章",
+    background: "/assets/CG/前兆/天花板.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "我迷迷糊糊地收拾床铺，然后下床。",
+    onCgEnd: "enter_dormitory_day",
+  },
+
+  // ── 以下为宿舍白天地图上的对话 ──
+
+  dorm_act3_notice_pc: {
+    id: "dorm_act3_notice_pc",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "等等，那是……",
+    nextSceneId: "dorm_act3_pc_on_1",
+  },
+
+  dorm_act3_pc_on_1: {
+    id: "dorm_act3_pc_on_1",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "我本来挺困的，却被入眼的白光吓得瞬间清醒。",
+    nextSceneId: "dorm_act3_pc_on_2",
+  },
+
+  dorm_act3_pc_on_2: {
+    id: "dorm_act3_pc_on_2",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "这次应该不是因为我忘记关电脑了，而是电脑自动打开了。",
+    nextSceneId: "dorm_act3_turn_roommate",
+  },
+
+  dorm_act3_turn_roommate: {
+    id: "dorm_act3_turn_roommate",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "我吞了口唾沫，转头看向室友。",
+    nextSceneId: "dorm_act3_ask_pc",
+  },
+
+  dorm_act3_ask_pc: {
+    id: "dorm_act3_ask_pc",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "你们昨晚有谁打开了我的电脑吗？",
+    nextSceneId: "dorm_act3_roommate_laugh",
+  },
+
+  dorm_act3_roommate_laugh: {
+    id: "dorm_act3_roommate_laugh",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "室友像听了什么笑话一样。",
+    nextSceneId: "dorm_act3_roommateA_reply",
+  },
+
+  dorm_act3_roommateA_reply: {
+    id: "dorm_act3_roommateA_reply",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "室友A",
+    text: "ber，哥们你卷糊涂了吧，我们自己有电脑，为啥要用你的？",
+    nextSceneId: "dorm_act3_narrate_other",
+  },
+
+  dorm_act3_narrate_other: {
+    id: "dorm_act3_narrate_other",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "另外一个室友附和道，",
+    nextSceneId: "dorm_act3_roommateB_reply",
+  },
+
+  dorm_act3_roommateB_reply: {
+    id: "dorm_act3_roommateB_reply",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "室友B",
+    text: "是啊……你卷得这么晚，哪个疯子会大晚上不睡觉就为了打开你的电脑？",
+    nextSceneId: "dorm_act3_still_doubt",
+  },
+
+  dorm_act3_still_doubt: {
+    id: "dorm_act3_still_doubt",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "我仍不死心，",
+    nextSceneId: "dorm_act3_ask_sound",
+  },
+
+  dorm_act3_ask_sound: {
+    id: "dorm_act3_ask_sound",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "那快天亮的时候你们有听到什么动静吗？",
+    nextSceneId: "dorm_act3_both_reply",
+  },
+
+  dorm_act3_both_reply: {
+    id: "dorm_act3_both_reply",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "俩室友",
+    text: "没，我俩都困得要死。",
+    nextSceneId: "dorm_act3_inner_thought",
+  },
+
+  dorm_act3_inner_thought: {
+    id: "dorm_act3_inner_thought",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "（也是，依他们的性子，这两个大摆锤恨不得睡得昏天黑地。）",
+    nextSceneId: "dorm_act3_ask_hao",
+  },
+
+  dorm_act3_ask_hao: {
+    id: "dorm_act3_ask_hao",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "那你呢，浩哥？",
+    nextSceneId: "dorm_act3_narrate_chen",
+  },
+
+  dorm_act3_narrate_chen: {
+    id: "dorm_act3_narrate_chen",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "陈煜浩是唯一一个比我还卷的室友，加之脑子比我好使，课设作业也比我早一天完成。他平时睡眠也不是很好，估计我昨晚熬夜把他搞失眠了，不过正好，后半夜的情况他应该很清楚。",
+    nextSceneId: "dorm_act3_chen_shake",
+  },
+
+  dorm_act3_chen_shake: {
+    id: "dorm_act3_chen_shake",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "他一边收拾书包一边摇了摇头。",
+    nextSceneId: "dorm_act3_shock",
+  },
+
+  dorm_act3_shock: {
+    id: "dorm_act3_shock",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "啊？",
+    nextSceneId: "dorm_act3_narrate_chen_detail",
+  },
+
+  dorm_act3_narrate_chen_detail: {
+    id: "dorm_act3_narrate_chen_detail",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "见我一脸疑惑，他淡淡解释道，",
+    nextSceneId: "dorm_act3_chen_reveal",
+  },
+
+  dorm_act3_chen_reveal: {
+    id: "dorm_act3_chen_reveal",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "陈煜浩",
+    text: "我的意思是，快天亮的时候就是你本人打开了电脑。",
+    nextSceneId: "dorm_act3_narrate_shock",
+  },
+
+  dorm_act3_narrate_shock: {
+    id: "dorm_act3_narrate_shock",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "旁白",
+    text: "我顿时汗毛倒竖。",
+    nextSceneId: "dorm_act3_protagonist_shock",
+  },
+
+  dorm_act3_protagonist_shock: {
+    id: "dorm_act3_protagonist_shock",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "叶平生",
+    text: "见鬼……怎么可能？我明明睡前把电脑关了。",
+    nextSceneId: "dorm_act3_chen_explain",
+  },
+
+  dorm_act3_chen_explain: {
+    id: "dorm_act3_chen_explain",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "陈煜浩",
+    text: "不用这么惊讶，我想，你应该是梦游了。这种事如今在年轻人之中并不少见。",
+    nextSceneId: "dorm_act3_roommateA_comfort",
+  },
+
+  dorm_act3_roommateA_comfort: {
+    id: "dorm_act3_roommateA_comfort",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/宿舍.png",
+    speaker: "室友A",
+    text: "叶卷卷你都连续熬了这么多天，是不是都神经衰弱了？被吓到也是情有可原。你这几天好好休息一下就好了。",
+    nextSceneId: "dorm_act3_idea_cg",
+  },
+
+  // 切换到 idea CG
+  dorm_act3_idea_cg: {
+    id: "dorm_act3_idea_cg",
+    chapter: "序章",
+    background: "/assets/CG/前兆/idea界面.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我又看了眼停留在5154行的光标，叹了口气，关上电脑把它仍进包里。",
+    nextSceneId: "dorm_act3_final_dark",
+  },
+
+  // 全黑
+  dorm_act3_final_dark: {
+    id: "dorm_act3_final_dark",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "整个白天我都在上课，电脑我一直监视着，这段时间倒是没有再徒生变故。\n\n难道昨晚的事件真的是我的错觉？",
+  },
+
 };

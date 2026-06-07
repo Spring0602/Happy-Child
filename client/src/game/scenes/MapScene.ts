@@ -642,30 +642,114 @@ export class MapScene extends Phaser.Scene {
       }
       case "fade_out_map": {
         // 地图淡出至全黑（睡觉过渡效果）
+        // 使用相机 fade 效果，而非手动创建矩形（手动矩形在世界坐标中位置会随相机滚动偏移）
         const duration = (payload?.duration as number) || 1500;
-        const overlay = this.add.rectangle(
-          this.cameras.main.width / 2,
-          this.cameras.main.height / 2,
-          this.cameras.main.width,
-          this.cameras.main.height,
-          0x000000, 0
-        ).setDepth(20000).setScrollFactor(0);
-        this.tweens.add({
-          targets: overlay,
-          alpha: 1,
-          duration,
-          ease: "Power2",
-          onComplete: () => {
+        this.cameras.main.fade(duration, 0, 0, 0, true, (_cam: Phaser.Cameras.Scene2D.Camera, progress: number) => {
+          // 淡出完成后，创建一个全屏黑幕盖住画面（防止 fadeIn 自动恢复）
+          if (progress >= 1) {
+            const cam = this.cameras.main;
+            const overlay = this.add.rectangle(
+              cam.scrollX + cam.width / 2,
+              cam.scrollY + cam.height / 2,
+              cam.width,
+              cam.height,
+              0x000000, 1
+            ).setDepth(20000).setScrollFactor(0);
             this.registry.set("fadeOverlay", overlay);
-          },
+          }
         });
         break;
       }
       case "remove_fade_overlay": {
+        // 移除淡出黑幕并恢复相机正常显示
         const overlay = this.registry.get("fadeOverlay") as Phaser.GameObjects.Rectangle | undefined;
         if (overlay) {
           overlay.destroy();
           this.registry.remove("fadeOverlay");
+        }
+        // 重置相机 fade 效果（防止相机仍处于 fade 状态）
+        this.cameras.main.resetFX();
+        break;
+      }
+      case "spawn_npc": {
+        // 在指定出生点生成 NPC 精灵
+        const spawnId = payload?.spawnId as string;
+        const npcKey = payload?.npcKey as string;
+        if (!spawnId || !npcKey) break;
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (spawnLayer) {
+          const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
+          if (spawn) {
+            const cx = spawn.x! + (spawn.width ?? 32) / 2;
+            const cy = spawn.y! + (spawn.height ?? 32) / 2;
+            const scale = (payload?.scale as number) || 2;
+            const sprite = this.add.sprite(cx, cy, npcKey).setScale(scale);
+            sprite.setDepth(cy / (this.map.heightInPixels || 1000));
+            // 碰撞体
+            const bodyW = (payload?.bodyWidth as number) || 24;
+            const bodyH = (payload?.bodyHeight as number) || 36;
+            const zone = this.add.zone(cx, cy, bodyW, bodyH);
+            this.physics.add.existing(zone, true);
+            this.collisionGroup.add(zone);
+            // 存储 NPC 引用
+            const npcList = (this.registry.get("npcSprites") as Map<string, Phaser.GameObjects.Sprite>) || new Map();
+            npcList.set(npcKey, sprite);
+            this.registry.set("npcSprites", npcList);
+          }
+        }
+        break;
+      }
+      case "set_npc_direction": {
+        // 设置 NPC 朝向（left/right 通过 setFlipX 镜像，front/back 不翻转）
+        const npcKey = payload?.npcKey as string;
+        const direction = payload?.direction as string;
+        if (!npcKey || !direction) break;
+        const npcList = this.registry.get("npcSprites") as Map<string, Phaser.GameObjects.Sprite> | undefined;
+        const sprite = npcList?.get(npcKey);
+        if (sprite) {
+          sprite.setFlipX(direction === "left");
+        }
+        break;
+      }
+      case "set_player_anim": {
+        // 设置玩家朝向动画
+        const direction = payload?.direction as string;
+        if (direction && this.playerCtrl) {
+          this.playerCtrl.setDirection(direction as "left" | "right" | "up" | "down");
+        }
+        break;
+      }
+      case "eye_open_effect": {
+        // 睁眼效果：在全屏黑幕上做眨眼动画（3次眨眼后完全亮起）
+        // 此效果依赖 React 端已有的 fadeOverlay，这里不做额外操作，
+        // 只通知 React 侧完成（由 App.tsx 的 onCgEnd 逻辑处理）
+        break;
+      }
+      case "play_sfx": {
+        // 播放音效（闹钟等）
+        const key = (payload?.key as string) || "";
+        try {
+          if (key && this.sound.get(key)) {
+            this.sound.play(key, { loop: (payload?.loop as boolean) || false, volume: (payload?.volume as number) || 1 });
+          } else if (key) {
+            console.warn(`[MapScene] 音效 "${key}" 未加载，请将音效文件放入 assets/audio/sfx/ 目录`);
+          }
+        } catch (e) {
+          console.warn(`[MapScene] 播放音效失败: ${key}`, e);
+        }
+        break;
+      }
+      case "stop_sfx": {
+        // 停止指定音效
+        const key = (payload?.key as string) || "";
+        try {
+          if (key) {
+            this.sound.stopByKey(key);
+          } else {
+            this.sound.stopAll();
+          }
+        } catch (e) {
+          // 忽略停止时的错误
         }
         break;
       }

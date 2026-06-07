@@ -16,6 +16,7 @@ export default function App() {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showAITrace, setShowAITrace] = useState(false);
+  const [eyeOpening, setEyeOpening] = useState(false);
 
   // 当前对话场景
   const dialogSceneId = state.currentSceneId && scenes[state.currentSceneId]
@@ -114,6 +115,23 @@ export default function App() {
             gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
             dispatch({ type: "DIALOG_START", sceneId: "dorm_act2_think" });
           }, 600);
+          dispatch({ type: "DIALOG_END" });
+          return;
+        }
+        if (currentScene.onCgEnd === "enter_dormitory_day") {
+          // 宿舍第三幕：起床 CG 结束 → 切换到白天地图 + NPC + 冻结 + 对话
+          dispatch({ type: "CHANGE_MAP", mapId: "dormitory_day", spawnId: "spawn_stand_chair_right", position: { x: 0, y: 0 } });
+          gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory_day", spawnId: "spawn_stand_chair_right" });
+          setTimeout(() => {
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_53", npcKey: "npc_cyh", scale: 2 } });
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_54", npcKey: "npc_roommateA", scale: 2 } });
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_55", npcKey: "npc_roommateB", scale: 2 } });
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_cyh", direction: "back" } });
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_roommateA", direction: "left" } });
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_roommateB", direction: "right" } });
+            gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+            dispatch({ type: "DIALOG_START", sceneId: "dorm_act3_notice_pc" });
+          }, 800);
           dispatch({ type: "DIALOG_END" });
           return;
         }
@@ -240,6 +258,48 @@ export default function App() {
       return;
     }
 
+    // ── 宿舍第三幕：闹铃音效 ──
+    if (nextSceneId === "dorm_act3_alarm") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "play_sfx", payload: { key: "alarm_clock", loop: true } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+    if (nextSceneId === "dorm_act3_wake") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "stop_sfx", payload: { key: "alarm_clock" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    // ── 宿舍第三幕：睁眼效果 ──
+    if (nextSceneId === "dorm_act3_getup") {
+      // 移除 Phaser 侧黑幕，露出后方 CG（天花板.png）
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "remove_fade_overlay" });
+      // 播放眨眼动画（React CSS overlay）
+      setEyeOpening(true);
+      setTimeout(() => setEyeOpening(false), 2000);
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    // ── 宿舍第三幕：玩家/NPC 动画 ──
+    if (nextSceneId === "dorm_act3_pc_on_1") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "left" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+    if (nextSceneId === "dorm_act3_turn_roommate") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "right" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+    if (nextSceneId === "dorm_act3_roommate_laugh") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_cyh", direction: "left" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_roommateA", direction: "front" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_roommateB", direction: "front" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
     dispatch({ type: "GO_NEXT", nextSceneId });
   }
 
@@ -295,11 +355,11 @@ export default function App() {
       return;
     }
 
-    // 宿舍第二幕：睡觉对话框关闭 → 移除淡出黑幕 + 该幕结束
+    // 宿舍第二幕：睡觉对话框关闭 → 保持黑屏，开始第三幕
     if (currentScene?.id === "dorm_act2_sleep_result") {
-      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "remove_fade_overlay" });
       dispatch({ type: "DIALOG_END" });
-      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      dispatch({ type: "SET_FLAG", flag: "dorm_act3" });
+      dispatch({ type: "DIALOG_START", sceneId: "dorm_act3_reflection" });
       return;
     }
 
@@ -324,6 +384,26 @@ export default function App() {
           gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
           dispatch({ type: "DIALOG_START", sceneId: "dorm_act2_think" });
         }, 600);
+        dispatch({ type: "DIALOG_END" });
+        return;
+      }
+      if (currentScene.onCgEnd === "enter_dormitory_day") {
+        // 宿舍第三幕：起床后切换到白天地图 + 生成 NPC + 冻结玩家 + 开始对话
+        dispatch({ type: "CHANGE_MAP", mapId: "dormitory_day", spawnId: "spawn_stand_chair_right", position: { x: 0, y: 0 } });
+        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory_day", spawnId: "spawn_stand_chair_right" });
+        setTimeout(() => {
+          // 生成 NPC
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_53", npcKey: "npc_cyh", scale: 2 } });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_54", npcKey: "npc_roommateA", scale: 2 } });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_55", npcKey: "npc_roommateB", scale: 2 } });
+          // NPC 初始朝向
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_cyh", direction: "back" } });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_roommateA", direction: "left" } });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_roommateB", direction: "right" } });
+          // 冻结玩家 + 开始对话
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "dorm_act3_notice_pc" });
+        }, 800);
         dispatch({ type: "DIALOG_END" });
         return;
       }
@@ -408,6 +488,9 @@ export default function App() {
         currentMapId={state.currentMapId}
         onDialogueTrigger={handleDialogueTrigger}
       />
+
+      {/* ── 睁眼效果遮罩（宿舍第三幕起床） ── */}
+      {eyeOpening && <div className="eye-open-overlay blinking" />}
 
       {/* ── 对话叠层（有对话时显示） ── */}
       {dialogScene && dialogScene.cgMode && (
