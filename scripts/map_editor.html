@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>地图编辑器 — 碰撞 / 多边形遮挡 / 触发器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 10px;background:#16213e;border-bottom:1px solid #0f3460;font-size:13px}
+#bar button{padding:5px 12px;border:1px solid #0f3460;border-radius:4px;background:#1a1a2e;color:#e0e0e0;cursor:pointer;font-size:12px}
+#bar button:hover{background:#0f3460}
+#bar button.pri{background:#e94560;border-color:#e94560;color:#fff}
+#bar button.pri:hover{background:#c73652}
+#bar button.act{background:#0f3460;color:#fff;border-color:#60a5fa}
+#bar .sep{width:1px;height:22px;background:#0f3460;margin:0 4px}
+#bar .info{color:#707080;font-size:11px;margin-left:6px}
+#work{display:flex;flex:1;overflow:hidden}
+#ca{flex:1;overflow:auto;background:#0d0d1a;position:relative}
+canvas{display:block}
+#side{width:320px;background:#16213e;border-left:1px solid #0f3460;display:flex;flex-direction:column;overflow:hidden}
+#side h3{font-size:12px;padding:8px 10px 4px;color:#e94560;border-bottom:1px solid #0f346008}
+#list{flex:1;overflow-y:auto;padding:4px 0}
+#list::-webkit-scrollbar{width:5px}
+#list::-webkit-scrollbar-thumb{background:#0f3460;border-radius:3px}
+.it{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid #0f346008}
+.it:hover{background:#0f3460}
+.it.sel{background:#0f3460;border-left:3px solid #e94560}
+.it .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.it .dot.col{background:#3b82f6}
+.it .dot.occ{background:#f59e0b}
+.it .dot.trg{background:#10b981}
+.it .info{flex:1;min-width:0}
+.it .n{color:#e0e0e0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .s{color:#707080;font-size:10px}
+#log{flex:0 0 auto;height:80px;overflow-y:auto;padding:4px 8px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:10px;font-family:Consolas,"Courier New",monospace}
+#log::-webkit-scrollbar{width:5px}
+#log::-webkit-scrollbar-thumb{background:#0f3460;border-radius:3px}
+.l{padding:1px 0;border-bottom:1px solid #ffffff05;white-space:pre-wrap;word-break:break-all}
+.lo{color:#4ade80}.le{color:#f87171}.li{color:#60a5fa}.lw{color:#fbbf24}
+#prop-panel{flex:0 0 auto;padding:6px 10px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:11px;display:none}
+#prop-panel label{display:flex;align-items:center;gap:4px;margin:3px 0;cursor:pointer}
+#prop-panel input[type=text]{flex:1;padding:2px 4px;background:#1a1a2e;border:1px solid #0f3460;border-radius:3px;color:#e0e0e0;font-size:11px;width:120px}
+#prop-panel input[type=number]{width:60px;padding:2px 4px;background:#1a1a2e;border:1px solid #0f3460;border-radius:3px;color:#e0e0e0;font-size:11px}
+#prop-panel select{background:#1a1a2e;border:1px solid #0f3460;color:#e0e0e0;font-size:11px;padding:2px 4px;border-radius:3px}
+#prop-panel .row{display:flex;align-items:center;gap:8px;margin:3px 0;flex-wrap:wrap}
+#prop-panel .lbl{color:#707080;font-size:10px;min-width:40px}
+#prop-panel .hint{color:#60a5fa;font-size:10px}
+#status{display:flex;gap:10px;padding:3px 10px;background:#0d0d1a;border-top:1px solid #0f3460;font-size:10px;color:#707080;align-items:center}
+#map-name-row{padding:4px 10px;background:#0d0d1a;border-top:1px solid #0f3460;display:flex;align-items:center;gap:6px;font-size:11px}
+#map-name-row .lbl{color:#707080;font-size:10px}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <button onclick="openBaseMap()">📂 加载底图</button>
+  <input type="file" id="fi" accept=".png,.jpg,.jpeg,.webp,.bmp" style="display:none" onchange="onBaseMapSelected(event)">
+  <span class="sep"></span>
+  <b style="font-size:11px;color:#707080;margin-right:4px">模式:</b>
+  <button id="btn-col" class="act" onclick="setMode('collision')">🔲 碰撞框</button>
+  <button id="btn-occ" onclick="setMode('occlusion')">🔶 多边形遮挡</button>
+  <button id="btn-trg" onclick="setMode('trigger')">🟢 交互触发</button>
+  <button id="btn-spawn" onclick="setMode('spawn')">🚶 出生点</button>
+  <span class="sep"></span>
+  <button onclick="loadSprites()">📥 加载精灵图</button>
+  <input type="file" id="fs" accept=".png" multiple style="display:none" onchange="onSpritesSelected(event)">
+  <span class="sep"></span>
+  <button onclick="exportMapJSON()" class="pri">💾 导出 map.json</button>
+  <button onclick="importMapJSON()">📥 导入 map.json</button>
+  <input type="file" id="fm" accept=".json" style="display:none" onchange="onMapJSONSelected(event)">
+  <span class="sep"></span>
+  <span class="info" id="zml">缩放: 100%</span>
+  <span class="info" id="cur">坐标: (-,-)</span>
+</div>
+
+<div id="work">
+  <div id="ca"><canvas id="cv"></canvas></div>
+  <div id="side">
+    <h3>📦 对象列表 (<span id="icnt">0</span>) — 点击选中</h3>
+    <div id="list"></div>
+    <div id="map-name-row">
+      <span class="lbl">地图名:</span>
+      <input type="text" id="map-name" value="new_map" style="width:120px;padding:2px 4px;background:#1a1a2e;border:1px solid #0f3460;border-radius:3px;color:#e0e0e0;font-size:11px">
+      <span class="lbl">底图文件:</span>
+      <input type="text" id="ground-file" value="ground.png" style="width:120px;padding:2px 4px;background:#1a1a2e;border:1px solid #0f3460;border-radius:3px;color:#e0e0e0;font-size:11px">
+    </div>
+    <div id="prop-panel">
+      <div class="row">
+        <span class="lbl">名称:</span>
+        <input type="text" id="p-name" onchange="updateProp()">
+        <span class="lbl">类型:</span>
+        <select id="p-layer" onchange="updateProp()">
+          <option value="collision">🔲 碰撞框</option>
+          <option value="occlusion">🔶 多边形遮挡</option>
+          <option value="trigger">🟢 交互触发</option>
+          <option value="spawn">🚶 出生点</option>
+        </select>
+      </div>
+      <div class="row" id="rect-props">
+        <span class="lbl">X:</span><input type="number" id="p-x" onchange="updateProp()">
+        <span class="lbl">Y:</span><input type="number" id="p-y" onchange="updateProp()">
+        <span class="lbl">W:</span><input type="number" id="p-w" onchange="updateProp()">
+        <span class="lbl">H:</span><input type="number" id="p-h" onchange="updateProp()">
+      </div>
+      <div class="row" id="trigger-props" style="display:none">
+        <span class="lbl">触发类型:</span>
+        <select id="p-triggerType" onchange="updateProp()">
+          <option value="interact">interact (E键)</option>
+          <option value="walk">walk (走入触发)</option>
+          <option value="auto">auto (自动触发)</option>
+          <option value="door">door (门，有碰撞)</option>
+        </select>
+      </div>
+      <div class="row" id="trigger-scene" style="display:none">
+        <span class="lbl">场景ID:</span>
+        <input type="text" id="p-sceneId" placeholder="场景ID" onchange="updateProp()">
+        <label><input type="checkbox" id="p-once" onchange="updateProp()"> 仅一次</label>
+      </div>
+      <div class="row" id="occlusion-props" style="display:none">
+        <label><input type="checkbox" id="p-walkable" onchange="updateProp()"> 可穿越(无碰撞)</label>
+        <span class="hint">💡 多边形内显示裁剪的底图内容</span>
+      </div>
+      <div class="row" id="spawn-props" style="display:none">
+        <span class="lbl">出生点ID:</span>
+        <input type="text" id="p-spawnId" placeholder="spawn_id" onchange="updateProp()">
+      </div>
+      <div class="row" id="sprite-props" style="display:none">
+        <span class="lbl">精灵图:</span>
+        <select id="p-sprite" onchange="updateProp()">
+          <option value="">— 无精灵图 —</option>
+        </select>
+        <span class="hint">可选：关联精灵图用于底图叠加</span>
+      </div>
+      <div class="row">
+        <button onclick="deleteSelected()" style="background:#e94560;border-color:#e94560;color:#fff;font-size:10px">🗑 删除选中对象</button>
+      </div>
+    </div>
+    <div id="log"></div>
+  </div>
+</div>
+
+<div id="status">
+  <span id="stmsg">就绪 — 加载底图，选择模式，在画布上绘制</span>
+  <span id="poly-hint" style="display:none;color:#f59e0b;margin-left:8px">🔶 多边形模式：左键添加顶点 | Ctrl+Z 撤销 | 右键/Enter 闭合 | 选中后拖拽顶点</span>
+  <span id="mode-hint" style="display:none;color:#60a5fa;margin-left:8px">🔲 碰撞框模式：拖拽绘制矩形</span>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+const ca = $('ca');
+
+// ── 状态 ──────────────────────────────
+let baseImg = null, baseW = 0, baseH = 0;
+let scale = 1, minSc = 0.05, maxSc = 8;
+let currentMode = 'collision'; // collision | occlusion | trigger | spawn
+
+// 所有对象统一存储
+// { id, name, type:'collision'|'occlusion'|'trigger'|'spawn',
+//   x, y, w, h,                     // 矩形用
+//   polygon:[{x,y},...],            // 多边形顶点（相对于 x,y）
+//   triggerType, sceneId, once,     // trigger 用
+//   occColor, walkable,             // occlusion 用
+//   spawnId,                        // spawn 用
+//   spriteKey }                     // 可选精灵图关联
+let objects = [];
+let nextId = 1;
+let selectedIdx = -1;
+
+// 精灵图存储 { key: Image }
+let spriteImages = {};
+
+function buildMapJSON(){
+  let cid = 1, fid = 1, tid = 100, sid = 200;
+  const collisionObjs = [], furnitureObjs = [], triggerObjs = [], spawnObjs = [];
+  objects.forEach(obj => {
+    switch(obj.type){
+      case 'collision': {
+        const colObj = { id: cid++, name: obj.name || 'collision', x: Math.round(obj.x), y: Math.round(obj.y), width: obj.w || 64, height: obj.h || 64 };
+        if(obj.spriteKey) colObj.properties = [{name:'spriteKey',type:'string',value:obj.spriteKey}];
+        collisionObjs.push(colObj); break;
+      }
+      case 'occlusion': {
+        const furnObj = { id: fid++, name: obj.name || 'occlusion', type: 'furniture', x: Math.round(obj.x), y: Math.round(obj.y), width: 0, height: 0, polygon: obj.polygon };
+        const props = [];
+        if(obj.walkable) props.push({name:'walkable',type:'bool',value:true});
+        if(obj.spriteKey) props.push({name:'spriteKey',type:'string',value:obj.spriteKey});
+        if(props.length) furnObj.properties = props;
+        furnitureObjs.push(furnObj); break;
+      }
+      case 'trigger': {
+        const tObj = { id: tid++, name: obj.name || 'trigger', x: Math.round(obj.x), y: Math.round(obj.y), width: obj.w || 64, height: obj.h || 64, properties: [{name:'triggerType', type:'string', value: obj.triggerType || 'interact'}, {name:'sceneId', type:'string', value: obj.sceneId || ''}] };
+        if(obj.once) tObj.properties.push({name:'once', type:'bool', value:true});
+        if(obj.spriteKey) tObj.properties.push({name:'spriteKey', type:'string', value:obj.spriteKey});
+        triggerObjs.push(tObj); break;
+      }
+      case 'spawn':
+        spawnObjs.push({ id: sid++, name: obj.spawnId || obj.name || 'spawn', x: Math.round(obj.x), y: Math.round(obj.y), width: 32, height: 32 }); break;
+    }
+  });
+  const mapName = $('map-name').value || 'new_map';
+  const groundFile = $('ground-file').value || 'ground.png';
+  return {
+    compressionlevel: -1, height: Math.ceil(baseH / 32), infinite: false,
+    layers: [
+      { id:1, name:'ground', type:'imagelayer', image:groundFile, x:0, y:0, width:baseW, height:baseH },
+      { id:2, name:'collision', type:'objectgroup', draworder:'topdown', objects:collisionObjs },
+      { id:3, name:'furniture_objects', type:'objectgroup', draworder:'topdown', objects:furnitureObjs },
+      { id:4, name:'triggers', type:'objectgroup', draworder:'topdown', objects:triggerObjs },
+      { id:5, name:'player_spawn', type:'objectgroup', draworder:'topdown', objects:spawnObjs },
+      { id:6, name:'npcs', type:'objectgroup', draworder:'topdown', objects:[] },
+      { id:7, name:'items', type:'objectgroup', draworder:'topdown', objects:[] }
+    ],
+    nextlayerid: 8, nextobjectid: Math.max(cid, fid, tid, sid) + 50,
+    orientation: 'orthogonal', renderorder: 'right-down', tiledversion: '1.10.2',
+    tileheight: 32, tilewidth: 32, type: 'map', version: '1.10', width: Math.ceil(baseW / 32)
+  };
+}
+
+// ── 绘制状态 ──────────────────────────
+let drawState = null; // { mode, startX, startY, currentX, currentY } 拖拽画矩形
+let polyDrawing = null; // { points: [{x,y},...] } 正在绘制的多边形顶点
+
+// ── 拖拽/平移 ──────────────────────────
+let dragging = false, dragStartX = 0, dragStartY = 0, dragOrigX = 0, dragOrigY = 0;
+let panning = false, panSx = 0, panSy = 0, scSx = 0, scSy = 0;
+let vertexDragging = null; // { objIdx, vertIdx, origX, origY }
+
+// ── 日志 ──────────────────────────────
+function log(msg, t){ const d=$('log'), ln=document.createElement('div'); ln.className='l l'+(t||'i'); ln.textContent=msg; d.appendChild(ln); d.scrollTop=d.scrollHeight; console.log('['+(t||'i')+'] '+msg); }
+
+// ── 模式切换 ──────────────────────────
+function setMode(mode){
+  currentMode = mode;
+  ['btn-col','btn-occ','btn-trg','btn-spawn'].forEach(id => $(id).className = '');
+  const btnMap = { collision:'btn-col', occlusion:'btn-occ', trigger:'btn-trg', spawn:'btn-spawn' };
+  $(btnMap[mode]).className = 'act';
+  
+  // 取消正在绘制的多边形
+  if(polyDrawing && mode !== 'occlusion'){
+    log('⚠ 已取消多边形绘制', 'w');
+    polyDrawing = null;
+  }
+  
+  // 更新提示
+  $('poly-hint').style.display = mode === 'occlusion' ? 'inline' : 'none';
+  $('mode-hint').style.display = mode === 'collision' || mode === 'trigger' || mode === 'spawn' ? 'inline' : 'none';
+  const hintMap = {
+    collision: '🔲 碰撞框模式：十字拖拽绘制矩形 | 拖拽已有对象移动',
+    trigger: '🟢 触发器模式：十字拖拽绘制矩形 | 拖拽已有对象移动',
+    spawn: '🚶 出生点模式：点击放置 | 拖拽已有对象移动',
+  };
+  $('mode-hint').textContent = hintMap[mode] || '';
+  $('stmsg').textContent = {
+    collision: '🔲 碰撞框模式：十字拖拽绘制矩形碰撞框',
+    occlusion: '🔶 多边形遮挡模式：左键添加顶点 | Ctrl+Z 撤销 | 右键/Enter 闭合多边形',
+    trigger: '🟢 交互触发模式：十字拖拽绘制矩形触发区域',
+    spawn: '🚶 出生点模式：点击放置出生点'
+  }[mode];
+  
+  render();
+}
+
+// ── 加载底图 ──────────────────────────
+function openBaseMap(){ $('fi').click(); }
+function onBaseMapSelected(ev){
+  const f = ev.target.files[0]; if(!f) return;
+  const u = URL.createObjectURL(f), im = new Image();
+  im.onload = ()=>{
+    baseImg = im; baseW = im.width; baseH = im.height;
+    $('ground-file').value = f.name;
+    // 初始化撤销栈
+    undoStack = []; undoIndex = -1;
+    saveState();
+    fitView();
+    log('✅ 底图: '+f.name+' ('+baseW+'×'+baseH+'px)', 'o');
+    $('stmsg').textContent = '底图已加载: '+f.name+' ('+baseW+'×'+baseH+')';
+  };
+  im.src = u;
+}
+
+// ── 加载精灵图 ────────────────────────
+function loadSprites(){ $('fs').click(); }
+function onSpritesSelected(ev){
+  const files = Array.from(ev.target.files);
+  if(!files.length) return;
+  log('📥 正在加载 '+files.length+' 个精灵图...', 'i');
+  let loaded = 0;
+  files.forEach(f => {
+    const u = URL.createObjectURL(f);
+    const im = new Image();
+    im.onload = ()=>{
+      let key = f.name.replace(/\.png$/i, '');
+      spriteImages[key] = { img: im, url: u, w: im.width, h: im.height };
+      loaded++;
+      if(loaded === files.length){
+        updateSpriteSelect();
+        log('✅ 已加载 '+loaded+' 个精灵图', 'o');
+      }
+    };
+    im.src = u;
+  });
+}
+function updateSpriteSelect(){
+  const sel = $('p-sprite');
+  sel.innerHTML = '<option value="">— 无精灵图 —</option>';
+  Object.keys(spriteImages).forEach(k => {
+    sel.innerHTML += `<option value="${k}">${k}</option>`;
+  });
+}
+
+// ── 渲染 ──────────────────────────────
+function render(){
+  if(!baseImg) return;
+  cv.width = Math.ceil(baseW * scale);
+  cv.height = Math.ceil(baseH * scale);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(baseImg, 0, 0, cv.width, cv.height);
+
+  // 按 Y 排序渲染（模拟深度排序）
+  const sorted = [...objects].sort((a,b)=>{
+    const ay = a.type==='occlusion' ? (a.y + getPolyBounds(a).maxY) : (a.y + (a.h||32));
+    const by = b.type==='occlusion' ? (b.y + getPolyBounds(b).maxY) : (b.y + (b.h||32));
+    return ay - by;
+  });
+
+  sorted.forEach(obj => {
+    const idx = objects.indexOf(obj);
+    const isSel = idx === selectedIdx;
+    if(obj.type === 'occlusion'){
+      drawOcclusion(obj, isSel);
+    } else {
+      drawRectObj(obj, isSel);
+    }
+  });
+
+  // 绘制进行中的多边形
+  if(polyDrawing && polyDrawing.points.length > 0){
+    drawPolyDrawing();
+  }
+
+  // 绘制进行中的矩形拖拽（十字拖拽线 + 虚线预览框）
+  if(drawState){
+    const { startX, startY, currentX, currentY, mode } = drawState;
+    const cx = currentX * scale;
+    const cy = currentY * scale;
+    const sx = startX * scale;
+    const sy = startY * scale;
+    const rectX = Math.min(sx, cx);
+    const rectY = Math.min(sy, cy);
+    const rectW = Math.abs(cx - sx);
+    const rectH = Math.abs(cy - sy);
+    
+    // 十字准星线（贯穿画布的水平/垂直线，经过起点）
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(sx, 0);
+    ctx.lineTo(sx, cv.height);
+    ctx.moveTo(0, sy);
+    ctx.lineTo(cv.width, sy);
+    ctx.stroke();
+    
+    // 起点十字标记
+    ctx.strokeStyle = '#e94560'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(sx - 8, sy); ctx.lineTo(sx + 8, sy);
+    ctx.moveTo(sx, sy - 8); ctx.lineTo(sx, sy + 8);
+    ctx.stroke();
+    ctx.fillStyle = '#e94560';
+    ctx.beginPath(); ctx.arc(sx, sy, 3, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+    
+    // 虚线预览框
+    ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.setLineDash([6,3]);
+    ctx.strokeRect(rectX, rectY, rectW, rectH);
+    ctx.setLineDash([]);
+    
+    // 尺寸标签
+    if(rectW > 0 || rectH > 0){
+      const labelW = Math.round(Math.abs(currentX - startX));
+      const labelH = Math.round(Math.abs(currentY - startY));
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = Math.max(10, 11/scale)+'px Consolas,monospace';
+      const label = labelW + ' × ' + labelH;
+      const textW = ctx.measureText(label).width;
+      ctx.fillText(label, rectX + rectW + 4/scale, rectY + rectH/2);
+    }
+  }
+
+  $('icnt').textContent = objects.length;
+}
+
+function drawRectObj(obj, isSel){
+  const cx = obj.x * scale, cy = obj.y * scale;
+  const cw = (obj.w||32) * scale, ch = (obj.h||32) * scale;
+  
+  // ── 精灵图叠加（如果有） ──
+  const spriteKey = obj.spriteKey;
+  if(spriteKey && spriteImages[spriteKey]){
+    const sp = spriteImages[spriteKey];
+    ctx.drawImage(sp.img, cx, cy, cw, ch);
+  }
+  
+  let color, fill;
+  switch(obj.type){
+    case 'collision': color = '#3b82f6'; fill = 'rgba(59,130,246,0.15)'; break;
+    case 'trigger': color = '#10b981'; fill = 'rgba(16,185,129,0.12)'; break;
+    case 'spawn': color = '#f472b6'; fill = 'rgba(244,114,182,0.15)'; break;
+    default: color = '#888'; fill = 'rgba(128,128,128,0.1)';
+  }
+  
+  ctx.fillStyle = fill;
+  ctx.fillRect(cx, cy, cw, ch);
+
+  if(isSel){
+    ctx.strokeStyle = color; ctx.lineWidth = 3;
+    ctx.strokeRect(cx, cy, cw, ch);
+    // 四角手柄
+    ctx.fillStyle = color;
+    [{x:cx,y:cy},{x:cx+cw-8,y:cy},{x:cx,y:cy+ch-8},{x:cx+cw-8,y:cy+ch-8}].forEach(p => ctx.fillRect(p.x,p.y,8,8));
+  } else {
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash(obj.type==='collision'?[5,5]:[]);
+    ctx.strokeRect(cx, cy, cw, ch);
+    ctx.setLineDash([]);
+  }
+
+  // 名称
+  const labelColor = isSel ? color : 'rgba(255,255,255,0.5)';
+  ctx.fillStyle = labelColor;
+  ctx.font = Math.max(10, 11/scale)+'px "Microsoft YaHei",Arial';
+  const label = obj.name || (obj.type==='spawn'?obj.spawnId:'');
+  ctx.fillText(label, cx + 2/scale, cy - 4/scale);
+
+  // 类型图标
+  const icons = { collision:'🔲', trigger:'🟢', spawn:'🚶' };
+  if(icons[obj.type]){
+    ctx.font = Math.max(12, 14/scale)+'px Arial';
+    ctx.fillText(icons[obj.type], cx + cw - 18/scale, cy + ch - 6/scale);
+  }
+}
+
+function getPolyBounds(obj){
+  if(!obj.polygon || obj.polygon.length === 0) return {minX:0,minY:0,maxX:obj.w||64,maxY:obj.h||64};
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  obj.polygon.forEach(p => {
+    if(p.x < minX) minX = p.x;
+    if(p.y < minY) minY = p.y;
+    if(p.x > maxX) maxX = p.x;
+    if(p.y > maxY) maxY = p.y;
+  });
+  return {minX, minY, maxX, maxY};
+}
+
+function drawOcclusion(obj, isSel){
+  if(!obj.polygon || obj.polygon.length < 3) return;
+  const bounds = getPolyBounds(obj);
+  
+  // 构建多边形路径
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo((obj.x + obj.polygon[0].x) * scale, (obj.y + obj.polygon[0].y) * scale);
+  for(let i = 1; i < obj.polygon.length; i++){
+    ctx.lineTo((obj.x + obj.polygon[i].x) * scale, (obj.y + obj.polygon[i].y) * scale);
+  }
+  ctx.closePath();
+  
+  // ── 核心：裁剪底图区域填充多边形 ──
+  // 计算多边形在画布上的包围盒（用于 drawImage 源区域）
+  const sx = (obj.x + bounds.minX) * scale;
+  const sy = (obj.y + bounds.minY) * scale;
+  const sw = Math.max(1, (bounds.maxX - bounds.minX) * scale);
+  const sh = Math.max(1, (bounds.maxY - bounds.minY) * scale);
+  
+  // 用 clip 限制绘制区域为多边形内部
+  ctx.clip();
+  
+  // 从底图裁剪对应区域绘制（源坐标 = 画布坐标 / scale → 原图坐标）
+  if(baseImg){
+    const srcX = obj.x + bounds.minX;
+    const srcY = obj.y + bounds.minY;
+    const srcW = bounds.maxX - bounds.minX;
+    const srcH = bounds.maxY - bounds.minY;
+    // drawImage 从底图原始坐标裁剪对应矩形区域，拉伸填充到画布多边形包围盒
+    ctx.drawImage(baseImg, srcX, srcY, srcW, srcH, sx, sy, sw, sh);
+  }
+  
+  // ── 叠加精灵图（如果有） ──
+  const spriteKey = obj.spriteKey;
+  if(spriteKey && spriteImages[spriteKey]){
+    const sp = spriteImages[spriteKey];
+    const ratio = sp.w / sw; // 精灵图与包围盒的比例
+    // 精灵图在包围盒内居中或拉伸适配
+    const spW = sw;
+    const spH = sp.img.height * (spW / sp.img.width);
+    ctx.drawImage(sp.img, sx, sy, spW, spH);
+  }
+  
+  ctx.restore();
+  
+  // ── 描边（在 clip 外，完整多边形轮廓） ──
+  ctx.beginPath();
+  ctx.moveTo((obj.x + obj.polygon[0].x) * scale, (obj.y + obj.polygon[0].y) * scale);
+  for(let i = 1; i < obj.polygon.length; i++){
+    ctx.lineTo((obj.x + obj.polygon[i].x) * scale, (obj.y + obj.polygon[i].y) * scale);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = isSel ? '#f59e0b' : 'rgba(245,158,11,0.5)';
+  ctx.lineWidth = isSel ? 3 : 1.5;
+  ctx.stroke();
+  
+  // 选中时画顶点手柄
+  if(isSel){
+    obj.polygon.forEach(p => {
+      const sx2 = (obj.x + p.x) * scale, sy2 = (obj.y + p.y) * scale;
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(sx2 - 4, sy2 - 4, 8, 8);
+    });
+  }
+  
+  // 名称
+  const labelColor = isSel ? '#f59e0b' : 'rgba(255,255,255,0.5)';
+  ctx.fillStyle = labelColor;
+  ctx.font = Math.max(10, 11/scale)+'px "Microsoft YaHei",Arial';
+  ctx.fillText(obj.name || 'polygon', (obj.x + bounds.minX) * scale + 2/scale, (obj.y + bounds.minY) * scale - 4/scale);
+}
+
+function drawPolyDrawing(){
+  const pts = polyDrawing.points;
+  if(pts.length < 1) return;
+  
+  // 连线
+  ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.setLineDash([4,4]);
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x * scale, pts[0].y * scale);
+  for(let i = 1; i < pts.length; i++){
+    ctx.lineTo(pts[i].x * scale, pts[i].y * scale);
+  }
+  // 虚线连到鼠标位置
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // 顶点
+  pts.forEach(p => {
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(p.x * scale, p.y * scale, 5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+}
+
+// ── 适应窗口 ──────────────────────────
+function fitView(){
+  if(!baseImg) return;
+  const aw = ca.clientWidth, ah = ca.clientHeight;
+  scale = Math.min(aw/baseW, ah/baseH)*0.9;
+  scale = Math.max(minSc, Math.min(maxSc, scale));
+  render(); updZoom();
+  ca.scrollLeft = (cv.width - ca.clientWidth)/2;
+  ca.scrollTop = (cv.height - ca.clientHeight)/2;
+}
+function updZoom(){ $('zml').textContent = '缩放: '+Math.round(scale*100)+'%'; }
+
+// ── 坐标转换 ──────────────────────────
+function toImg(cx,cy){ return [cx/scale, cy/scale]; }
+
+// ── 命中检测 ──────────────────────────
+function hitTest(ix, iy){
+  for(let i = objects.length - 1; i >= 0; i--){
+    const obj = objects[i];
+    if(obj.type === 'occlusion'){
+      if(pointInPolygon(ix - obj.x, iy - obj.y, obj.polygon)) return i;
+    } else {
+      if(ix >= obj.x && ix <= obj.x + (obj.w||32) && iy >= obj.y && iy <= obj.y + (obj.h||32)) return i;
+    }
+  }
+  return -1;
+}
+
+function pointInPolygon(px, py, polygon){
+  if(!polygon || polygon.length < 3) return false;
+  let inside = false;
+  for(let i = 0, j = polygon.length - 1; i < polygon.length; j = i++){
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    if((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi){
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+// 检测是否在多边形的顶点上（返回顶点索引）
+function hitVertex(objIdx, ix, iy, threshold = 8){
+  const obj = objects[objIdx];
+  if(obj.type !== 'occlusion' || !obj.polygon) return -1;
+  const t = threshold / scale;
+  for(let i = 0; i < obj.polygon.length; i++){
+    const vx = obj.x + obj.polygon[i].x;
+    const vy = obj.y + obj.polygon[i].y;
+    if(Math.abs(ix - vx) < t && Math.abs(iy - vy) < t) return i;
+  }
+  return -1;
+}
+
+// ── 对象列表 ──────────────────────────
+function updList(){
+  const ls = $('list'); ls.innerHTML = '';
+  objects.forEach((obj, i) => {
+    const d = document.createElement('div');
+    const selClass = 'sel';
+    d.className = 'it' + (i === selectedIdx ? ' '+selClass : '');
+    const typeNames = { collision:'碰撞框', occlusion:'多边形遮挡', trigger:'交互触发', spawn:'出生点' };
+    const typeClasses = { collision:'col', occlusion:'occ', trigger:'trg', spawn:'trg' };
+    const typeLabel = typeNames[obj.type] || obj.type;
+    const dotClass = typeClasses[obj.type] || '';
+    d.innerHTML = `
+      <div class="dot ${dotClass}"></div>
+      <div class="info">
+        <div class="n">${obj.name || '未命名'} <span style="color:#707080;font-size:9px">${typeLabel}</span></div>
+        <div class="s">${obj.type==='occlusion' ? (obj.polygon?.length||0)+'顶点' : (obj.w||32)+'×'+(obj.h||32)} @ (${Math.round(obj.x)},${Math.round(obj.y)})</div>
+      </div>`;
+    d.onclick = () => selectItem(i);
+    ls.appendChild(d);
+  });
+}
+
+function selectItem(idx){
+  selectedIdx = idx;
+  updList(); showProps(idx); render();
+  if(idx >= 0){
+    const obj = objects[idx];
+    ca.scrollLeft = obj.x * scale - ca.clientWidth/2;
+    ca.scrollTop = obj.y * scale - ca.clientHeight/2;
+  }
+}
+
+// ── 属性面板 ──────────────────────────
+function showProps(idx){
+  const panel = $('prop-panel');
+  if(idx < 0 || idx >= objects.length){
+    panel.style.display = 'none'; return;
+  }
+  panel.style.display = 'block';
+  const obj = objects[idx];
+  $('p-name').value = obj.name || '';
+  $('p-layer').value = obj.type;
+  
+  // 显示/隐藏对应属性区
+  const isOcclusion = obj.type === 'occlusion';
+  const isTrigger = obj.type === 'trigger';
+  const isSpawn = obj.type === 'spawn';
+  
+  $('rect-props').style.display = isOcclusion ? 'none' : 'flex';
+  $('occlusion-props').style.display = isOcclusion ? 'flex' : 'none';
+  $('trigger-props').style.display = isTrigger ? 'flex' : 'none';
+  $('trigger-scene').style.display = isTrigger ? 'flex' : 'none';
+  $('spawn-props').style.display = isSpawn ? 'flex' : 'none';
+  $('sprite-props').style.display = 'flex';
+  
+  if(!isOcclusion){
+    $('p-x').value = Math.round(obj.x);
+    $('p-y').value = Math.round(obj.y);
+    $('p-w').value = obj.w || 64;
+    $('p-h').value = obj.h || 64;
+  }
+  
+  if(isTrigger){
+    $('p-triggerType').value = obj.triggerType || 'interact';
+    $('p-sceneId').value = obj.sceneId || '';
+    $('p-once').checked = obj.once || false;
+  }
+  
+  if(isOcclusion){
+    $('p-walkable').checked = obj.walkable || false;
+  }
+  $('p-sprite').value = obj.spriteKey || '';
+  
+  if(isSpawn){
+    $('p-spawnId').value = obj.spawnId || '';
+  }
+}
+
+function updateProp(){
+  if(selectedIdx < 0) return;
+  const obj = objects[selectedIdx];
+  obj.name = $('p-name').value || obj.name;
+  
+  const newType = $('p-layer').value;
+  if(newType !== obj.type){
+    // 类型变更：保留位置，清除旧属性
+    obj.type = newType;
+    if(newType === 'occlusion'){
+      // 转换矩形 → 多边形
+      obj.polygon = [{x:0,y:0},{x:obj.w||64,y:0},{x:obj.w||64,y:obj.h||64},{x:0,y:obj.h||64}];
+      obj.occColor = '#808080';
+      obj.walkable = false;
+      delete obj.w; delete obj.h;
+    } else if(obj.polygon){
+      // 多边形 → 矩形：用包围盒
+      const b = getPolyBounds(obj);
+      obj.w = Math.max(32, b.maxX - b.minX);
+      obj.h = Math.max(32, b.maxY - b.minY);
+      obj.x = obj.x + b.minX;
+      obj.y = obj.y + b.minY;
+      delete obj.polygon; delete obj.occColor; delete obj.walkable;
+      if(newType === 'trigger'){ obj.triggerType = 'interact'; obj.sceneId = ''; obj.once = false; }
+      if(newType === 'spawn'){ obj.spawnId = 'spawn_'+nextId; obj.w = 32; obj.h = 32; }
+    }
+    showProps(selectedIdx);
+  }
+  
+  if(obj.type !== 'occlusion'){
+    obj.x = parseFloat($('p-x').value) || obj.x;
+    obj.y = parseFloat($('p-y').value) || obj.y;
+    obj.w = parseFloat($('p-w').value) || obj.w;
+    obj.h = parseFloat($('p-h').value) || obj.h;
+  }
+  
+  if(obj.type === 'trigger'){
+    obj.triggerType = $('p-triggerType').value;
+    obj.sceneId = $('p-sceneId').value;
+    obj.once = $('p-once').checked;
+  }
+  
+  if(obj.type === 'occlusion'){
+    obj.walkable = $('p-walkable').checked;
+  }
+  
+  // 精灵图对所有类型都适用
+  obj.spriteKey = $('p-sprite').value || null;
+  
+  if(obj.type === 'spawn'){
+    obj.spawnId = $('p-spawnId').value;
+  }
+  
+  saveState();
+  updList(); render();
+}
+
+function deleteSelected(){
+  if(selectedIdx < 0) return;
+  objects.splice(selectedIdx, 1);
+  selectedIdx = Math.min(selectedIdx, objects.length - 1);
+  $('prop-panel').style.display = 'none';
+  saveState();
+  updList(); render();
+}
+
+// ── 鼠标事件 ──────────────────────────
+ca.addEventListener('mousedown', e => {
+  const r = ca.getBoundingClientRect();
+  const cx = e.clientX - r.left + ca.scrollLeft;
+  const cy = e.clientY - r.top + ca.scrollTop;
+  const [ix, iy] = toImg(cx, cy);
+
+  // 中键 / Alt+左键 = 平移
+  if(e.button === 1 || (e.button === 0 && e.altKey)){
+    panning = true; panSx = e.clientX; panSy = e.clientY;
+    scSx = ca.scrollLeft; scSy = ca.scrollTop;
+    cv.style.cursor = 'grabbing'; e.preventDefault(); return;
+  }
+  if(e.button !== 0) return;
+
+  // 右键 = 闭合多边形 / 取消
+  if(e.button === 2){
+    if(polyDrawing && polyDrawing.points.length >= 3){
+      finishPolygon();
+    } else if(polyDrawing){
+      polyDrawing = null;
+      log('⚠ 取消多边形绘制', 'w');
+      render();
+    }
+    e.preventDefault(); return;
+  }
+
+  // 多边形模式
+  if(currentMode === 'occlusion'){
+    if(polyDrawing){
+      // 已有绘制中的多边形：添加顶点
+      polyDrawing.points.push({x: ix, y: iy});
+      render();
+      return;
+    }
+    // 先检查是否点到已有对象的顶点
+    const hitIdx = hitTest(ix, iy);
+    if(hitIdx >= 0 && objects[hitIdx].type === 'occlusion'){
+      const vIdx = hitVertex(hitIdx, ix, iy);
+      if(vIdx >= 0){
+        // 拖拽顶点
+        selectItem(hitIdx);
+        vertexDragging = { objIdx: hitIdx, vertIdx: vIdx, origX: objects[hitIdx].polygon[vIdx].x, origY: objects[hitIdx].polygon[vIdx].y, moved: false };
+        dragStartX = e.clientX; dragStartY = e.clientY;
+        return;
+      }
+      // 点击多边形内部：整体拖拽移动
+      selectItem(hitIdx);
+      dragging = true;
+      dragStartX = e.clientX; dragStartY = e.clientY;
+      dragOrigX = objects[hitIdx].x; dragOrigY = objects[hitIdx].y;
+      cv.style.cursor = 'grabbing';
+      return;
+    }
+    // 开始新多边形
+    polyDrawing = { points: [{x: ix, y: iy}] };
+    selectedIdx = -1; $('prop-panel').style.display = 'none';
+    updList(); render();
+    return;
+  }
+
+  // 矩形模式（collision / trigger / spawn）
+  if(currentMode === 'collision' || currentMode === 'trigger' || currentMode === 'spawn'){
+    const hitIdx = hitTest(ix, iy);
+    if(hitIdx >= 0){
+      selectItem(hitIdx);
+      dragging = true;
+      dragStartX = e.clientX; dragStartY = e.clientY;
+      dragOrigX = objects[hitIdx].x; dragOrigY = objects[hitIdx].y;
+      cv.style.cursor = 'grabbing';
+    } else {
+      // 开始绘制新矩形
+      drawState = { mode: currentMode, startX: ix, startY: iy, currentX: ix, currentY: iy };
+      selectedIdx = -1; $('prop-panel').style.display = 'none';
+    }
+    return;
+  }
+});
+
+ca.addEventListener('mousemove', e => {
+  const r = ca.getBoundingClientRect();
+  const cx = e.clientX - r.left + ca.scrollLeft;
+  const cy = e.clientY - r.top + ca.scrollTop;
+  const [ix, iy] = toImg(cx, cy);
+  $('cur').textContent = '坐标: ('+Math.round(ix)+','+Math.round(iy)+')';
+
+  if(panning){ ca.scrollLeft = scSx - (e.clientX - panSx); ca.scrollTop = scSy - (e.clientY - panSy); return; }
+
+  // 拖拽顶点
+  if(vertexDragging){
+    const dx = (e.clientX - dragStartX) / scale;
+    const dy = (e.clientY - dragStartY) / scale;
+    const obj = objects[vertexDragging.objIdx];
+    obj.polygon[vertexDragging.vertIdx].x = vertexDragging.origX + dx;
+    obj.polygon[vertexDragging.vertIdx].y = vertexDragging.origY + dy;
+    render(); return;
+  }
+
+  // 拖拽矩形对象
+  if(dragging && selectedIdx >= 0){
+    const dx = (e.clientX - dragStartX) / scale;
+    const dy = (e.clientY - dragStartY) / scale;
+    const obj = objects[selectedIdx];
+    obj.x = dragOrigX + dx;
+    obj.y = dragOrigY + dy;
+    render(); return;
+  }
+
+  // 绘制中的矩形
+  if(drawState){
+    drawState.currentX = ix;
+    drawState.currentY = iy;
+    render(); return;
+  }
+
+  // 鼠标悬浮提示
+  if(!panning && !vertexDragging && !dragging && !drawState){
+    if(currentMode === 'occlusion' && !polyDrawing){
+      const hitIdx = hitTest(ix, iy);
+      if(hitIdx >= 0 && objects[hitIdx].type === 'occlusion'){
+        const vIdx = hitVertex(hitIdx, ix, iy);
+        cv.style.cursor = vIdx >= 0 ? 'grab' : 'move';
+      } else {
+        cv.style.cursor = 'crosshair';
+      }
+    } else if(currentMode === 'collision' || currentMode === 'trigger' || currentMode === 'spawn'){
+      const hitIdx = hitTest(ix, iy);
+      cv.style.cursor = hitIdx >= 0 ? 'move' : 'crosshair';
+    }
+  }
+  
+  // 拖拽绘制中显示十字线
+  if(drawState && (currentMode === 'collision' || currentMode === 'trigger')){
+    render(); // 每次移动都重新渲染以更新辅助线
+  }
+});
+
+ca.addEventListener('mouseup', e => {
+  if(panning){ panning = false; cv.style.cursor = 'default'; return; }
+  
+  if(vertexDragging){
+    const obj = objects[vertexDragging.objIdx];
+    const dx = obj.polygon[vertexDragging.vertIdx].x - vertexDragging.origX;
+    const dy = obj.polygon[vertexDragging.vertIdx].y - vertexDragging.origY;
+    // 位移 < 3 像素视为点击（未移动），还原顶点位置
+    if(Math.abs(dx) < 3 && Math.abs(dy) < 3){
+      obj.polygon[vertexDragging.vertIdx].x = vertexDragging.origX;
+      obj.polygon[vertexDragging.vertIdx].y = vertexDragging.origY;
+    } else {
+      saveState();
+    }
+    vertexDragging = null;
+    showProps(selectedIdx); updList(); render();
+    return;
+  }
+  
+  if(dragging){
+    dragging = false; cv.style.cursor = 'default';
+    if(selectedIdx >= 0){
+      const obj = objects[selectedIdx];
+      const dx = obj.x - dragOrigX;
+      const dy = obj.y - dragOrigY;
+      // 位移 < 3 像素视为未移动
+      if(Math.abs(dx) < 3 && Math.abs(dy) < 3){
+        obj.x = dragOrigX;
+        obj.y = dragOrigY;
+      } else {
+        saveState();
+      }
+      showProps(selectedIdx); updList(); render();
+    }
+    return;
+  }
+  
+  // 完成矩形绘制（拖拽生成）
+  if(drawState){
+    const { mode, startX, startY, currentX, currentY } = drawState;
+    const x = Math.min(startX, currentX);
+    const y = Math.min(startY, currentY);
+    const rawW = Math.abs(currentX - startX);
+    const rawH = Math.abs(currentY - startY);
+    
+    // 拖拽距离太小则不生成（防止误点）
+    if(rawW < 5 && rawH < 5){
+      drawState = null;
+      render();
+      return;
+    }
+    
+    const w = rawW;
+    const h = rawH;
+    
+    const newObj = {
+      id: nextId++,
+      name: mode + '_' + (nextId - 1),
+      type: mode,
+      x, y, w, h
+    };
+    
+    if(mode === 'trigger'){
+      newObj.triggerType = 'interact';
+      newObj.sceneId = '';
+      newObj.once = false;
+    }
+    if(mode === 'spawn'){
+      newObj.spawnId = 'spawn_'+newObj.name;
+      newObj.w = 32; newObj.h = 32;
+    }
+    
+    objects.push(newObj);
+    selectItem(objects.length - 1);
+    drawState = null;
+    saveState();
+    log('✅ 已创建: '+newObj.name+' ('+Math.round(w)+'×'+Math.round(h)+')', 'o');
+    return;
+  }
+});
+
+// 完成多边形
+function finishPolygon(){
+  if(!polyDrawing || polyDrawing.points.length < 3) return;
+  const pts = polyDrawing.points;
+  
+  // 计算包围盒原点（取最小 x,y）
+  let minX=Infinity, minY=Infinity;
+  pts.forEach(p => { if(p.x<minX)minX=p.x; if(p.y<minY)minY=p.y; });
+  
+  // 顶点转为相对坐标
+  const polygon = pts.map(p => ({x: Math.round(p.x - minX), y: Math.round(p.y - minY)}));
+  
+  const newObj = {
+    id: nextId++,
+    name: 'occlusion_' + (nextId - 1),
+    type: 'occlusion',
+    x: Math.round(minX),
+    y: Math.round(minY),
+    polygon,
+    occColor: '#808080',
+    walkable: false,
+    spriteKey: null
+  };
+  
+  objects.push(newObj);
+  selectItem(objects.length - 1);
+  polyDrawing = null;
+  saveState();
+  log('✅ 已创建多边形遮挡: '+newObj.name+' ('+polygon.length+'个顶点)', 'o');
+}
+
+// 右键菜单阻止
+ca.addEventListener('contextmenu', e => e.preventDefault());
+
+// ── 撤销历史栈 ──────────────────────────
+const MAX_HISTORY = 100;
+let undoStack = [];
+let undoIndex = -1;
+
+function saveState(){
+  // 清除 redo 部分
+  undoStack = undoStack.slice(0, undoIndex + 1);
+  const snap = {
+    objects: JSON.parse(JSON.stringify(objects)),
+    nextId,
+    selectedIdx
+  };
+  undoStack.push(snap);
+  if(undoStack.length > MAX_HISTORY) undoStack.shift();
+  undoIndex = undoStack.length - 1;
+}
+
+function undo(){
+  if(undoIndex <= 0) return;
+  undoIndex--;
+  restoreState(undoStack[undoIndex]);
+}
+
+function redo(){
+  if(undoIndex >= undoStack.length - 1) return;
+  undoIndex++;
+  restoreState(undoStack[undoIndex]);
+}
+
+function restoreState(snap){
+  objects = snap.objects;
+  nextId = snap.nextId;
+  selectedIdx = snap.selectedIdx;
+  if(selectedIdx >= objects.length) selectedIdx = -1;
+  if(selectedIdx >= 0) showProps(selectedIdx);
+  else $('prop-panel').style.display = 'none';
+  updList(); render();
+}
+
+// ── 键盘操作 ──────────────────────────
+document.addEventListener('keydown', e => {
+  // 如果在 input/select 中，不处理 Ctrl+Z/Ctrl+Y/方向键/Delete
+  const inInput = (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT');
+  
+  // Ctrl+Z 撤销（全局 + 多边形顶点）
+  if(e.ctrlKey && !e.shiftKey && e.key === 'z'){
+    e.preventDefault();
+    if(inInput) return; // input 框内不拦截
+    // 优先处理多边形绘制中的顶点撤销
+    if(polyDrawing && polyDrawing.points.length > 0){
+      polyDrawing.points.pop();
+      log('↩ 撤销顶点，剩余 ' + polyDrawing.points.length + ' 个', 'w');
+      if(polyDrawing.points.length === 0){
+        polyDrawing = null;
+        log('⚠ 已取消多边形绘制', 'w');
+      }
+      render();
+    } else {
+      // 全局撤销
+      undo();
+      log('↩ 撤销操作', 'i');
+    }
+    return;
+  }
+  
+  // Ctrl+Y 或 Ctrl+Shift+Z 重做
+  if((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')){
+    e.preventDefault();
+    if(inInput) return;
+    redo();
+    log('↪ 重做操作', 'i');
+    return;
+  }
+  
+  if(inInput) return;
+  
+  // Enter 闭合多边形
+  if(e.key === 'Enter' && polyDrawing && polyDrawing.points.length >= 3){
+    finishPolygon(); e.preventDefault(); return;
+  }
+  if(e.key === 'Escape'){
+    if(polyDrawing){ polyDrawing = null; render(); log('⚠ 取消多边形绘制', 'w'); }
+    e.preventDefault(); return;
+  }
+  
+  if(selectedIdx < 0) return;
+  const obj = objects[selectedIdx];
+  const step = e.shiftKey ? 10 : 1;
+  switch(e.key){
+    case 'ArrowLeft':  obj.x -= step; saveState(); e.preventDefault(); break;
+    case 'ArrowRight': obj.x += step; saveState(); e.preventDefault(); break;
+    case 'ArrowUp':    obj.y -= step; saveState(); e.preventDefault(); break;
+    case 'ArrowDown':  obj.y += step; saveState(); e.preventDefault(); break;
+    case 'Delete':
+    case 'Backspace':
+      objects.splice(selectedIdx, 1);
+      selectedIdx = Math.min(selectedIdx, objects.length - 1);
+      $('prop-panel').style.display = 'none';
+      saveState();
+      e.preventDefault(); break;
+    default: return;
+  }
+  showProps(selectedIdx); updList(); render();
+});
+
+// ── 缩放 ──────────────────────────────
+ca.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f = e.deltaY < 0 ? 1.12 : 0.89;
+  const r = ca.getBoundingClientRect();
+  const mx = e.clientX - r.left + ca.scrollLeft;
+  const my = e.clientY - r.top + ca.scrollTop;
+  const os = scale;
+  scale = Math.max(minSc, Math.min(maxSc, scale * f));
+  ca.scrollLeft = mx * (scale/os) - (e.clientX - r.left);
+  ca.scrollTop = my * (scale/os) - (e.clientY - r.top);
+  render(); updZoom();
+}, {passive: false});
+
+// ── 导出 map.json ────────────────────
+function exportMapJSON(){
+  if(!baseImg){ log('⚠ 请先加载底图','w'); return; }
+  const mapName = $('map-name').value || 'new_map';
+  const mapData = buildMapJSON();
+  const jsonStr = JSON.stringify(mapData, null, 2);
+  const blob = new Blob([jsonStr], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = mapName + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  // 统计各类对象数量
+  const cnt = { collision:0, occlusion:0, trigger:0, spawn:0 };
+  objects.forEach(o => cnt[o.type]++);
+  log('💾 已导出 '+mapName+'.json', 'o');
+  log('  🔲 碰撞: '+cnt.collision, 'i');
+  log('  🔶 多边形遮挡: '+cnt.occlusion, 'i');
+  log('  🟢 触发器: '+cnt.trigger, 'i');
+  log('  🚶 出生点: '+cnt.spawn, 'i');
+}
+
+// ── 导入 map.json ─────────────────────
+function importMapJSON(){ $('fm').click(); }
+function onMapJSONSelected(ev){
+  const f = ev.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      objects = [];
+      nextId = 1;
+      
+      data.layers.forEach(layer => {
+        if(!layer.objects) return;
+        layer.objects.forEach(obj => {
+          const newObj = { id: nextId++ };
+          
+          if(layer.name === 'collision'){
+            newObj.type = 'collision';
+            newObj.name = obj.name || 'collision';
+            newObj.x = obj.x; newObj.y = obj.y;
+            newObj.w = obj.width || 64; newObj.h = obj.height || 64;
+            const colProps = getPropsMap(obj.properties);
+            newObj.spriteKey = colProps.spriteKey || null;
+          } else if(layer.name === 'furniture_objects'){
+            if(obj.polygon){
+              newObj.type = 'occlusion';
+              newObj.name = obj.name || 'occlusion';
+              newObj.x = obj.x; newObj.y = obj.y;
+              newObj.polygon = obj.polygon;
+              newObj.occColor = '#808080';
+              const props = getPropsMap(obj.properties);
+              newObj.walkable = props.walkable === 'true' || props.walkable === true;
+              newObj.spriteKey = props.spriteKey || null;
+            } else {
+              // 普通矩形家具 → 转为多边形
+              newObj.type = 'occlusion';
+              newObj.name = obj.name || 'furniture';
+              newObj.x = obj.x; newObj.y = obj.y;
+              const w = obj.width || 64, h = obj.height || 64;
+              newObj.polygon = [{x:0,y:0},{x:w,y:0},{x:w,y:h},{x:0,y:h}];
+              newObj.occColor = '#808080';
+              const props = getPropsMap(obj.properties);
+              newObj.walkable = props.walkable === 'true' || props.walkable === true;
+              newObj.spriteKey = props.spriteKey || null;
+            }
+          } else if(layer.name === 'triggers'){
+            newObj.type = 'trigger';
+            newObj.name = obj.name || 'trigger';
+            newObj.x = obj.x; newObj.y = obj.y;
+            newObj.w = obj.width || 64; newObj.h = obj.height || 64;
+            const props = getPropsMap(obj.properties);
+            newObj.triggerType = props.triggerType || 'interact';
+            newObj.sceneId = props.sceneId || '';
+            newObj.once = props.once === 'true' || props.once === true;
+            newObj.spriteKey = props.spriteKey || null;
+          } else if(layer.name === 'player_spawn'){
+            newObj.type = 'spawn';
+            newObj.name = obj.name || 'spawn';
+            newObj.x = obj.x; newObj.y = obj.y;
+            newObj.w = 32; newObj.h = 32;
+            newObj.spawnId = obj.name || 'spawn';
+          }
+          
+          if(newObj.type) objects.push(newObj);
+        });
+      });
+      
+      // 从 ground 层获取底图尺寸
+      const groundLayer = data.layers.find(l => l.name === 'ground');
+      if(groundLayer){
+        baseW = groundLayer.width || data.width * 32;
+        baseH = groundLayer.height || data.height * 32;
+      }
+      
+      selectedIdx = -1;
+      $('prop-panel').style.display = 'none';
+      // 初始化撤销栈
+      undoStack = []; undoIndex = -1;
+      saveState();
+      updList(); render();
+      log('✅ 已导入 map.json: '+objects.length+' 个对象', 'o');
+    } catch(err){
+      log('❌ 解析失败: '+err.message, 'e');
+    }
+  };
+  reader.readAsText(f);
+}
+
+function getPropsMap(properties){
+  const map = {};
+  if(!properties) return map;
+  properties.forEach(p => { map[p.name] = p.value; });
+  return map;
+}
+
+// ── 拖拽文件打开 ──────────────────────
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  const files = Array.from(e.dataTransfer.files);
+  const imgFiles = files.filter(f => f.type.startsWith('image/'));
+  const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+  
+  if(!baseImg && imgFiles.length > 0){
+    const f = imgFiles.shift();
+    const dt = new DataTransfer(); dt.items.add(f);
+    $('fi').files = dt.files;
+    onBaseMapSelected({target: $('fi')});
+  }
+  
+  if(imgFiles.length > 0){
+    const dt = new DataTransfer();
+    imgFiles.forEach(f => dt.items.add(f));
+    $('fs').files = dt.files;
+    onSpritesSelected({target: $('fs')});
+  }
+  
+  if(jsonFiles.length > 0 && !baseImg){
+    const dt = new DataTransfer(); dt.items.add(jsonFiles[0]);
+    $('fm').files = dt.files;
+    onMapJSONSelected({target: $('fm')});
+  }
+});
+
+// ── 初始化 ────────────────────────────
+log('🗺️ 地图编辑器已就绪', 'o');
+log('','i');
+log('📌 四种模式：', 'i');
+log('  🔲 碰撞框 — 十字拖拽绘制矩形碰撞', 'i');
+log('  🔶 多边形遮挡 — 点击添加顶点，右键闭合', 'i');
+log('  🟢 交互触发 — 十字拖拽绘制矩形触发区域', 'i');
+log('  🚶 出生点 — 点击放置出生点', 'i');
+log('','i');
+log('操作提示:', 'i');
+log('  🖱 左键拖拽 = 绘制/移动 | 中键/Alt+左键 = 平移画布', 'i');
+log('  🔶 多边形模式：左键加顶点 | Ctrl+Z 撤销 | 右键/Enter 闭合', 'i');
+log('  ↩ Ctrl+Z = 全局撤销 | Ctrl+Y = 重做', 'i');
+log('  ⌨ 方向键 = 微调 | Shift+方向键 = 快调 | Delete = 删除', 'i');
+log('  🖱 滚轮 = 缩放', 'i');
+
+</script>
+</body>
+</html>

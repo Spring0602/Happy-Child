@@ -95,9 +95,11 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    console.log(`[PreloadScene] ✅ create() 被调用，准备启动 MapScene`);
     // 注册角色动画
     createPlayerAnimations(this);
-    // 进入地图场景（默认宿舍 sleep 场景，等待 CG 结束后激活）
+    // 立即启动地图场景（默认宿舍 sleep 场景，等待 CG 结束后激活）
+    // 注意：scene.start 会 shutdown 当前场景（PreloadScene），其 children 自动销毁
     this.scene.start("MapScene", { mapId: "dormitory" });
   }
 }

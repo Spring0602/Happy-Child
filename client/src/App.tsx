@@ -36,10 +36,11 @@ export default function App() {
     return () => window.removeEventListener("close-ai-trace", onClose);
   }, []);
 
-  // 检测对话链结束（无 nextSceneId / choices / aiEvent）→ 关闭对话框
+  // 检测对话链结束（无 nextSceneId / choices / aiEvent / onCgEnd）→ 关闭对话框
+  // 注：有 onCgEnd 的场景由 handleNext 在跳转时处理副作用，此处不自动关闭
   useEffect(() => {
     if (!dialogScene) return;
-    if (!dialogScene.nextSceneId && !dialogScene.choices?.length && !dialogScene.aiEvent) {
+    if (!dialogScene.nextSceneId && !dialogScene.choices?.length && !dialogScene.aiEvent && !dialogScene.onCgEnd) {
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
     }
@@ -82,7 +83,23 @@ export default function App() {
   }
 
   function handleNext(nextSceneId: string) {
-    // 检测 CG 结束后的场景转换效果
+    // 空 nextSceneId：关闭对话/ CG，解冻玩家
+    // 但需检查当前场景的 onCgEnd（CG 结束后的副作用，如地图切换）
+    if (!nextSceneId) {
+      const currentScene = dialogScene;
+      if (currentScene?.onCgEnd) {
+        if (currentScene.onCgEnd === "enter_dormitory_playable") {
+          dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_dorm_entrance", position: { x: 0, y: 0 } });
+          gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_dorm_entrance" });
+        }
+        // 其他 onCgEnd 类型可在此扩展
+      }
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
+
+    // 检测 CG 结束后的场景转换效果（在 GO_NEXT 之前执行副作用）
     const nextScene = scenes[nextSceneId];
     if (nextScene?.onCgEnd) {
       if (nextScene.onCgEnd === "enter_dormitory") {
@@ -103,17 +120,18 @@ export default function App() {
         return;
       }
       if (nextScene.onCgEnd === "enter_balcony") {
-        dispatch({ type: "CHANGE_MAP", mapId: "balcony", spawnId: "spawn_balcony_entrance", position: { x: 0, y: 0 } });
-        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony", spawnId: "spawn_balcony_entrance" });
+        // 切换到夜晚阳台（balcony_night），因为剧情发生在晚上
+        dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_balcony_entrance", position: { x: 0, y: 0 } });
+        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_balcony_entrance" });
         dispatch({ type: "GO_NEXT", nextSceneId });
         return;
       }
       if (nextScene.onCgEnd === "enter_dormitory_playable") {
-        // CG 结束 → 切换到 dormitory 地图，玩家可操控，走向窗户交互进入阳台
+        // CG 结束 → 先切换到 dormitory 地图，但让 CG 继续播放
+        // CG 播放完毕后由 useEffect 自动 DIALOG_END + UNFREEZE_PLAYER
         dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_dorm_entrance", position: { x: 0, y: 0 } });
         gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_dorm_entrance" });
-        dispatch({ type: "DIALOG_END" });
-        gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+        dispatch({ type: "GO_NEXT", nextSceneId });
         return;
       }
     }
@@ -169,6 +187,16 @@ export default function App() {
   }
 
   const handleDialogueTrigger = useCallback((sceneId: string) => {
+    // 检查场景的 onCgEnd，在对话开始前执行地图切换等副作用
+    const scene = scenes[sceneId];
+    if (scene?.onCgEnd) {
+      if (scene.onCgEnd === "enter_balcony") {
+        // 切换到夜晚阳台（balcony_night）
+        dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_balcony_entrance", position: { x: 0, y: 0 } });
+        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_balcony_entrance" });
+      }
+      // 其他 onCgEnd 类型可在此扩展
+    }
     dispatch({ type: "DIALOG_START", sceneId });
   }, []);
 
