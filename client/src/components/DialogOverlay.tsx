@@ -157,7 +157,6 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
         <div className="dialog-box" onClick={handleSpace}>
           <div className="dialog-header">
             {label && <span className="dialog-speaker">{label}</span>}
-            {label && !NARRATOR_NAMES.includes(scene.speaker ?? "") && <span className="dialog-chapter">{scene.chapter}</span>}
           </div>
           <div className={`dialog-text${isNarrator ? " narrator" : ""}`}>
             {fullText.slice(0, displayedChars)}

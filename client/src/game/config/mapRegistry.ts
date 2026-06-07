@@ -98,14 +98,6 @@ export const MapRegistry: Record<string, MapEntry> = {
     tilesetImage: "/assets/maps/dormitory/tileset.png",
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_sit_desk",
-    furnitureImages: [
-      // 只有需要 Y 轴深度遮挡的物品才叠精灵图层
-      // 其余物品碰撞直接画在 collision 层，底图已包含视觉
-      // key 加 dorm_ 前缀避免与其他地图同名 item 纹理冲突
-      { key: "dorm_item_14", path: "/assets/maps/dormitory/物品_sprites/item_14.png" },
-      { key: "dorm_item_15", path: "/assets/maps/dormitory/物品_sprites/item_15.png" },
-    ],
-    furnitureTint: 0x8899aa, // 室内夜间色调
     width: 1149,
     height: 1369,
     tileWidth: 32,
@@ -119,7 +111,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     tilesetKey: "tileset_balcony",
     tilesetImage: "/assets/maps/balcony/tileset.png",
     tilesetNameInTiled: "dummy",
-    defaultSpawn: "spawn_balcony_entrance",
+    defaultSpawn: "spawn_spawn_77",
     furnitureImages: [
       { key: "item_01", path: "/assets/maps/balcony/物品_sprites/item_01.png" },
       { key: "item_02", path: "/assets/maps/balcony/物品_sprites/item_02.png" },
@@ -145,7 +137,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     tilesetKey: "tileset_balcony_night",
     tilesetImage: "/assets/maps/balcony/tileset.png",
     tilesetNameInTiled: "dummy",
-    defaultSpawn: "spawn_balcony_entrance",
+    defaultSpawn: "spawn_spawn_77",
     furnitureTint: 0x8899aa, // 夜晚阳台色调
     width: 1376,
     height: 768,

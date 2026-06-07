@@ -173,11 +173,12 @@ body {
 }
 
 .dialog-portrait {
-  max-height: 28vh;
+  max-height: 50vh;
   min-height: 120px;
   width: auto;
   object-fit: contain;
   object-position: bottom;
+  align-self: flex-end;
   image-rendering: pixelated;
   filter: drop-shadow(0 0 8px rgba(0,0,0,0.5));
   display: block;
@@ -471,12 +472,13 @@ body {
 }
 
 .cg-portrait {
-  max-height: 35vh;
+  max-height: 50vh;
   width: auto;
   object-fit: contain;
   object-position: bottom;
   image-rendering: pixelated;
   filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
+  display: block;
 }
 
 /* CG 选项 */

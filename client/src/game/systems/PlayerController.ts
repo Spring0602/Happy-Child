@@ -10,6 +10,7 @@ export class PlayerController {
   private frozen = false;
   private isSitting = false;
   private lastDirection: Direction = "down";
+  private onStandUpCallback: (() => void) | null = null;
 
   constructor(scene: Phaser.Scene, player: Phaser.GameObjects.Sprite) {
     this.player = player;
@@ -160,16 +161,35 @@ export class PlayerController {
     this.player.setDepth(sitInFront ? (chairY + 1) / mapHeight : (chairY - 1) / mapHeight);
   }
 
+  /** 设置站起回调（用于传送等操作） */
+  setOnStandUp(callback: () => void) {
+    this.onStandUpCallback = callback;
+  }
+
   /** 站起来（按任意方向键时调用） */
   standUp() {
     if (!this.isSitting) return;
     this.isSitting = false;
     this.playIdleAnimation(this.lastDirection);
+    // 执行站起回调（如传送到椅子右侧出生点）
+    if (this.onStandUpCallback) {
+      this.onStandUpCallback();
+    }
   }
 
   /** 是否处于坐下状态 */
   get sitting() {
     return this.isSitting;
+  }
+
+  /** 设置角色朝向（用于剧情事件控制） */
+  setDirection(dir: Direction) {
+    this.lastDirection = dir;
+    if (this.isSitting) {
+      this.playSitAnimation(dir);
+    } else {
+      this.playIdleAnimation(dir);
+    }
   }
 
   freeze() {
