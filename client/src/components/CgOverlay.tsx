@@ -91,9 +91,9 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
     } else if (currentParagraph < totalParagraphs - 1) {
       // 下一段
       setCurrentParagraph(prev => prev + 1);
-    } else if (scene.nextSceneId) {
-      // 进入下一场景
-      onNext(scene.nextSceneId);
+    } else {
+      // 进入下一场景（即使 nextSceneId 为空也触发，让上层处理关闭逻辑）
+      onNext(scene.nextSceneId || "");
     }
   }, [hasChoices, typingDone, currentParagraph, totalParagraphs, scene.nextSceneId, onNext, fullText.length]);
 

@@ -9,6 +9,10 @@ export function PhaserGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     parent,
     width: 960,
     height: 540,
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     pixelArt: true,
     roundPixels: true,
     physics: {

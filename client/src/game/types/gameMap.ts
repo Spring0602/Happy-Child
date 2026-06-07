@@ -19,6 +19,7 @@ export interface MapEntry {
     key: string;
     path: string;
   }[];
+  furnitureTint?: number;        // 家具精灵图色调（0xRRGGBB），用于适配场景光照（如夜晚=0x8899aa）
   width: number;                // 地图宽度（像素，须与底图实际尺寸一致）
   height: number;               // 地图高度（像素，须与底图实际尺寸一致）
   tileWidth: number;            // 单个 tile 宽度（默认 32）

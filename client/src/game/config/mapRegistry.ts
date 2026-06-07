@@ -101,9 +101,11 @@ export const MapRegistry: Record<string, MapEntry> = {
     furnitureImages: [
       // 只有需要 Y 轴深度遮挡的物品才叠精灵图层
       // 其余物品碰撞直接画在 collision 层，底图已包含视觉
-      { key: "item_14", path: "/assets/maps/dormitory/物品_sprites/item_14.png" },
-      { key: "item_15", path: "/assets/maps/dormitory/物品_sprites/item_15.png" },
+      // key 加 dorm_ 前缀避免与其他地图同名 item 纹理冲突
+      { key: "dorm_item_14", path: "/assets/maps/dormitory/物品_sprites/item_14.png" },
+      { key: "dorm_item_15", path: "/assets/maps/dormitory/物品_sprites/item_15.png" },
     ],
+    furnitureTint: 0x8899aa, // 室内夜间色调
     width: 1149,
     height: 1369,
     tileWidth: 32,
@@ -129,6 +131,22 @@ export const MapRegistry: Record<string, MapEntry> = {
       { key: "item_08", path: "/assets/maps/balcony/物品_sprites/item_08.png" },
       { key: "item_09", path: "/assets/maps/balcony/物品_sprites/item_09.png" },
     ],
+    width: 1376,
+    height: 768,
+    tileWidth: 32,
+    tileHeight: 32,
+  },
+  /** 阳台夜间测试版（含多边形遮挡） */
+  balcony_night: {
+    mapKey: "map_balcony_night",
+    mapJson: "/assets/maps/balcony/map.json",
+    groundKey: "ground_balcony_night",
+    groundImage: "/assets/maps/balcony/阳台_夜晚.png",
+    tilesetKey: "tileset_balcony_night",
+    tilesetImage: "/assets/maps/balcony/tileset.png",
+    tilesetNameInTiled: "dummy",
+    defaultSpawn: "spawn_balcony_entrance",
+    furnitureTint: 0x8899aa, // 夜晚阳台色调
     width: 1376,
     height: 768,
     tileWidth: 32,
