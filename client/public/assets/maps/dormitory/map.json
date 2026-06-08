@@ -7,7 +7,7 @@
       "id": 1,
       "name": "ground",
       "type": "imagelayer",
-      "image": "sleep.png",
+      "image": "宿舍.png",
       "x": 0,
       "y": 0,
       "width": 1149,
@@ -174,18 +174,18 @@
         {
           "id": 20,
           "name": "collision_item17",
-          "x": 201,
-          "y": 498,
-          "width": 90,
-          "height": 105
+          "x": 202,
+          "y": 546,
+          "width": 89,
+          "height": 61
         },
         {
           "id": 21,
           "name": "collision_item18",
-          "x": 842,
-          "y": 498,
+          "x": 847,
+          "y": 560,
           "width": 90,
-          "height": 108
+          "height": 58
         },
         {
           "id": 22,
@@ -242,6 +242,22 @@
           "y": 944,
           "width": 70,
           "height": 47
+        },
+        {
+          "id": 29,
+          "name": "collision_44",
+          "x": 841,
+          "y": 1060,
+          "width": 67.33665538913726,
+          "height": 58.02996318088253
+        },
+        {
+          "id": 30,
+          "name": "collision_46",
+          "x": 214,
+          "y": 1060,
+          "width": 80.47551497726153,
+          "height": 62.4095830435906
         }
       ]
     },
@@ -253,25 +269,61 @@
       "objects": [
         {
           "id": 1,
-          "name": "item_14",
+          "name": "occlusion_50",
           "type": "furniture",
-          "x": 211,
-          "y": 1015,
-          "width": 83,
-          "height": 106,
+          "x": 67,
+          "y": 665,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 5,
+              "y": 3
+            },
+            {
+              "x": 29,
+              "y": 0
+            },
+            {
+              "x": 31,
+              "y": 24
+            },
+            {
+              "x": 341,
+              "y": 24
+            },
+            {
+              "x": 348,
+              "y": 8
+            },
+            {
+              "x": 366,
+              "y": 8
+            },
+            {
+              "x": 366,
+              "y": 34
+            },
+            {
+              "x": 29,
+              "y": 38
+            },
+            {
+              "x": 31,
+              "y": 54
+            },
+            {
+              "x": 9,
+              "y": 54
+            },
+            {
+              "x": 0,
+              "y": 2
+            }
+          ],
           "properties": [
             {
-              "name": "interactable",
-              "type": "bool",
-              "value": true
-            },
-            {
-              "name": "interactSceneId",
-              "type": "string",
-              "value": "item_14"
-            },
-            {
-              "name": "sitAction",
+              "name": "walkable",
               "type": "bool",
               "value": true
             }
@@ -279,12 +331,640 @@
         },
         {
           "id": 2,
-          "name": "item_15",
+          "name": "occlusion_51",
           "type": "furniture",
-          "x": 833,
-          "y": 1011,
-          "width": 86,
-          "height": 109
+          "x": 76,
+          "y": 696,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 23,
+              "y": 21
+            },
+            {
+              "x": 89,
+              "y": 22
+            },
+            {
+              "x": 95,
+              "y": 15
+            },
+            {
+              "x": 122,
+              "y": 11
+            },
+            {
+              "x": 130,
+              "y": 17
+            },
+            {
+              "x": 333,
+              "y": 17
+            },
+            {
+              "x": 337,
+              "y": 3
+            },
+            {
+              "x": 356,
+              "y": 0
+            },
+            {
+              "x": 359,
+              "y": 125
+            },
+            {
+              "x": 0,
+              "y": 132
+            },
+            {
+              "x": 4,
+              "y": 24
+            },
+            {
+              "x": 24,
+              "y": 20
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "occlusion_52",
+          "type": "furniture",
+          "x": 716,
+          "y": 668,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 19,
+              "y": 3
+            },
+            {
+              "x": 28,
+              "y": 21
+            },
+            {
+              "x": 341,
+              "y": 21
+            },
+            {
+              "x": 341,
+              "y": 1
+            },
+            {
+              "x": 356,
+              "y": 8
+            },
+            {
+              "x": 353,
+              "y": 40
+            },
+            {
+              "x": 338,
+              "y": 33
+            },
+            {
+              "x": 28,
+              "y": 33
+            },
+            {
+              "x": 14,
+              "y": 36
+            },
+            {
+              "x": 1,
+              "y": 36
+            },
+            {
+              "x": 0,
+              "y": 3
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "occlusion_53",
+          "type": "furniture",
+          "x": 716,
+          "y": 676,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 30,
+              "y": 40
+            },
+            {
+              "x": 28,
+              "y": 23
+            },
+            {
+              "x": 1,
+              "y": 28
+            },
+            {
+              "x": 0,
+              "y": 124
+            },
+            {
+              "x": 365,
+              "y": 126
+            },
+            {
+              "x": 367,
+              "y": 78
+            },
+            {
+              "x": 367,
+              "y": 11
+            },
+            {
+              "x": 361,
+              "y": 0
+            },
+            {
+              "x": 352,
+              "y": 25
+            },
+            {
+              "x": 341,
+              "y": 25
+            },
+            {
+              "x": 340,
+              "y": 38
+            },
+            {
+              "x": 274,
+              "y": 42
+            },
+            {
+              "x": 268,
+              "y": 33
+            },
+            {
+              "x": 255,
+              "y": 33
+            },
+            {
+              "x": 241,
+              "y": 33
+            },
+            {
+              "x": 234,
+              "y": 37
+            },
+            {
+              "x": 32,
+              "y": 37
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "occlusion_49",
+          "type": "furniture",
+          "x": 76,
+          "y": 814,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 1
+            },
+            {
+              "x": 359,
+              "y": 5
+            },
+            {
+              "x": 361,
+              "y": 123
+            },
+            {
+              "x": 8,
+              "y": 126
+            },
+            {
+              "x": 0,
+              "y": 0
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "occlusion_50",
+          "type": "furniture",
+          "x": 715,
+          "y": 779,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 3
+            },
+            {
+              "x": 368,
+              "y": 0
+            },
+            {
+              "x": 366,
+              "y": 144
+            },
+            {
+              "x": 3,
+              "y": 141
+            },
+            {
+              "x": 3,
+              "y": 5
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "occlusion_51",
+          "type": "furniture",
+          "x": 836,
+          "y": 1010,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 58
+            },
+            {
+              "x": 1,
+              "y": 3
+            },
+            {
+              "x": 11,
+              "y": 0
+            },
+            {
+              "x": 13,
+              "y": 8
+            },
+            {
+              "x": 64,
+              "y": 8
+            },
+            {
+              "x": 67,
+              "y": 2
+            },
+            {
+              "x": 75,
+              "y": 2
+            },
+            {
+              "x": 78,
+              "y": 61
+            },
+            {
+              "x": 65,
+              "y": 61
+            },
+            {
+              "x": 65,
+              "y": 41
+            },
+            {
+              "x": 17,
+              "y": 40
+            },
+            {
+              "x": 15,
+              "y": 60
+            },
+            {
+              "x": 1,
+              "y": 61
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "occlusion_52",
+          "type": "furniture",
+          "x": 213,
+          "y": 1018,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 70
+            },
+            {
+              "x": 0,
+              "y": 1
+            },
+            {
+              "x": 10,
+              "y": 0
+            },
+            {
+              "x": 12,
+              "y": 5
+            },
+            {
+              "x": 36,
+              "y": 7
+            },
+            {
+              "x": 61,
+              "y": 7
+            },
+            {
+              "x": 64,
+              "y": 1
+            },
+            {
+              "x": 75,
+              "y": 1
+            },
+            {
+              "x": 79,
+              "y": 64
+            },
+            {
+              "x": 67,
+              "y": 62
+            },
+            {
+              "x": 66,
+              "y": 41
+            },
+            {
+              "x": 15,
+              "y": 41
+            },
+            {
+              "x": 14,
+              "y": 64
+            },
+            {
+              "x": 4,
+              "y": 68
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "occlusion_53",
+          "type": "furniture",
+          "x": 202,
+          "y": 501,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 55
+            },
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 0
+            },
+            {
+              "x": 23,
+              "y": 6
+            },
+            {
+              "x": 44,
+              "y": 9
+            },
+            {
+              "x": 67,
+              "y": 11
+            },
+            {
+              "x": 70,
+              "y": 6
+            },
+            {
+              "x": 80,
+              "y": 7
+            },
+            {
+              "x": 83,
+              "y": 57
+            },
+            {
+              "x": 82,
+              "y": 64
+            },
+            {
+              "x": 72,
+              "y": 64
+            },
+            {
+              "x": 68,
+              "y": 45
+            },
+            {
+              "x": 16,
+              "y": 41
+            },
+            {
+              "x": 13,
+              "y": 60
+            },
+            {
+              "x": 0,
+              "y": 58
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "occlusion_54",
+          "type": "furniture",
+          "x": 851,
+          "y": 495,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 66
+            },
+            {
+              "x": 1,
+              "y": 11
+            },
+            {
+              "x": 7,
+              "y": 9
+            },
+            {
+              "x": 17,
+              "y": 11
+            },
+            {
+              "x": 41,
+              "y": 9
+            },
+            {
+              "x": 63,
+              "y": 9
+            },
+            {
+              "x": 75,
+              "y": 0
+            },
+            {
+              "x": 82,
+              "y": 5
+            },
+            {
+              "x": 82,
+              "y": 37
+            },
+            {
+              "x": 81,
+              "y": 50
+            },
+            {
+              "x": 81,
+              "y": 63
+            },
+            {
+              "x": 68,
+              "y": 66
+            },
+            {
+              "x": 66,
+              "y": 49
+            },
+            {
+              "x": 66,
+              "y": 40
+            },
+            {
+              "x": 14,
+              "y": 47
+            },
+            {
+              "x": 13,
+              "y": 58
+            },
+            {
+              "x": 12,
+              "y": 66
+            },
+            {
+              "x": 0,
+              "y": 67
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "occlusion_55",
+          "type": "furniture",
+          "x": 227,
+          "y": 1073,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 49,
+              "y": 2
+            },
+            {
+              "x": 50,
+              "y": 13
+            },
+            {
+              "x": 0,
+              "y": 14
+            },
+            {
+              "x": 0,
+              "y": 0
+            }
+          ]
         }
       ]
     },
@@ -310,37 +990,12 @@
             {
               "name": "sceneId",
               "type": "string",
-              "value": "ch1_go_balcony"
+              "value": "dorm_go_balcony"
             }
           ]
         },
         {
           "id": 101,
-          "name": "trigger_sit_area",
-          "x": 450,
-          "y": 800,
-          "width": 300,
-          "height": 200,
-          "properties": [
-            {
-              "name": "triggerType",
-              "type": "string",
-              "value": "walk"
-            },
-            {
-              "name": "sceneId",
-              "type": "string",
-              "value": "ch1_stand_up"
-            },
-            {
-              "name": "once",
-              "type": "bool",
-              "value": true
-            }
-          ]
-        },
-        {
-          "id": 102,
           "name": "trigger_pc",
           "x": 217,
           "y": 906,
@@ -355,12 +1010,12 @@
             {
               "name": "sceneId",
               "type": "string",
-              "value": "查看电脑"
+              "value": "dorm_interact_pc"
             }
           ]
         },
         {
-          "id": 103,
+          "id": 102,
           "name": "trigger_cpp_book",
           "x": 843,
           "y": 944,
@@ -375,12 +1030,12 @@
             {
               "name": "sceneId",
               "type": "string",
-              "value": "c++程序设计书"
+              "value": "dorm_interact_cpp_book"
             }
           ]
         },
         {
-          "id": 104,
+          "id": 103,
           "name": "trigger_balcony_door",
           "x": 404,
           "y": 101,
@@ -390,17 +1045,17 @@
             {
               "name": "triggerType",
               "type": "string",
-              "value": "door"
+              "value": "interact"
             },
             {
               "name": "sceneId",
               "type": "string",
-              "value": "是否前往阳台"
+              "value": "dorm_go_balcony"
             }
           ]
         },
         {
-          "id": 105,
+          "id": 104,
           "name": "trigger_clock",
           "x": 218,
           "y": 1191,
@@ -415,12 +1070,12 @@
             {
               "name": "sceneId",
               "type": "string",
-              "value": "时钟"
+              "value": "dorm_interact_clock"
             }
           ]
         },
         {
-          "id": 106,
+          "id": 105,
           "name": "trigger_exit_door",
           "x": 486,
           "y": 1259,
@@ -435,7 +1090,27 @@
             {
               "name": "sceneId",
               "type": "string",
-              "value": "出门"
+              "value": "dorm_interact_exit_door"
+            }
+          ]
+        },
+        {
+          "id": 106,
+          "name": "trigger_chair",
+          "x": 213,
+          "y": 1046,
+          "width": 83,
+          "height": 79,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": "item_14"
             }
           ]
         }
@@ -449,25 +1124,57 @@
       "objects": [
         {
           "id": 200,
-          "name": "spawn_sit_desk",
-          "x": 570,
-          "y": 950,
+          "name": "spawn_dorm_entrance",
+          "x": 574,
+          "y": 1265,
           "width": 32,
           "height": 32
         },
         {
           "id": 201,
-          "name": "spawn_stand_by_chair",
-          "x": 650,
-          "y": 940,
+          "name": "spawn_sit_chair",
+          "x": 239,
+          "y": 1021,
           "width": 32,
           "height": 32
         },
         {
           "id": 202,
-          "name": "spawn_dorm_entrance",
-          "x": 100,
-          "y": 1200,
+          "name": "spawn_stand_chair_right",
+          "x": 309,
+          "y": 1083,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 203,
+          "name": "spawn_spawn_52",
+          "x": 538,
+          "y": 370,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_53",
+          "x": 772,
+          "y": 1086,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 205,
+          "name": "spawn_spawn_54",
+          "x": 763,
+          "y": 578,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 206,
+          "name": "spawn_spawn_55",
+          "x": 340,
+          "y": 578,
           "width": 32,
           "height": 32
         }
@@ -489,7 +1196,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 300,
+  "nextobjectid": 257,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

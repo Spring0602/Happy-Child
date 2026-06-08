@@ -12,6 +12,7 @@ interface Interactable {
   sitAction?: boolean;
   sitInFront?: boolean;
   chairY?: number;
+  hintText?: string;  // 自定义交互提示文本（如"E坐下"、"E查看电脑"）
 }
 
 export class InteractionSystem {
@@ -80,9 +81,10 @@ export class InteractionSystem {
 
     // 显示/隐藏交互提示
     if (nearest) {
+      const label = nearest.hintText || "[E] 交互";
       if (!this.interactHint) {
         this.interactHint = this.scene.add
-          .text(0, 0, "[E] 交互", {
+          .text(0, 0, label, {
             fontSize: "16px",
             fontFamily: "Arial",
             color: "#ffff00",
@@ -92,6 +94,8 @@ export class InteractionSystem {
           .setDepth(9999)
           .setOrigin(0.5);
         console.log("[InteractionSystem] 💬 交互提示文本已创建");
+      } else {
+        this.interactHint.setText(label);
       }
       this.interactHint.setPosition(nearest.x, nearest.y - 60);
       this.interactHint.setVisible(true);
@@ -106,6 +110,7 @@ export class InteractionSystem {
     if (!nearest) return;
 
     console.log(`[InteractionSystem] 🎯 E 键触发交互: id=${nearest.id}, type=${nearest.type}, sitAction=${nearest.sitAction}`);
+    console.log(`[InteractionSystem] 📋 当前可交互对象列表:`, this.interactables.map(o => ({ id: o.id, sitAction: o.sitAction, x: Math.round(o.x), y: Math.round(o.y) })));
 
     // 坐下动作：优先处理，不走对话流程
     if (nearest.sitAction && this.onSitCallback) {

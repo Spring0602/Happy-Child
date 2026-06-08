@@ -53,6 +53,7 @@ export class MapScene extends Phaser.Scene {
     try {
       // 清理旧场景对象
       this.children.removeAll(true);
+      this.rainParticles = null;
 
       // 注册当前地图到 scene registry
       this.registry.set("currentMapId", mapId);
@@ -135,7 +136,29 @@ export class MapScene extends Phaser.Scene {
       this.playerCtrl = new PlayerController(this, this.player);
       this.interactionSys = new InteractionSystem(this, this.player);
       this.interactionSys.setOnSit((chairY, sitInFront) => {
+        // 先传送到椅子前的坐下出生点，再坐下（面朝上，显示 sit_back）
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (spawnLayer) {
+          const sitSpawn = spawnLayer.objects.find((o) => o.name === "spawn_sit_chair");
+          if (sitSpawn) {
+            this.player.x = sitSpawn.x! + (sitSpawn.width ?? 32) / 2;
+            this.player.y = sitSpawn.y! + (sitSpawn.height ?? 32) / 2;
+          }
+        }
+        this.playerCtrl?.setDirection("up");
         this.playerCtrl?.sit(chairY, sitInFront, entry.height);
+      });
+      // 设置站起后的回调：传送到椅子坐下出生点
+      this.playerCtrl.setOnStandUp(() => {
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (spawnLayer) {
+          const sitSpawn = spawnLayer.objects.find((o) => o.name === "spawn_sit_chair");
+          if (sitSpawn) {
+            this.player.x = sitSpawn.x! + (sitSpawn.width ?? 32) / 2;
+            this.player.y = sitSpawn.y! + (sitSpawn.height ?? 32) / 2;
+          }
+        }
+        this.playerCtrl?.setDirection("down");
       });
       this.triggerSys = new TriggerSystem(this, this.player);
 
@@ -175,9 +198,10 @@ export class MapScene extends Phaser.Scene {
     }
 
     // --- furniture_objects ---
-    // 支持两种模式：
-    //   1. 精灵图叠层（矩形对象 + entry.furnitureImages 中有匹配 key）
-    //   2. 多边形遮挡（对象含 polygon 字段，用纯色填充 + depth sorting 遮挡玩家）
+    // 统一使用"多边形遮挡"模式（与 map_editor 对齐）：
+    //   - 有 polygon 字段 → 按多边形裁剪底图
+    //   - 无 polygon 但有 width/height → 自动生成矩形 polygon，按矩形裁剪底图
+    //   - 支持可选 spriteKey 叠加精灵图
     const furnitureLayer = this.map.getObjectLayer("furniture_objects");
     console.log(`[MapScene] 📦 furniture_objects layer: ${furnitureLayer ? `found (${furnitureLayer.objects.length} objects)` : "NOT FOUND!"}`);
     console.log(`[MapScene] 🖼️  furnitureImages: ${entry.furnitureImages ? `${entry.furnitureImages.length} entries` : "undefined"}`);
@@ -189,8 +213,20 @@ export class MapScene extends Phaser.Scene {
         const name = obj.name;
         const props = this.getProps(obj.properties);
 
-        // ── 多边形遮挡物（裁剪底图 + 叠加精灵图）──
-        if (obj.polygon && Array.isArray(obj.polygon) && obj.polygon.length >= 3) {
+        // 无 polygon 的矩形对象 → 自动生成矩形 polygon（与 map_editor 一致）
+        const effectivePolygon = obj.polygon && Array.isArray(obj.polygon) && obj.polygon.length >= 3
+          ? obj.polygon
+          : (obj.width && obj.height ? [
+              { x: 0, y: 0 },
+              { x: obj.width, y: 0 },
+              { x: obj.width, y: obj.height },
+              { x: 0, y: obj.height }
+            ] : null);
+
+        // ── 多边形遮挡物（裁剪底图 + 可选叠加精灵图）──
+        if (effectivePolygon) {
+          // 统一用 effectivePolygon 替换 obj.polygon 以便后续代码使用
+          obj.polygon = effectivePolygon;
           polygonCount++;
           // 计算多边形包围盒
           let minX = Infinity, minY = Infinity;
@@ -338,6 +374,7 @@ export class MapScene extends Phaser.Scene {
               sitAction: props.sitAction === "true",
               sitInFront: props.sitInFront !== "false",
               chairY: obj.y! + objH,
+              hintText: props.hintText,
             });
           } else {
             console.log(`[MapScene]   📍 装饰品: ${name} at (${Math.round(sx)},${Math.round(sy)}), size=(${Math.round(objW)},${Math.round(objH)}), walkable=${props.walkable}`);
@@ -411,12 +448,20 @@ export class MapScene extends Phaser.Scene {
 
         // interact/door 类型 → 注册到 InteractionSystem（E 键交互）
         if (triggerType === "interact" || triggerType === "door") {
+          // 阳台门不注册为可交互（只有窗户 trigger_window 能去阳台）
+          if (obj.name === "trigger_balcony_door") continue;
+          // 硬编码：特定 trigger 的坐下行为（避免修改 map.json）
+          const isChair = obj.name === "trigger_chair";
           this.interactionSys?.registerInteractable({
             x: sx,
             y: sy,
             type: "item",
             id: props.itemId || obj.name,
             sceneId: props.sceneId,
+            hintText: props.hintText,
+            sitAction: isChair ? true : (props.sitAction === "true"),
+            sitInFront: props.sitInFront !== "false",
+            chairY: obj.y! + (obj.height ?? 64),
           });
 
           // 渲染精灵图（仅当该物件未被 foreground 层渲染时才在此处显示）
@@ -543,11 +588,14 @@ export class MapScene extends Phaser.Scene {
     console.log(`[MapScene] 📖 剧情事件: ${eventId}`, payload);
     switch (eventId) {
       case "player_sit_down": {
-        // 玩家在当前位置坐下（朝前）
+        // 玩家在当前位置坐下（朝上/背对镜头，显示 sit_back 帧）
+        this.playerCtrl?.setDirection("up");
         this.playerCtrl?.sit(this.player.y, false, this.map.heightInPixels || 600);
         break;
       }
       case "player_stand_up": {
+        // 站起时面向右（显示 stand_right 帧）
+        this.playerCtrl?.setDirection("right");
         this.playerCtrl?.standUp();
         break;
       }
@@ -631,12 +679,179 @@ export class MapScene extends Phaser.Scene {
         }
         break;
       }
+      case "rain_start": {
+        // 启动全屏下雨粒子效果（阳台剧情）
+        if (!this.rainParticles) {
+          this.createRainEffect();
+        }
+        break;
+      }
+      case "rain_stop": {
+        // 停止下雨效果
+        if (this.rainParticles) {
+          this.rainParticles.destroy();
+          this.rainParticles = null;
+        }
+        break;
+      }
+      case "fade_out_map": {
+        // 地图淡出至全黑（睡觉过渡效果）
+        // 使用相机 fade 效果，而非手动创建矩形（手动矩形在世界坐标中位置会随相机滚动偏移）
+        const duration = (payload?.duration as number) || 1500;
+        this.cameras.main.fade(duration, 0, 0, 0, true, (_cam: Phaser.Cameras.Scene2D.Camera, progress: number) => {
+          // 淡出完成后，创建一个全屏黑幕盖住画面（防止 fadeIn 自动恢复）
+          if (progress >= 1) {
+            const cam = this.cameras.main;
+            const overlay = this.add.rectangle(
+              cam.scrollX + cam.width / 2,
+              cam.scrollY + cam.height / 2,
+              cam.width,
+              cam.height,
+              0x000000, 1
+            ).setDepth(20000).setScrollFactor(0);
+            this.registry.set("fadeOverlay", overlay);
+          }
+        });
+        break;
+      }
+      case "remove_fade_overlay": {
+        // 移除淡出黑幕并恢复相机正常显示
+        const overlay = this.registry.get("fadeOverlay") as Phaser.GameObjects.Rectangle | undefined;
+        if (overlay) {
+          overlay.destroy();
+          this.registry.remove("fadeOverlay");
+        }
+        // 重置相机 fade 效果（防止相机仍处于 fade 状态）
+        this.cameras.main.resetFX();
+        break;
+      }
+      case "spawn_npc": {
+        // 在指定出生点生成 NPC 精灵
+        const spawnId = payload?.spawnId as string;
+        const npcKey = payload?.npcKey as string;
+        if (!spawnId || !npcKey) break;
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (spawnLayer) {
+          const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
+          if (spawn) {
+            const cx = spawn.x! + (spawn.width ?? 32) / 2;
+            const cy = spawn.y! + (spawn.height ?? 32) / 2;
+            const scale = (payload?.scale as number) || 2;
+            const sprite = this.add.sprite(cx, cy, npcKey).setScale(scale);
+            sprite.setDepth(cy / (this.map.heightInPixels || 1000));
+            // 碰撞体
+            const bodyW = (payload?.bodyWidth as number) || 24;
+            const bodyH = (payload?.bodyHeight as number) || 36;
+            const zone = this.add.zone(cx, cy, bodyW, bodyH);
+            this.physics.add.existing(zone, true);
+            this.collisionGroup.add(zone);
+            // 存储 NPC 引用
+            const npcList = (this.registry.get("npcSprites") as Map<string, Phaser.GameObjects.Sprite>) || new Map();
+            npcList.set(npcKey, sprite);
+            this.registry.set("npcSprites", npcList);
+          }
+        }
+        break;
+      }
+      case "set_npc_direction": {
+        // 设置 NPC 朝向（left/right 通过 setFlipX 镜像，front/back 不翻转）
+        const npcKey = payload?.npcKey as string;
+        const direction = payload?.direction as string;
+        if (!npcKey || !direction) break;
+        const npcList = this.registry.get("npcSprites") as Map<string, Phaser.GameObjects.Sprite> | undefined;
+        const sprite = npcList?.get(npcKey);
+        if (sprite) {
+          sprite.setFlipX(direction === "left");
+        }
+        break;
+      }
+      case "set_player_anim": {
+        // 设置玩家朝向动画
+        const direction = payload?.direction as string;
+        if (direction && this.playerCtrl) {
+          this.playerCtrl.setDirection(direction as "left" | "right" | "up" | "down");
+        }
+        break;
+      }
+      case "eye_open_effect": {
+        // 睁眼效果：在全屏黑幕上做眨眼动画（3次眨眼后完全亮起）
+        // 此效果依赖 React 端已有的 fadeOverlay，这里不做额外操作，
+        // 只通知 React 侧完成（由 App.tsx 的 onCgEnd 逻辑处理）
+        break;
+      }
+      case "play_sfx": {
+        // 播放音效（闹钟等）
+        const key = (payload?.key as string) || "";
+        try {
+          if (key && this.sound.get(key)) {
+            this.sound.play(key, { loop: (payload?.loop as boolean) || false, volume: (payload?.volume as number) || 1 });
+          } else if (key) {
+            console.warn(`[MapScene] 音效 "${key}" 未加载，请将音效文件放入 assets/audio/sfx/ 目录`);
+          }
+        } catch (e) {
+          console.warn(`[MapScene] 播放音效失败: ${key}`, e);
+        }
+        break;
+      }
+      case "stop_sfx": {
+        // 停止指定音效
+        const key = (payload?.key as string) || "";
+        try {
+          if (key) {
+            this.sound.stopByKey(key);
+          } else {
+            this.sound.stopAll();
+          }
+        } catch (e) {
+          // 忽略停止时的错误
+        }
+        break;
+      }
     }
+  }
+
+  /** 下雨粒子效果 */
+  private rainParticles: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+
+  private createRainEffect() {
+    const { width, height } = this.cameras.main;
+    console.log(`[MapScene] 🌧️ 创建下雨特效, 相机尺寸: ${width}x${height}`);
+
+    // 生成雨滴纹理（蓝色半透明细线）
+    const gfx = this.make.graphics({ x: 0, y: 0 });
+    gfx.fillStyle(0x88aacc, 0.7);
+    gfx.fillRect(0, 0, 3, 18);
+    gfx.generateTexture("rain_drop", 3, 18);
+    gfx.destroy();
+
+    // Phaser 3.60+: add.particles 直接返回 ParticleEmitter
+    this.rainParticles = this.add.particles(0, 0, "rain_drop", {
+      x: { min: -50, max: width + 50 },
+      y: -30,
+      lifespan: 1000,
+      speedY: { min: 500, max: 700 },
+      speedX: { min: -40, max: 10 },
+      scaleY: { start: 1.2, end: 0.5 },
+      scaleX: { start: 1, end: 0.8 },
+      alpha: { start: 0.6, end: 0.05 },
+      frequency: 20,
+      quantity: 3,
+      gravityY: 80,
+    });
+    this.rainParticles.setDepth(9998);
+    // 设置粒子随相机滚动（固定在世界空间）
+    this.rainParticles.setScrollFactor(0);
+    console.log(`[MapScene] 🌧️ 下雨特效已创建, emitter=`, this.rainParticles);
   }
 
   /** 地图切换（淡入淡出） */
   private transitionToMap(mapId: string, spawnId: string) {
     console.log(`[MapScene] 🗺️ 开始切换地图: ${mapId} (spawn=${spawnId})`);
+    // 清理下雨效果
+    if (this.rainParticles) {
+      this.rainParticles.destroy();
+      this.rainParticles = null;
+    }
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once("camerafadeoutcomplete", () => {
       // 清理旧子系统引用（loadMap 中 children.removeAll 会销毁所有游戏对象）

@@ -13,6 +13,11 @@ interface Props {
 export function PhaserContainer({ dispatch, currentMapId, onDialogueTrigger }: Props) {
   const gameRef = useRef<Phaser.Game | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // 用 ref 保存最新的回调和 dispatch，避免闭包捕获过时引用
+  const onDialogueTriggerRef = useRef(onDialogueTrigger);
+  const dispatchRef = useRef(dispatch);
+  onDialogueTriggerRef.current = onDialogueTrigger;
+  dispatchRef.current = dispatch;
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -25,23 +30,22 @@ export function PhaserContainer({ dispatch, currentMapId, onDialogueTrigger }: P
       if (event.type !== "TRIGGER_DIALOGUE") return;
       console.log(`[PhaserContainer] 📥 收到 TRIGGER_DIALOGUE: sceneId=${event.sceneId}`);
       gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
-      onDialogueTrigger(event.sceneId);
+      onDialogueTriggerRef.current(event.sceneId);
     });
 
     // 监听 Phaser → React: item 交互（独立事件，按开发文档 §7.2）
     gameBridge.onPhaserEvent("TRIGGER_ITEM", (event) => {
       if (event.type !== "TRIGGER_ITEM") return;
       console.log(`[PhaserContainer] 📥 收到 TRIGGER_ITEM: itemId=${event.itemId}`);
-      // item 交互也走对话叠层，用 itemId 作为 sceneId
       gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
-      onDialogueTrigger(event.itemId);
+      onDialogueTriggerRef.current(event.itemId);
     });
 
     // 监听门触发 → 切换地图
     gameBridge.onPhaserEvent("TRIGGER_DOOR", (event) => {
       if (event.type !== "TRIGGER_DOOR") return;
       console.log(`[PhaserContainer] 📥 收到 TRIGGER_DOOR: targetMap=${event.targetMap}`);
-      dispatch({
+      dispatchRef.current({
         type: "CHANGE_MAP",
         mapId: event.targetMap,
         spawnId: event.spawnId,
