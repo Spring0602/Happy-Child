@@ -86,19 +86,15 @@ export class PlayerController {
     switch (dir) {
       case "left":
         this.player.play("yps_run_left", true);
-        this.player.setFlipX(false);
         break;
       case "right":
-        this.player.play("yps_run_left", true);
-        this.player.setFlipX(true);
+        this.player.play("yps_run_right", true);
         break;
       case "up":
         this.player.play("yps_run_up", true);
-        this.player.setFlipX(false);
         break;
       case "down":
         this.player.play("yps_run_down", true);
-        this.player.setFlipX(false);
         break;
     }
   }
@@ -108,19 +104,15 @@ export class PlayerController {
     switch (dir) {
       case "left":
         this.player.play("yps_idle_left", true);
-        this.player.setFlipX(false);
         break;
       case "right":
-        this.player.play("yps_idle_left", true);
-        this.player.setFlipX(true);
+        this.player.play("yps_idle_right", true);
         break;
       case "up":
         this.player.play("yps_idle_up", true);
-        this.player.setFlipX(false);
         break;
       case "down":
         this.player.play("yps_idle_down", true);
-        this.player.setFlipX(false);
         break;
     }
   }
@@ -130,19 +122,15 @@ export class PlayerController {
     switch (dir) {
       case "left":
         this.player.play("yps_sit_left", true);
-        this.player.setFlipX(false);
         break;
       case "right":
-        this.player.play("yps_sit_left", true);
-        this.player.setFlipX(true);
+        this.player.play("yps_sit_right", true);
         break;
       case "up":
         this.player.play("yps_sit_up", true);
-        this.player.setFlipX(false);
         break;
       case "down":
         this.player.play("yps_sit_down", true);
-        this.player.setFlipX(false);
         break;
     }
   }

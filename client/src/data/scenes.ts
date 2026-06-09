@@ -1280,7 +1280,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "",
     cgMode: true,
-    speaker: "叶平生",
+    speaker: "旁白",
     text: "那时我并不知道，前方有多少未知在虎视眈眈地盯着我，但我能肯定，未知每天都在我的生活中流淌，无论这个世界如何变化，它都在那里。",
     nextSceneId: "dorm_act3_alarm",
   },
@@ -1291,7 +1291,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "",
     cgMode: true,
-    speaker: "叶平生",
+    speaker: "旁白",
     text: "闹钟在07：00准时响起，我烦躁地翻了个身，精准地抓住不听话的手机把铃声快速关掉。",
     nextSceneId: "dorm_act3_wake",
   },
@@ -1302,7 +1302,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "",
     cgMode: true,
-    speaker: "叶平生",
+    speaker: "旁白",
     text: "我在床上苦苦挣扎了一分钟，最后终于说服自己睁开了眼。",
     nextSceneId: "dorm_act3_getup",
   },
@@ -1313,7 +1313,7 @@ export const scenes: Record<string, Scene> = {
     chapter: "序章",
     background: "/assets/CG/前兆/天花板.png",
     cgMode: true,
-    speaker: "叶平生",
+    speaker: "旁白",
     text: "我迷迷糊糊地收拾床铺，然后下床。",
     onCgEnd: "enter_dormitory_day",
   },
@@ -1405,7 +1405,7 @@ export const scenes: Record<string, Scene> = {
     id: "dorm_act3_still_doubt",
     chapter: "序章",
     background: "/assets/maps/dormitory/宿舍.png",
-    speaker: "叶平生",
+    speaker: "旁白",
     text: "我仍不死心，",
     nextSceneId: "dorm_act3_ask_sound",
   },
@@ -1546,6 +1546,566 @@ export const scenes: Record<string, Scene> = {
     cgMode: true,
     speaker: "旁白",
     text: "整个白天我都在上课，电脑我一直监视着，这段时间倒是没有再徒生变故。\n\n难道昨晚的事件真的是我的错觉？",
+    nextSceneId: "dorm_act4_return_dorm",
+  },
+
+  // ══════════════════════════════════════════════
+  // 宿舍第四幕：邮件出现
+  // ══════════════════════════════════════════════
+
+  // 第四幕入口 —— 旁白
+  dorm_act4_return_dorm: {
+    id: "dorm_act4_return_dorm",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/sleep.png",
+    speaker: "旁白",
+    text: "晚上23：00，我写完当天的作业，打算拿起手机玩会游戏。",
+    nextSceneId: "dorm_act4_return_dorm_inner",
+  },
+
+  // 第四幕入口 —— 主角内心
+  dorm_act4_return_dorm_inner: {
+    id: "dorm_act4_return_dorm_inner",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/sleep.png",
+    speaker: "叶平生",
+    text: "（完蛋，今天X神小月卡还没领，我的30元大洋啊。）",
+    nextSceneId: "dorm_act4_pc_boot_shock",
+  },
+
+  // 电脑开机 —— 主角惊呼
+  dorm_act4_pc_boot_shock: {
+    id: "dorm_act4_pc_boot_shock",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/sleep.png",
+    speaker: "叶平生",
+    text: "（我的天！？）",
+    nextSceneId: "dorm_act4_pc_boot_narrate",
+  },
+
+  // 电脑开机 —— 旁白叙述
+  dorm_act4_pc_boot_narrate: {
+    id: "dorm_act4_pc_boot_narrate",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/sleep.png",
+    speaker: "旁白",
+    text: "没错，这次绝对不是我的错觉，它在我眼皮子底下开机了。\n\n估计是黑客用远程代码控制了我的电脑，但是电脑显示防火墙并没有给予入侵提示。\n\n看来这个黑客技术相当高超。",
+    nextSceneId: "dorm_act4_pc_boot_digest",
+  },
+
+  // 电脑开机 —— 主角消化 + 选项
+  dorm_act4_pc_boot_digest: {
+    id: "dorm_act4_pc_boot_digest",
+    chapter: "序章",
+    background: "/assets/maps/dormitory/sleep.png",
+    speaker: "叶平生",
+    text: "（让我消化一下……）",
+    choices: [
+      {
+        id: "dorm_act4_choice_check",
+        text: "我还不清楚事情的全貌，先看看电脑上有什么",
+        nextSceneId: "dorm_act4_check_pc",
+        effects: {
+          authorityResistance: -1,
+          realityJudgment: 2,
+        },
+        tags: ["谨慎", "冷静", "理性", "独立"],
+        needAIAnalysis: true,
+      },
+      {
+        id: "dorm_act4_choice_ask",
+        text: "浩哥这么聪明，让他帮我看看电脑出了什么问题",
+        nextSceneId: "dorm_act4_death_ask",
+        effects: {
+          trustLevel: 1,
+          realityJudgment: -2,
+          authorityResistance: -1,
+        },
+        tags: ["信任", "依赖", "天真"],
+        needAIAnalysis: true,
+      },
+    ],
+  },
+
+  // ── 死亡分支：每句独立场景 ──
+
+  dorm_act4_death_ask: {
+    id: "dorm_act4_death_ask",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "浩哥，你能不能过来一下？",
+    nextSceneId: "dorm_act4_death_chen",
+  },
+
+  dorm_act4_death_chen: {
+    id: "dorm_act4_death_chen",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "陈煜浩",
+    text: "什么事？",
+    nextSceneId: "dorm_act4_death_explain",
+  },
+
+  dorm_act4_death_explain: {
+    id: "dorm_act4_death_explain",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "刚才我的电脑忽然自动开机了。",
+    nextSceneId: "dorm_act4_death_narrate1",
+  },
+
+  dorm_act4_death_narrate1: {
+    id: "dorm_act4_death_narrate1",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "他疑惑地挑起一根眉毛，一副\"你在说什么胡话\"的表情。",
+    nextSceneId: "dorm_act4_death_handover",
+  },
+
+  dorm_act4_death_handover: {
+    id: "dorm_act4_death_handover",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "喏，你看。",
+    nextSceneId: "dorm_act4_death_narrate2",
+  },
+
+  dorm_act4_death_narrate2: {
+    id: "dorm_act4_death_narrate2",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我将电脑递给陈煜浩。\n\n但就在他看向屏幕的那一刻，我的心脏突然就像被一只无形的大手抓住了，隐隐作痛，而且，力道还在不断收紧。",
+    nextSceneId: "dorm_act4_death_cough",
+  },
+
+  dorm_act4_death_cough: {
+    id: "dorm_act4_death_cough",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "咳咳……",
+    nextSceneId: "dorm_act4_death_final",
+  },
+
+  dorm_act4_death_final: {
+    id: "dorm_act4_death_final",
+    chapter: "序章",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "猩红的血液从我的嘴角流出，意识逐渐远去，我砰的一声倒在了地上。\n\n弥留之际，我看到了震惊的陈煜浩和慌忙跑过来的两个室友。\n\n我死了。",
+    nextSceneId: "title_screen",
+  },
+
+  // ── 阅读邮件 CG（每句独立场景）──
+
+  dorm_act4_check_pc: {
+    id: "dorm_act4_check_pc",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我深吸一口气平复了不安的心情，仔细查看电脑，映入眼帘的是一封邮件通知。\n\n于是我点开了那封邮件。",
+    nextSceneId: "dorm_act4_mail_think",
+  },
+
+  dorm_act4_mail_think: {
+    id: "dorm_act4_mail_think",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（这封邮件……）",
+    nextSceneId: "dorm_act4_mail_label",
+  },
+
+  dorm_act4_mail_label: {
+    id: "dorm_act4_mail_label",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "邮件内容是：",
+    nextSceneId: "dorm_act4_mail_content",
+  },
+
+  dorm_act4_mail_content: {
+    id: "dorm_act4_mail_content",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "亲爱的预备参赛者：\n\n由于系统检测到您在\"人类\"智慧群体中资质出众，您将成为第一批进入\"人类进化计划\"筛选的参赛者。此邮件作为新手引导，以下内容请您仔细阅读。\n\n初赛将于00：00准时开启，您可以按照下列提示进行赛前准备：\n\n1. 按需准备15日的能量摄入来源。\n\n2. 依据个人身体素质准备强度不一的防身武器。\n\n3. 尽量保持稳定的磁场紊乱状态。\n\n关于初赛信息：\n\n无确切内容，无具体规则。唯一规则：任何违反规则的参赛者将被即刻抹除。\n\n请您遵守保密协议：严禁将比赛信息泄露给无关人员，若有违反，系统将即刻抹除您的存在。\n\n祝您比赛顺利~",
+    nextSceneId: "dorm_act4_mail_silence",
+  },
+
+  dorm_act4_mail_silence: {
+    id: "dorm_act4_mail_silence",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（……）",
+    nextSceneId: "dorm_act4_mail_search",
+  },
+
+  dorm_act4_mail_search: {
+    id: "dorm_act4_mail_search",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "发件人身份是一堆乱码，我尝试在邮件网站中搜索这个人，却发现这个账号并不存在。",
+    nextSceneId: "dorm_act4_mail_interesting",
+  },
+
+  dorm_act4_mail_interesting: {
+    id: "dorm_act4_mail_interesting",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（有意思。）",
+    nextSceneId: "dorm_act4_mail_analyze",
+  },
+
+  // ── 分析邮件（每句独立场景）──
+
+  dorm_act4_mail_analyze: {
+    id: "dorm_act4_mail_analyze",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "不知是不是在高压的环境下生活惯了，我看完这封邮件后的感受中，恐惧仅占三成。\n\n我长舒一口气，很快接受了这个事实，开始思考邮件里的内容。",
+    nextSceneId: "dorm_act4_analyze_2",
+  },
+
+  dorm_act4_analyze_2: {
+    id: "dorm_act4_analyze_2",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "首先，关于这封邮件的虚实，我认为其所言大概率不是恶作剧。\n\n昨晚电脑反复开机就是一种预兆，同时也暗示我对方的科技实力不是如今的人类可以匹敌的。\n\n哪怕这很荒谬，我也不得不承认，邮件的发送者，或者说这场比赛的举办方，如果不是思想极端的科研恐怖分子，只能是来自比人类更高层次文明的智慧生物了。",
+    nextSceneId: "dorm_act4_analyze_3",
+  },
+
+  dorm_act4_analyze_3: {
+    id: "dorm_act4_analyze_3",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "但愿是我异想天开了。\n\n还有这个\"资质出众\"。\n\n说到这都有点好笑，我真想不通自己哪里资质出众了。\n\n找高智商参赛者应该找研究院的研究人员或者前沿科技开发者，找高武力值参赛者应该找军人武警之类的……我这种大学生就像待宰的羔羊，除了比这些人的未来有更多不确定因素还有什么优势？",
+    nextSceneId: "dorm_act4_analyze_inner",
+  },
+
+  dorm_act4_analyze_inner: {
+    id: "dorm_act4_analyze_inner",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（真有够扯的，不过这奇怪的评判逻辑目前也没必要深究是了。）",
+    nextSceneId: "dorm_act4_analyze_prep",
+  },
+
+  dorm_act4_analyze_prep: {
+    id: "dorm_act4_analyze_prep",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "接下来是我准备的重点。根据三条提示，我可以得到以下信息：",
+    nextSceneId: "dorm_act4_tip1",
+  },
+
+  // ── 第一条提示（选项）──
+
+  dorm_act4_tip1: {
+    id: "dorm_act4_tip1",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    choices: [
+      {
+        id: "dorm_act4_tip1_choice",
+        text: "查看第一条提示",
+        nextSceneId: "dorm_act4_tip1_narrate",
+        effects: {},
+        tags: [],
+        needAIAnalysis: false,
+      },
+    ],
+  },
+
+  dorm_act4_tip1_narrate: {
+    id: "dorm_act4_tip1_narrate",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "按需准备15日的能量摄入来源。",
+    nextSceneId: "dorm_act4_tip1_inner",
+  },
+
+  dorm_act4_tip1_inner: {
+    id: "dorm_act4_tip1_inner",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（初赛一共15天，参赛者需自行解决温饱问题。）",
+    nextSceneId: "dorm_act4_tip2",
+  },
+
+  // ── 第二条提示（选项）──
+
+  dorm_act4_tip2: {
+    id: "dorm_act4_tip2",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    choices: [
+      {
+        id: "dorm_act4_tip2_choice",
+        text: "查看第二条提示",
+        nextSceneId: "dorm_act4_tip2_narrate",
+        effects: {},
+        tags: [],
+        needAIAnalysis: false,
+      },
+    ],
+  },
+
+  dorm_act4_tip2_narrate: {
+    id: "dorm_act4_tip2_narrate",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "依据个人身体素质准备强度不一的防身武器。",
+    nextSceneId: "dorm_act4_tip2_inner",
+  },
+
+  dorm_act4_tip2_inner: {
+    id: "dorm_act4_tip2_inner",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（比赛过程很危险，可能存在致命伤害源。）",
+    nextSceneId: "dorm_act4_tip3",
+  },
+
+  // ── 第三条提示（选项）──
+
+  dorm_act4_tip3: {
+    id: "dorm_act4_tip3",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    choices: [
+      {
+        id: "dorm_act4_tip3_choice",
+        text: "查看第三条提示",
+        nextSceneId: "dorm_act4_tip3_narrate1",
+        effects: {},
+        tags: [],
+        needAIAnalysis: false,
+      },
+    ],
+  },
+
+  dorm_act4_tip3_narrate1: {
+    id: "dorm_act4_tip3_narrate1",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "尽量保持稳定的磁场紊乱状态。",
+    nextSceneId: "dorm_act4_tip3_inner1",
+  },
+
+  dorm_act4_tip3_inner1: {
+    id: "dorm_act4_tip3_inner1",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（不过\"稳定的磁场紊乱状态\"是什么？）",
+    nextSceneId: "dorm_act4_tip3_narrate2",
+  },
+
+  dorm_act4_tip3_narrate2: {
+    id: "dorm_act4_tip3_narrate2",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "这自相矛盾的形容词让我云里雾里的。\n\n只能确定一点，这里的\"磁场\"肯定不是物理学中的磁场。其他信息还是先不要胡乱猜测的好。",
+    nextSceneId: "dorm_act4_tip3_narrate3",
+  },
+
+  dorm_act4_tip3_narrate3: {
+    id: "dorm_act4_tip3_narrate3",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "至于规则这一块……有意思的是，只有一条规则，但这条规则也真是够致命的。",
+    nextSceneId: "dorm_act4_tip3_inner2",
+  },
+
+  dorm_act4_tip3_inner2: {
+    id: "dorm_act4_tip3_inner2",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（无确切内容，无具体规则。唯一规则：任何违反规则的参赛者将被即刻抹除。）",
+    nextSceneId: "dorm_act4_tip3_narrate4",
+  },
+
+  dorm_act4_tip3_narrate4: {
+    id: "dorm_act4_tip3_narrate4",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "或许\"寻找规则\"也是比赛的评判标准之一。\n\n另外，参赛者之间的关系也需要注意。",
+    nextSceneId: "dorm_act4_tip3_choices",
+  },
+
+  // 第三条提示 → 策略选择（纯选项场景，旁白已在上一页显示完毕）
+  dorm_act4_tip3_choices: {
+    id: "dorm_act4_tip3_choices",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    choices: [
+      {
+        id: "dorm_act4_strategy_trust",
+        text: "虽然表面上是竞争者，但我并没有单枪匹马通关的信心",
+        nextSceneId: "dorm_act4_choice_trust",
+        effects: {
+          trustLevel: 1,
+          empathyLevel: 1,
+          realityJudgment: 1,
+        },
+        tags: ["信任", "共赢", "理智", "目光长远"],
+        needAIAnalysis: true,
+      },
+      {
+        id: "dorm_act4_strategy_lone",
+        text: "这是一个死亡游戏，社会规则会变得比我现在身处的社会更加残酷，每一个参赛者都是潜在的敌人",
+        nextSceneId: "dorm_act4_choice_lone",
+        effects: {
+          trustLevel: -2,
+          empathyLevel: -1,
+          selfProtection: 2,
+        },
+        tags: ["冷漠", "自私", "悲观厌世", "防御"],
+        needAIAnalysis: true,
+      },
+      {
+        id: "dorm_act4_strategy_optimist",
+        text: "或许在新的世界，我反而能找到真正志同道合的同伴",
+        nextSceneId: "dorm_act4_choice_optimist",
+        effects: {
+          trustLevel: 2,
+          empathyLevel: 2,
+          joyPerception: 1,
+          authorityResistance: 1,
+        },
+        tags: ["乐观", "勇敢", "信任", "机敏", "思辨", "渴望被理解", "个性"],
+        needAIAnalysis: true,
+      },
+    ],
+  },
+
+  // ── 策略选择分支（每句独立）──
+
+  dorm_act4_choice_trust: {
+    id: "dorm_act4_choice_trust",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（从古至今，人类一直是彼此扶持着一路走来的。单枪匹马只属于实力超群的强者，但游戏还没开始，我怎么能确定自己是那个强者呢？）",
+    nextSceneId: "dorm_act4_prepare_think",
+  },
+
+  dorm_act4_choice_lone: {
+    id: "dorm_act4_choice_lone",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（无论身处何处，我都必须要赢。）",
+    nextSceneId: "dorm_act4_prepare_think",
+  },
+
+  dorm_act4_choice_optimist: {
+    id: "dorm_act4_choice_optimist",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（我生来就不是正常人。我曾认命地认为人类无法真正地理解彼此，因为谁都无法复刻他人的人生。但是谁能保证新的世界中我无法体验别人的人生呢？）",
+    nextSceneId: "dorm_act4_choice_optimist_narrate",
+  },
+
+  dorm_act4_choice_optimist_narrate: {
+    id: "dorm_act4_choice_optimist_narrate",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "想到这里，我心里反而隐隐有些期待。\n\n或许我真的是个疯子吧。",
+    nextSceneId: "dorm_act4_prepare_think",
+  },
+
+  // ── 准备出发 ──
+
+  dorm_act4_prepare_think: {
+    id: "dorm_act4_prepare_think",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "（那么，接下来就是准备行囊了。）",
+    nextSceneId: "dorm_act4_prepare_depart",
+  },
+
+  dorm_act4_prepare_depart: {
+    id: "dorm_act4_prepare_depart",
+    chapter: "序章",
+    background: "/assets/CG/前兆/邮件.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我整理完思绪，两眼一睁就是飞奔到楼下的小卖部。",
   },
 
 };

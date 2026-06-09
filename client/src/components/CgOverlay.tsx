@@ -10,6 +10,11 @@ interface Props {
 /** 主角说话者名单 */
 const PROTAGONIST_NAMES = ["叶平生"];
 
+/** NPC 立绘路径映射（CG 模式下仅主角显示立绘） */
+const PORTRAIT_MAP: Record<string, string> = {
+  "叶平生": "/assets/portraits/yps_defult.png",
+};
+
 /** 旁白/系统类（不显示立绘） */
 const NARRATOR_NAMES = ["旁白", "系统", "系统邮件", "规则"];
 
@@ -17,6 +22,15 @@ function getSpeakerLabel(speaker: string | undefined): string | null {
   if (!speaker || NARRATOR_NAMES.includes(speaker)) return null;
   if (PROTAGONIST_NAMES.includes(speaker)) return "我";
   return speaker;
+}
+
+/** 获取立绘路径（CG 模式仅主角显示） */
+function getPortraitSrc(speaker: string | undefined): string | null {
+  if (!speaker) return null;
+  if (NARRATOR_NAMES.includes(speaker)) return null;
+  if (PROTAGONIST_NAMES.includes(speaker)) return PORTRAIT_MAP[speaker] ?? null;
+  // NPC 在 CG 模式下不显示立绘
+  return null;
 }
 
 /** 按 \\n\\n 拆分文本段落（至少保留一整段） */
@@ -28,13 +42,19 @@ function splitParagraphs(text: string): string[] {
 export function CgOverlay({ scene, onNext, onChoose }: Props) {
   const hasChoices = scene.choices && scene.choices.length > 0;
   const speakerLabel = getSpeakerLabel(scene.speaker);
-  const showPortrait = speakerLabel !== null;
+  const portraitSrc = getPortraitSrc(scene.speaker);
+  const showPortrait = portraitSrc !== null;
   const isNarrator = !speakerLabel;
 
   // 稳定化 paragraphs 数组引用，避免每次都触发 useEffect
   const paragraphs = useMemo(() => splitParagraphs(scene.text), [scene.text]);
   const [currentParagraph, setCurrentParagraph] = useState(0);
   const totalParagraphs = paragraphs.length;
+
+  // ⚠️ scene 切换时重置段落（修复选项后对话框空白的 bug）
+  useEffect(() => {
+    setCurrentParagraph(0);
+  }, [scene.id]);
 
   // 打字机效果状态
   const [displayedChars, setDisplayedChars] = useState(0);
@@ -116,15 +136,17 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
       {/* 全屏 CG 背景 */}
       <div
         className="cg-background"
-        style={{ backgroundImage: `url(${scene.background})` }}
+        style={scene.background
+          ? { backgroundImage: `url(${scene.background})` }
+          : { backgroundColor: "#000" }}
       />
 
-      {/* 立绘（非旁白时显示） */}
+      {/* 立绘（仅主角说话时在左下角显示） */}
       {showPortrait && (
         <div className="cg-portrait-area">
           <img
             className="cg-portrait"
-            src="/assets/portraits/yps_defult.png"
+            src={portraitSrc!}
             alt={speakerLabel ?? ""}
           />
         </div>
@@ -152,7 +174,6 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
             {speakerLabel && (
               <span className="cg-dialog-speaker">{speakerLabel}</span>
             )}
-            {speakerLabel && <span className="cg-dialog-chapter">{scene.chapter}</span>}
           </div>
           <div className={`cg-dialog-text${isNarrator ? " narrator" : ""}`}>
             {fullText.slice(0, displayedChars)}

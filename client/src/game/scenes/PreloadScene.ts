@@ -64,7 +64,7 @@ export class PreloadScene extends Phaser.Scene {
     // 加载角色精灵图帧（从GIF提取的PNG序列帧）
     // 目录结构：/assets/sprites/frames/{角色}_frames/{角色}_frames_{动作方向}/frame_XX.png
     // 帧键名：{角色}_frames_{动作方向}_{帧号}  (如 yps_frames_left_0)
-    const charDirs = ["ly_frames", "yps_frames"];
+    const charDirs = ["ly_frames", "yps_frames", "cyh_frames", "roommateA_frames", "roommateB_frames"];
     // 跑步方向（每个方向6帧，帧号00-05）
     const runDirs = ["left", "right", "front", "back"];
     // 坐下/站立方向（每个方向1帧，帧号00）
@@ -93,13 +93,17 @@ export class PreloadScene extends Phaser.Scene {
       }
     }
 
-    // 加载 NPC 精灵图（宿舍第三幕等）
-    this.load.image("npc_cyh", "assets/sprites/cyh.png");
-    this.load.image("npc_roommateA", "assets/sprites/roommateA.png");
-    this.load.image("npc_roommateB", "assets/sprites/roommateB.png");
+    // 修复 roommateB 的 stand_back 目录命名异常（磁盘上是 roommateB2_frames_stand_back）
+    this.load.image("roommateB_frames_stand_back_0", "assets/sprites/frames/roommateB_frames/roommateB2_frames_stand_back/frame_00.png");
+
+    // NPC 精灵帧已在上面 charDirs 中统一加载，不再使用静态图片
+
+    // 加载宿舍夜景变体底图（电脑关/开，用于第四幕）
+    this.load.image("ground_dorm_night_pc_off", "assets/maps/dormitory/宿舍_夜晚_电脑关.png");
+    this.load.image("ground_dorm_night_pc_on", "assets/maps/dormitory/宿舍_夜晚_电脑开.png");
 
     // 加载音效
-    this.load.audio("alarm_clock", "assets/audio/sfx/alarm_clock.mp3");
+    this.load.audio("alarm_clock", "assets/audio/sfx/alarm_clock.wav");
   }
 
   create() {

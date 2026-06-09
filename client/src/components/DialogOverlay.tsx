@@ -55,6 +55,11 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
   const [currentParagraph, setCurrentParagraph] = useState(0);
   const totalParagraphs = paragraphs.length;
 
+  // ⚠️ scene 切换时重置段落（修复选项后对话框空白的 bug）
+  useEffect(() => {
+    setCurrentParagraph(0);
+  }, [scene.id]);
+
   // 打字机效果状态
   const [displayedChars, setDisplayedChars] = useState(0);
   const [typingDone, setTypingDone] = useState(false);
