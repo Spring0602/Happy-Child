@@ -1,216 +1,728 @@
 {
-  "bg_size": [
+  "_说明": "客厅地图完整清单 - 坐标与 map.json 实时同步 (v2.0 图层分层架构)",
+  "_图层架构": {
+    "ground": "底图 - 地板、墙面、不可交互的固定背景装饰",
+    "furniture_objects": "物品层 - 独立精灵图渲染的家俱（按Y轴depth排序）",
+    "collision": "碰撞层 - 墙壁/家具碰撞体（不可见）",
+    "player_spawn": "出生点 - 玩家进入地图的初始位置",
+    "triggers": "触发器层 - 交互区+门区（纯逻辑，不渲染视觉）",
+    "npcs": "NPC层 - NPC放置位置",
+    "items": "物品层 - 可调查小型物件",
+    "foreground": "前景遮挡层 - 墙面装饰等始终渲染在玩家上层（depth=1.0）"
+  },
+  "底图": "客厅.png",
+  "地图尺寸": [
     1692,
     929
   ],
-  "furniture": [
+  "统计": {
+    "家具": 16,
+    "触发器": 7,
+    "出生点": 5,
+    "碰撞体": 14,
+    "前景物件": 1
+  },
+  "家具清单": [
     {
-      "name": "item_11",
-      "x": 1166,
-      "y": 8,
-      "width": 256,
-      "height": 256,
-      "content_w": 202,
-      "content_h": 245,
-      "center_x": 1294,
-      "center_y": 136,
-      "mse": 185.41897370554847,
-      "quality": "较差"
-    },
-    {
-      "name": "item_13",
-      "x": 979,
-      "y": 97,
-      "width": 256,
-      "height": 256,
-      "content_w": 90,
-      "content_h": 112,
-      "center_x": 1107,
-      "center_y": 225,
-      "mse": 155.11597431529287,
-      "quality": "较差"
-    },
-    {
-      "name": "item_14",
-      "x": 968,
-      "y": 99,
-      "width": 256,
-      "height": 256,
-      "content_w": 86,
-      "content_h": 100,
-      "center_x": 1096,
-      "center_y": 227,
-      "mse": 134.60018916362654,
-      "quality": "较差"
-    },
-    {
-      "name": "item_06_flip",
-      "x": 1164,
-      "y": 105,
-      "width": 256,
-      "height": 256,
-      "content_w": 85,
-      "content_h": 104,
-      "center_x": 1292,
-      "center_y": 233,
-      "mse": 181.7243543758967,
-      "quality": "较差"
-    },
-    {
-      "name": "item_06",
-      "x": 1168,
-      "y": 105,
-      "width": 256,
-      "height": 256,
-      "content_w": 85,
-      "content_h": 104,
-      "center_x": 1296,
-      "center_y": 233,
-      "mse": 183.60150645624103,
-      "quality": "较差"
-    },
-    {
-      "name": "item_12",
-      "x": 962,
-      "y": 118,
-      "width": 256,
-      "height": 256,
-      "content_w": 125,
-      "content_h": 155,
-      "center_x": 1090,
-      "center_y": 246,
-      "mse": 150.65638428483732,
-      "quality": "较差"
-    },
-    {
-      "name": "item_09",
-      "x": 529,
-      "y": 171,
-      "width": 256,
-      "height": 256,
-      "content_w": 87,
-      "content_h": 227,
-      "center_x": 657,
-      "center_y": 299,
-      "mse": 114.17783655117694,
-      "quality": "较差"
-    },
-    {
-      "name": "item_08",
-      "x": 612,
-      "y": 181,
-      "width": 256,
-      "height": 256,
-      "content_w": 254,
-      "content_h": 143,
-      "center_x": 740,
-      "center_y": 309,
-      "mse": 139.2707920952721,
-      "quality": "较差"
-    },
-    {
-      "name": "item_05",
-      "x": 575,
-      "y": 221,
-      "width": 256,
-      "height": 256,
-      "content_w": 254,
-      "content_h": 97,
-      "center_x": 703,
-      "center_y": 349,
-      "mse": 133.53855074953825,
-      "quality": "较差"
+      "name": "item_01",
+      "id": 1,
+      "物品": "餐桌",
+      "位置": {
+        "x": 617.24,
+        "y": 203.62
+      },
+      "尺寸": {
+        "w": 106.36,
+        "h": 197.73
+      },
+      "旋转": 359.75,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_dining_table",
+        "interactable": true,
+        "label": "餐桌",
+        "walkable": false
+      }
     },
     {
       "name": "item_02",
-      "x": 1154,
-      "y": 226,
-      "width": 256,
-      "height": 256,
-      "content_w": 125,
-      "content_h": 245,
-      "center_x": 1282,
-      "center_y": 354,
-      "mse": 157.62194757895995,
-      "quality": "较差"
-    },
-    {
-      "name": "item_07",
-      "x": 1178,
-      "y": 276,
-      "width": 256,
-      "height": 256,
-      "content_w": 59,
-      "content_h": 254,
-      "center_x": 1306,
-      "center_y": 404,
-      "mse": 87.29759089565475,
-      "quality": "较差"
-    },
-    {
-      "name": "item_15",
-      "x": 995,
-      "y": 321,
-      "width": 256,
-      "height": 256,
-      "content_w": 196,
-      "content_h": 256,
-      "center_x": 1123,
-      "center_y": 449,
-      "mse": 161.1720145391522,
-      "quality": "较差"
-    },
-    {
-      "name": "item_01",
-      "x": 622,
-      "y": 360,
-      "width": 256,
-      "height": 256,
-      "content_w": 126,
-      "content_h": 236,
-      "center_x": 750,
-      "center_y": 488,
-      "mse": 96.25987231023883,
-      "quality": "较差"
-    },
-    {
-      "name": "item_04",
-      "x": 1025,
-      "y": 391,
-      "width": 256,
-      "height": 256,
-      "content_w": 160,
-      "content_h": 243,
-      "center_x": 1153,
-      "center_y": 519,
-      "mse": 179.87474894235288,
-      "quality": "较差"
-    },
-    {
-      "name": "item_10",
-      "x": 974,
-      "y": 404,
-      "width": 256,
-      "height": 256,
-      "content_w": 254,
-      "content_h": 127,
-      "center_x": 1102,
-      "center_y": 532,
-      "mse": 84.61648613300245,
-      "quality": "较差"
+      "id": 2,
+      "物品": "椅子",
+      "位置": {
+        "x": 562.17,
+        "y": 206.33
+      },
+      "尺寸": {
+        "w": 51.33,
+        "h": 99.33
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_chair",
+        "interactable": true,
+        "label": "椅子",
+        "sitAction": true,
+        "sitInFront": true,
+        "walkable": true
+      }
     },
     {
       "name": "item_03",
-      "x": 566,
-      "y": 485,
-      "width": 256,
-      "height": 256,
-      "content_w": 246,
-      "content_h": 144,
-      "center_x": 694,
-      "center_y": 613,
-      "mse": 130.2911170277139,
-      "quality": "较差"
+      "id": 3,
+      "物品": "电视机",
+      "位置": {
+        "x": 1158.44,
+        "y": 170.78
+      },
+      "尺寸": {
+        "w": 76.13,
+        "h": 138.49
+      },
+      "旋转": 90.36,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_tv",
+        "interactable": true,
+        "label": "电视机",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_04",
+      "id": 4,
+      "物品": "盆栽",
+      "位置": {
+        "x": 1250,
+        "y": 157.33
+      },
+      "尺寸": {
+        "w": 85.33,
+        "h": 120.67
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "label": "盆栽",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_05",
+      "id": 5,
+      "物品": "电视柜",
+      "位置": {
+        "x": 992.17,
+        "y": 220.67
+      },
+      "尺寸": {
+        "w": 191.5,
+        "h": 70.33
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_tv_stand",
+        "interactable": true,
+        "label": "电视柜",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_07",
+      "id": 8,
+      "物品": "电视柜(侧)",
+      "位置": {
+        "x": 1275,
+        "y": 289
+      },
+      "尺寸": {
+        "w": 62,
+        "h": 237
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "label": "电视柜(侧)",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_08",
+      "id": 9,
+      "物品": "茶几",
+      "位置": {
+        "x": 1030,
+        "y": 358
+      },
+      "尺寸": {
+        "w": 134.5,
+        "h": 80.5
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_table",
+        "interactable": true,
+        "label": "茶几",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_09",
+      "id": 10,
+      "物品": "柜子",
+      "位置": {
+        "x": 818,
+        "y": 582.5
+      },
+      "尺寸": {
+        "w": 40,
+        "h": 119
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "label": "柜子",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_10",
+      "id": 11,
+      "物品": "沙发",
+      "位置": {
+        "x": 995.5,
+        "y": 469
+      },
+      "尺寸": {
+        "w": 232,
+        "h": 123
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_sofa",
+        "interactable": true,
+        "label": "沙发",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_11",
+      "id": 12,
+      "物品": "椅子",
+      "位置": {
+        "x": 1240,
+        "y": 800
+      },
+      "尺寸": {
+        "w": 81.5,
+        "h": 83.5
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_chair",
+        "interactable": true,
+        "label": "椅子",
+        "sitAction": true,
+        "sitInFront": true,
+        "walkable": true
+      }
+    },
+    {
+      "name": "item_12",
+      "id": 13,
+      "物品": "盆栽",
+      "位置": {
+        "x": 829.67,
+        "y": 750.67
+      },
+      "尺寸": {
+        "w": 67,
+        "h": 80.5
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "label": "盆栽",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_13",
+      "id": 14,
+      "物品": "盆栽",
+      "位置": {
+        "x": 835.5,
+        "y": 834.5
+      },
+      "尺寸": {
+        "w": 50,
+        "h": 54.5
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "label": "盆栽",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_14",
+      "id": 15,
+      "物品": "盆栽",
+      "位置": {
+        "x": 890.5,
+        "y": 842
+      },
+      "尺寸": {
+        "w": 47,
+        "h": 53
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "label": "盆栽",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_15",
+      "id": 16,
+      "物品": "垃圾桶",
+      "位置": {
+        "x": 501.25,
+        "y": 204.5
+      },
+      "尺寸": {
+        "w": 41.75,
+        "h": 59
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_trash",
+        "interactable": true,
+        "label": "垃圾桶",
+        "walkable": false
+      }
+    },
+    {
+      "name": "item_02",
+      "id": 33,
+      "物品": "椅子",
+      "位置": {
+        "x": 562.17,
+        "y": 284.83
+      },
+      "尺寸": {
+        "w": 53.67,
+        "h": 100.33
+      },
+      "旋转": 0,
+      "visible": true,
+      "属性": {
+        "interactSceneId": "interact_livingroom_chair",
+        "interactable": true,
+        "label": "椅子",
+        "sitAction": true,
+        "sitInFront": true,
+        "walkable": true
+      }
+    }
+  ],
+  "触发器": [
+    {
+      "name": "trigger_family_photo",
+      "type": "item",
+      "触发方式": "按E键交互",
+      "注": "视觉由 foreground 层渲染，此处仅处理交互逻辑",
+      "位置": {
+        "x": 804.67,
+        "y": 103.67
+      },
+      "尺寸": {
+        "w": 46,
+        "h": 37.33
+      },
+      "属性": {
+        "itemId": "item_16",
+        "sceneId": "interact_livingroom_photo",
+        "triggerType": "interact"
+      }
+    },
+    {
+      "name": "trigger_trash_rule",
+      "type": "item",
+      "触发方式": "按E键交互",
+      "位置": {
+        "x": 503,
+        "y": 212
+      },
+      "尺寸": {
+        "w": 42,
+        "h": 48
+      },
+      "属性": {
+        "itemId": "trash_rule",
+        "sceneId": "interact_livingroom_trash_rule",
+        "triggerType": "interact"
+      }
+    },
+    {
+      "name": "door_bathroom",
+      "type": "door",
+      "触发方式": "走入自动触发",
+      "位置": {
+        "x": 202,
+        "y": 428
+      },
+      "尺寸": {
+        "w": 18,
+        "h": 97
+      },
+      "属性": {
+        "targetMap": "bathroom",
+        "targetSpawn": "spawn_bathroom_door",
+        "triggerType": "walk"
+      }
+    },
+    {
+      "name": "door_bedroom",
+      "type": "door",
+      "触发方式": "走入自动触发",
+      "位置": {
+        "x": 469,
+        "y": 536.67
+      },
+      "尺寸": {
+        "w": 85,
+        "h": 19
+      },
+      "属性": {
+        "targetMap": "bedroom",
+        "targetSpawn": "spawn_bedroom_door",
+        "triggerType": "walk"
+      }
+    },
+    {
+      "name": "door_bedroom_parents",
+      "type": "door",
+      "触发方式": "走入自动触发",
+      "位置": {
+        "x": 331,
+        "y": 540
+      },
+      "尺寸": {
+        "w": 87,
+        "h": 15
+      },
+      "属性": {
+        "targetMap": "bedroom_parents",
+        "targetSpawn": "spawn_bedroom_parents_door",
+        "triggerType": "walk"
+      }
+    },
+    {
+      "name": "door_kitchen",
+      "type": "door",
+      "触发方式": "走入自动触发",
+      "位置": {
+        "x": 223,
+        "y": 403
+      },
+      "尺寸": {
+        "w": 119,
+        "h": 16
+      },
+      "属性": {
+        "targetMap": "kitchen",
+        "targetSpawn": "spawn_kitchen_door",
+        "triggerType": "walk"
+      }
+    },
+    {
+      "name": "door_bedroom",
+      "id": 46,
+      "type": "door",
+      "触发方式": "走入自动触发",
+      "位置": {
+        "x": 1313.5,
+        "y": 529.83
+      },
+      "尺寸": {
+        "w": 85,
+        "h": 19
+      },
+      "属性": {
+        "targetMap": "bedroom",
+        "targetSpawn": "spawn_bedroom_door",
+        "triggerType": "walk"
+      }
+    }
+  ],
+  "出生点": [
+    {
+      "name": "spawn_livingroom_center",
+      "位置": {
+        "x": 867,
+        "y": 377
+      },
+      "中心点": {
+        "x": 896.0,
+        "y": 408.0
+      }
+    },
+    {
+      "name": "spawn_from_bathroom",
+      "位置": {
+        "x": 220,
+        "y": 447
+      },
+      "中心点": {
+        "x": 236.0,
+        "y": 471.0
+      }
+    },
+    {
+      "name": "spawn_from_bedroom",
+      "位置": {
+        "x": 497,
+        "y": 486
+      },
+      "中心点": {
+        "x": 513.0,
+        "y": 510.0
+      }
+    },
+    {
+      "name": "spawn_from_bedroom_parents",
+      "位置": {
+        "x": 351,
+        "y": 496
+      },
+      "中心点": {
+        "x": 367.0,
+        "y": 516.5
+      }
+    },
+    {
+      "name": "spawn_from_kitchen",
+      "位置": {
+        "x": 266,
+        "y": 430
+      },
+      "中心点": {
+        "x": 289.0,
+        "y": 443.0
+      }
+    }
+  ],
+  "碰撞": [
+    {
+      "name": "wall_top",
+      "id": 1,
+      "位置": {
+        "x": 490,
+        "y": 222
+      },
+      "尺寸": {
+        "w": 886,
+        "h": 15
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_bottom",
+      "id": 2,
+      "位置": {
+        "x": 823,
+        "y": 896
+      },
+      "尺寸": {
+        "w": 544,
+        "h": 33
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_left",
+      "id": 3,
+      "位置": {
+        "x": 795,
+        "y": 541
+      },
+      "尺寸": {
+        "w": 25,
+        "h": 382
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_right",
+      "id": 4,
+      "位置": {
+        "x": 1338.33,
+        "y": 22
+      },
+      "尺寸": {
+        "w": 32,
+        "h": 563
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_left",
+      "id": 36,
+      "位置": {
+        "x": 476.5,
+        "y": 227
+      },
+      "尺寸": {
+        "w": 18,
+        "h": 191
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_left",
+      "id": 37,
+      "位置": {
+        "x": 329.46,
+        "y": 538.5
+      },
+      "尺寸": {
+        "w": 19.38,
+        "h": 126.94
+      },
+      "旋转": 89.68
+    },
+    {
+      "name": "wall_left",
+      "id": 38,
+      "位置": {
+        "x": 202.5,
+        "y": 529
+      },
+      "尺寸": {
+        "w": 14,
+        "h": 23
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_left",
+      "id": 39,
+      "位置": {
+        "x": 247.88,
+        "y": 407.69
+      },
+      "尺寸": {
+        "w": 10.29,
+        "h": 44.88
+      },
+      "旋转": 89.81
+    },
+    {
+      "name": "wall_left",
+      "id": 40,
+      "位置": {
+        "x": 814.27,
+        "y": 535.81
+      },
+      "尺寸": {
+        "w": 19.38,
+        "h": 255.91
+      },
+      "旋转": 89.68
+    },
+    {
+      "name": "wall_left",
+      "id": 41,
+      "位置": {
+        "x": 205,
+        "y": 407.5
+      },
+      "尺寸": {
+        "w": 14,
+        "h": 23
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_left",
+      "id": 42,
+      "位置": {
+        "x": 421,
+        "y": 539.5
+      },
+      "尺寸": {
+        "w": 45,
+        "h": 18
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_left",
+      "id": 43,
+      "位置": {
+        "x": 341.5,
+        "y": 402
+      },
+      "尺寸": {
+        "w": 149,
+        "h": 18
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_right",
+      "id": 44,
+      "位置": {
+        "x": 1334,
+        "y": 687.5
+      },
+      "尺寸": {
+        "w": 32,
+        "h": 56
+      },
+      "旋转": 0
+    },
+    {
+      "name": "wall_right",
+      "id": 45,
+      "位置": {
+        "x": 1252,
+        "y": 713
+      },
+      "尺寸": {
+        "w": 80,
+        "h": 31
+      },
+      "旋转": 0
+    }
+  ],
+  "前景物件": [
+    {
+      "name": "item_16",
+      "id": 1,
+      "物品": "全家福",
+      "说明": "墙面装饰，渲染 depth=1.0（始终在角色上方），不参与碰撞/交互",
+      "位置": {
+        "x": 787.67,
+        "y": 90.33
+      },
+      "尺寸": {
+        "w": 80,
+        "h": 64
+      },
+      "中心点": {
+        "x": 827.67,
+        "y": 122.33
+      },
+      "精灵Key": "item_16"
     }
   ]
 }
