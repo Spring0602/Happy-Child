@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>小卖部 — 碰撞 + 触发器测试</title>
+<style>
+  body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: "Microsoft YaHei",monospace; }
+  #game-container { position: relative; }
+
+  /* HUD 左上 */
+  #hud {
+    position: fixed; top: 10px; left: 10px;
+    color: #0f0; font: 13px "Consolas",monospace; background: rgba(0,0,0,0.7);
+    padding: 6px 12px; border-radius: 4px; z-index: 10;
+    pointer-events: none; line-height: 1.6;
+  }
+
+  /* 交互提示 — 屏幕中下方 */
+  #interact-hint {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(16,185,129,0.9); color: #fff;
+    font: bold 16px "Microsoft YaHei"; padding: 8px 24px;
+    border-radius: 8px; z-index: 20; pointer-events: none;
+    display: none;
+    animation: pulse 0.8s ease-in-out infinite alternate;
+  }
+  #interact-hint.show { display: block; }
+  @keyframes pulse {
+    from { box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+    to   { box-shadow: 0 0 20px rgba(16,185,129,0.8); }
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(0,0,0,0.85); color: #fbbf24;
+    font: bold 18px "Microsoft YaHei"; padding: 14px 32px;
+    border-radius: 10px; border: 2px solid #fbbf24;
+    z-index: 30; pointer-events: none;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  #toast.show { opacity: 1; }
+
+  /* 触发日志 — 右上 */
+  #trigger-log-panel {
+    position: fixed; top: 10px; right: 10px;
+    width: 260px; max-height: 320px; overflow-y: auto;
+    background: rgba(0,0,0,0.82); border: 1px solid #0f3460;
+    border-radius: 6px; z-index: 25;
+    font: 11px "Consolas",monospace; padding: 6px;
+  }
+  #trigger-log-panel .log-title {
+    color: #10b981; font-size: 12px; font-weight: bold;
+    margin-bottom: 4px; padding-bottom: 4px;
+    border-bottom: 1px solid #0f3460;
+  }
+  #trigger-log-panel .log-entry {
+    padding: 3px 0; border-bottom: 1px solid #ffffff08;
+    color: #e0e0e0;
+    animation: logIn 0.3s;
+  }
+  @keyframes logIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+  #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #fff; font: 18px monospace; z-index: 50; }
+
+  /* 工具栏 */
+  #toolbar {
+    position: fixed; top: 10px; right: 10px; z-index: 30;
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  }
+  #toolbar button {
+    padding: 5px 10px; border: 1px solid #60a5fa; border-radius: 4px;
+    background: rgba(0,0,0,0.7); color: #60a5fa; font: 11px monospace;
+    cursor: pointer; white-space: nowrap;
+  }
+  #toolbar button:hover { background: #0f3460; }
+  #toolbar button.act { background: #10b981; border-color: #10b981; color: #fff; }
+  #toolbar .src {
+    font-size: 10px; color: #707080; padding: 4px 8px;
+    background: rgba(0,0,0,0.5); border-radius: 3px;
+  }
+
+  /* 触发区标签（绝对定位叠加在 Phaser canvas 上方） */
+  #trigger-labels {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 15;
+  }
+</style>
+</head>
+<body>
+<div id="game-container"></div>
+<div id="hud">加载中...</div>
+<div id="interact-hint">🅴 交互</div>
+<div id="toast"></div>
+<div id="loading">正在加载 map.json...</div>
+
+<div id="trigger-log-panel" style="display:none">
+  <div class="log-title">📋 触发记录</div>
+  <div id="log-entries"></div>
+</div>
+
+<div id="toolbar">
+  <span class="src" id="info-src">📁 磁盘文件</span>
+  <button id="btn-debug" class="act" onclick="toggleDebug()">👁 触发区</button>
+  <button id="btn-walk" class="act" onclick="toggleWalk()">🚶 走入触发</button>
+  <button onclick="toggleLogPanel()">📋 日志</button>
+  <button onclick="loadCustomJSON()">📥 加载 JSON</button>
+  <button onclick="resetToDefault()" style="border-color:#707080;color:#707080;">🔄 重置</button>
+</div>
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="onFileSelected(event)">
+
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+<script>
+const LS_KEY = "shop_school_map_data";
+const MAP_JSON_URL = "../client/public/assets/maps/shop_school/map.json";
+let MAP_DATA = null;
+
+// ═══════════════════════════════════════
+// 全局开关
+// ═══════════════════════════════════════
+let SHOW_TRIGGER_GFX = true;
+let ENABLE_WALK_TRIGGER = true;
+
+function toggleDebug() {
+  SHOW_TRIGGER_GFX = !SHOW_TRIGGER_GFX;
+  document.getElementById("btn-debug").classList.toggle("act", SHOW_TRIGGER_GFX);
+  document.getElementById("btn-debug").textContent = SHOW_TRIGGER_GFX ? "👁 触发区" : "👁 触发区(关)";
+  if (window._scene) window._scene.refreshTriggerGfx();
+}
+
+function toggleWalk() {
+  ENABLE_WALK_TRIGGER = !ENABLE_WALK_TRIGGER;
+  document.getElementById("btn-walk").classList.toggle("act", ENABLE_WALK_TRIGGER);
+  document.getElementById("btn-walk").textContent = ENABLE_WALK_TRIGGER ? "🚶 走入触发" : "🚶 走入(关)";
+}
+
+function toggleLogPanel() {
+  const p = document.getElementById("trigger-log-panel");
+  p.style.display = p.style.display === "none" ? "block" : "none";
+}
+
+// ═══════════════════════════════════════
+// Toast
+// ═══════════════════════════════════════
+let _toastTimer = null;
+function showToast(msg, dur) {
+  dur = dur || 2000;
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove("show"), dur);
+}
+
+// ═══════════════════════════════════════
+// 触发日志
+// ═══════════════════════════════════════
+function addLog(name, type, sceneId) {
+  const map = { interact: "🅴按键", walk: "🚶走入", auto: "⚡自动", door: "🚪门" };
+  const el = document.getElementById("log-entries");
+  const d = document.createElement("div");
+  d.className = "log-entry";
+  d.innerHTML =
+    `<span style="color:#10b981">${name}</span> ` +
+    `<span style="color:#707080;font-size:10px">${map[type]||type}</span> ` +
+    `<span style="color:#fbbf24">→ ${sceneId||'(无场景)'}</span>`;
+  el.prepend(d);
+  while (el.children.length > 50) el.lastChild.remove();
+}
+
+// ═══════════════════════════════════════
+// Phaser 场景
+// ═══════════════════════════════════════
+class TestScene extends Phaser.Scene {
+  constructor() { super({ key: "TestScene" }); }
+
+  preload() {
+    const FRAMES = "../client/public/assets/sprites/frames/yps_frames";
+    this.load.image("ground", "../client/public/assets/maps/shop_school/便利店.png");
+    this.load.image("yps_frames_stand_front_0", `${FRAMES}/yps_frames_stand_front/frame_00.png`);
+    this.load.image("yps_frames_stand_back_0",  `${FRAMES}/yps_frames_stand_back/frame_00.png`);
+    this.load.image("yps_frames_stand_left_0",  `${FRAMES}/yps_frames_stand_left/frame_00.png`);
+    this.load.image("yps_frames_stand_right_0", `${FRAMES}/yps_frames_stand_right/frame_00.png`);
+    for (let i = 0; i < 6; i++) {
+      this.load.image(`yps_frames_left_${i}`,  `${FRAMES}/yps_frames_left/frame_0${i}.png`);
+      this.load.image(`yps_frames_front_${i}`, `${FRAMES}/yps_frames_front/frame_0${i}.png`);
+      this.load.image(`yps_frames_back_${i}`,  `${FRAMES}/yps_frames_back/frame_0${i}.png`);
+    }
+  }
+
+  create() {
+    window._scene = this;
+    if (!MAP_DATA) { document.getElementById("loading").textContent = "map.json 加载失败！"; return; }
+    document.getElementById("loading").style.display = "none";
+
+    const mapW = MAP_DATA.width * MAP_DATA.tilewidth;
+    const mapH = MAP_DATA.height * MAP_DATA.tileheight;
+
+    // 出生点
+    const spawnLayer = MAP_DATA.layers.find(l => l.name === "player_spawn");
+    const spawnObj = spawnLayer && spawnLayer.objects[0];
+    const spawnX = spawnObj ? spawnObj.x : mapW / 2;
+    const spawnY = spawnObj ? spawnObj.y : mapH / 2;
+
+    // ── 1. 底图 ──
+    this.add.image(0, 0, "ground").setOrigin(0, 0).setDepth(0);
+
+    // ── 2. 动画 ──
+    const mk = (key, prefix, n, r, rep) => {
+      this.anims.create({ key, frames: Array.from({length:n},(_,i)=>({key:`${prefix}_${i}`})), frameRate:r, repeat:rep });
+    };
+    mk("yps_run_left","yps_frames_left",6,10,-1);
+    mk("yps_run_down","yps_frames_front",6,10,-1);
+    mk("yps_run_up","yps_frames_back",6,10,-1);
+    mk("yps_idle_left","yps_frames_stand_left",1,1,0);
+    mk("yps_idle_up","yps_frames_stand_back",1,1,0);
+    mk("yps_idle_down","yps_frames_stand_front",1,1,0);
+
+    // ── 3. 玩家 ──
+    this.player = this.physics.add.sprite(spawnX, spawnY, "yps_frames_stand_front_0");
+    this.player.setOrigin(0.5, 1);
+    this.player.setScale(3);
+    this.player.body.setSize(12, 12);
+    this.player.body.setOffset(10, 48);
+    this.player.setCollideWorldBounds(true);
+    this.player.setDepth(100);
+    this.player.play("yps_idle_down");
+    this.player.lastDir = "down";
+
+    // ── 4. 碰撞体 ──
+    this.collisionGroup = this.physics.add.staticGroup();
+    const colLayer = MAP_DATA.layers.find(l => l.name === "collision");
+    this.collisionObjs = colLayer ? colLayer.objects : [];
+    const colGfx = this.add.graphics().setDepth(998);
+    colGfx.lineStyle(2, 0x3b82f6, 0.35);
+    for (const obj of this.collisionObjs) {
+      const z = this.add.zone(obj.x + obj.width/2, obj.y + obj.height/2, obj.width, obj.height);
+      this.physics.add.existing(z, true);
+      this.collisionGroup.add(z);
+      colGfx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+    }
+    this.physics.add.collider(this.player, this.collisionGroup);
+
+    // ── 5. 触发器 ──
+    this.triggers = [];                     // { name, type, sceneId, once, zone, x, y, w, h, fired }
+    this._triggerFiredOnce = new Set();     // "仅一次" 已触发的名称
+    this._walkInside = new Set();           // 当前走入触发的名称（防重复）
+    this._currentInteractTarget = null;     // 当前可交互的 trigger
+
+    this.triggerGfxLayer = this.add.graphics().setDepth(999);
+    this.triggerLabelGfx = this.add.graphics().setDepth(1000);
+
+    const trgLayer = MAP_DATA.layers.find(l => l.name === "triggers");
+    const trgObjs = trgLayer ? trgLayer.objects : [];
+
+    for (const obj of trgObjs) {
+      const props = {};
+      if (obj.properties) obj.properties.forEach(p => { props[p.name] = p.value; });
+
+      const type = props.triggerType || "interact";
+      const sceneId = props.sceneId || "";
+      const once = props.once === true || props.once === "true";
+
+      const z = this.add.zone(obj.x + obj.width/2, obj.y + obj.height/2, obj.width, obj.height);
+      this.physics.add.existing(z, true);
+
+      const t = {
+        name: obj.name || "trigger",
+        type, sceneId, once,
+        x: obj.x, y: obj.y, w: obj.width, h: obj.height,
+        zone: z,
+        fired: false
+      };
+      this.triggers.push(t);
+
+      // 所有 trigger 都用 overlap 检测
+      this.physics.add.overlap(this.player, z, () => this._onTriggerOverlap(t));
+
+      // auto 类型：场景加载后立即触发
+      if (type === "auto") {
+        this.time.delayedCall(300, () => this._fireTrigger(t));
+      }
+    }
+
+    // 绘制触发区
+    this._drawTriggers();
+
+    // ── 6. 相机 ──
+    this.cameras.main.setBounds(0, 0, mapW, mapH);
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+
+    // ── 7. 键盘 ──
+    this.cursors = this.input.keyboard.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D
+    });
+    this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+    // ── 8. 出生点标记 ──
+    const sm = this.add.graphics().setDepth(1001);
+    sm.fillStyle(0xffff00, 0.8);
+    sm.fillCircle(spawnX, spawnY, 6);
+    sm.lineStyle(1, 0xffff00, 1);
+    sm.strokeCircle(spawnX, spawnY, 8);
+
+    this.mapW = mapW; this.mapH = mapH;
+    this.hudEl = document.getElementById("hud");
+    this.interactHintEl = document.getElementById("interact-hint");
+  }
+
+  // ── 触发器重叠检测 ──
+  _onTriggerOverlap(t) {
+    if (t.once && this._triggerFiredOnce.has(t.name)) return;
+
+    if (t.type === "walk" && ENABLE_WALK_TRIGGER) {
+      // 走入触发：防止每帧都触发
+      if (!this._walkInside.has(t.name)) {
+        this._walkInside.add(t.name);
+        this._fireTrigger(t);
+      }
+    } else if (t.type === "interact" || t.type === "door") {
+      // E 键交互：记录当前可交互对象
+      this._currentInteractTarget = t;
+    }
+  }
+
+  // ── 执行触发 ──
+  _fireTrigger(t) {
+    if (t.once && this._triggerFiredOnce.has(t.name)) return;
+
+    t.fired = true;
+    if (t.once) this._triggerFiredOnce.add(t.name);
+
+    addLog(t.name, t.type, t.sceneId);
+    const label = t.sceneId ? `${t.name} → ${t.sceneId}` : t.name;
+    showToast(`触发：${label}  [${t.type}]`, 2000);
+
+    // door 类型有碰撞 + 地图切换（这里模拟）
+    if (t.type === "door") {
+      showToast(`🚪 切换地图 → ${t.sceneId}`, 2500);
+    }
+  }
+
+  // ── 绘制触发区 ──
+  _drawTriggers() {
+    this.triggerGfxLayer.clear();
+    this.triggerLabelGfx.clear();
+
+    if (!SHOW_TRIGGER_GFX) return;
+
+    for (const t of this.triggers) {
+      const fired = t.once && this._triggerFiredOnce.has(t.name);
+      const alpha = fired ? 0.08 : 0.18;
+      const alpha2 = fired ? 0.15 : 0.55;
+
+      // 颜色：interact=绿, walk=蓝, auto=紫, door=橙
+      const colorMap = { interact: 0x10b981, walk: 0x3b82f6, auto: 0x8b5cf6, door: 0xf59e0b };
+      const color = colorMap[t.type] || 0x10b981;
+
+      // 填充
+      this.triggerGfxLayer.fillStyle(color, alpha);
+      this.triggerGfxLayer.fillRect(t.x, t.y, t.w, t.h);
+
+      // 边框（虚线效果用实线小段模拟）
+      const dashLen = 8;
+      const dashGap = 5;
+      this.triggerGfxLayer.lineStyle(2, color, alpha2);
+      // 上边
+      for (let x = t.x; x < t.x + t.w; x += dashLen + dashGap) {
+        const endX = Math.min(x + dashLen, t.x + t.w);
+        this.triggerGfxLayer.beginPath();
+        this.triggerGfxLayer.moveTo(x, t.y);
+        this.triggerGfxLayer.lineTo(endX, t.y);
+        this.triggerGfxLayer.strokePath();
+      }
+      // 下边
+      for (let x = t.x; x < t.x + t.w; x += dashLen + dashGap) {
+        const endX = Math.min(x + dashLen, t.x + t.w);
+        this.triggerGfxLayer.beginPath();
+        this.triggerGfxLayer.moveTo(x, t.y + t.h);
+        this.triggerGfxLayer.lineTo(endX, t.y + t.h);
+        this.triggerGfxLayer.strokePath();
+      }
+      // 左边
+      for (let y = t.y; y < t.y + t.h; y += dashLen + dashGap) {
+        const endY = Math.min(y + dashLen, t.y + t.h);
+        this.triggerGfxLayer.beginPath();
+        this.triggerGfxLayer.moveTo(t.x, y);
+        this.triggerGfxLayer.lineTo(t.x, endY);
+        this.triggerGfxLayer.strokePath();
+      }
+      // 右边
+      for (let y = t.y; y < t.y + t.h; y += dashLen + dashGap) {
+        const endY = Math.min(y + dashLen, t.y + t.h);
+        this.triggerGfxLayer.beginPath();
+        this.triggerGfxLayer.moveTo(t.x + t.w, y);
+        this.triggerGfxLayer.lineTo(t.x + t.w, endY);
+        this.triggerGfxLayer.strokePath();
+      }
+
+      // 标签文字
+      const icons = { interact: "🅴", walk: "🚶", auto: "⚡", door: "🚪" };
+      const label = (icons[t.type]||"") + " " + t.name + (t.sceneId ? " → " + t.sceneId : "");
+      // 用另一个 graphics 写文字（Phaser 不支持 fillText，这里用位图文字模拟）
+      // 用简单的颜色块做标签
+      const lblW = Math.min(t.w - 4, label.length * 10 + 16);
+      const lblH = 18;
+      this.triggerLabelGfx.fillStyle(0x000000, 0.7);
+      this.triggerLabelGfx.fillRect(t.x + 2, t.y - lblH - 2, lblW, lblH);
+      this.triggerLabelGfx.lineStyle(1, color, 0.9);
+      this.triggerLabelGfx.strokeRect(t.x + 2, t.y - lblH - 2, lblW, lblH);
+      // 用 HTML overlay 做标签文字（后面用 dom overlay）
+    }
+
+    // HTML 标签覆盖
+    this._updateDOMLabels();
+  }
+
+  _updateDOMLabels() {
+    // 移除旧标签
+    document.querySelectorAll(".trg-dom-label").forEach(e => e.remove());
+
+    if (!SHOW_TRIGGER_GFX) return;
+
+    // 获取 Phaser canvas 缩放比例
+    const canvas = this.sys.game.canvas;
+    const canvasRect = canvas.getBoundingClientRect();
+    const scaleX = canvasRect.width / this.cameras.main.width;
+    const scaleY = canvasRect.height / this.cameras.main.height;
+    const cam = this.cameras.main;
+
+    for (const t of this.triggers) {
+      const fired = t.once && this._triggerFiredOnce.has(t.name);
+      const colorMap = { interact: "#10b981", walk: "#3b82f6", auto: "#8b5cf6", door: "#f59e0b" };
+      const color = colorMap[t.type] || "#10b981";
+      const icons = { interact: "🅴", walk: "🚶", auto: "⚡", door: "🚪" };
+      const label = (icons[t.type]||"") + " " + t.name + (t.sceneId ? " → " + t.sceneId : "");
+
+      const screenX = (t.x - cam.scrollX) * scaleX + canvasRect.left;
+      const screenY = (t.y - cam.scrollY) * scaleY + canvasRect.top;
+
+      const lbl = document.createElement("div");
+      lbl.className = "trg-dom-label";
+      lbl.style.cssText = `
+        position:fixed; left:${screenX + 2}px; top:${Math.max(0, screenY - 22)}px;
+        background:${fired?"rgba(0,0,0,0.4)":"rgba(0,0,0,0.7)"};
+        color:${color}; font:10px "Consolas",monospace;
+        padding:1px 6px; border-radius:3px;
+        pointer-events:none; z-index:15;
+        white-space:nowrap;
+        border-left:2px solid ${color};
+      `;
+      lbl.textContent = label;
+      document.body.appendChild(lbl);
+    }
+  }
+
+  refreshTriggerGfx() { this._drawTriggers(); }
+
+  // ── update ──
+  update() {
+    const speed = 160;
+    const body = this.player.body;
+    body.setVelocity(0);
+
+    const left  = this.cursors.left.isDown;
+    const right = this.cursors.right.isDown;
+    const up    = this.cursors.up.isDown;
+    const down  = this.cursors.down.isDown;
+
+    let dir = this.player.lastDir;
+    if (left)  { body.setVelocityX(-speed); dir = "left"; }
+    if (right) { body.setVelocityX(speed);  dir = "right"; }
+    if (up)    { body.setVelocityY(-speed); dir = "up"; }
+    if (down)  { body.setVelocityY(speed);  dir = "down"; }
+
+    const moving = left || right || up || down;
+
+    if (dir === "right") {
+      this.player.setFlipX(true);
+      this.player.play(moving ? "yps_run_left" : "yps_idle_left", true);
+    } else {
+      this.player.setFlipX(false);
+      if (moving) {
+        this.player.play(`yps_run_${dir}`, true);
+      } else {
+        this.player.play(`yps_idle_${dir}`);
+      }
+    }
+
+    this.player.lastDir = dir;
+    this.player.setDepth(this.player.y / this.mapH);
+
+    // ── 触发逻辑 ──
+    // 检测是否离开了某个 trigger 区域
+    // 用 AABB 手动检测（因为 Phaser overlap 只在重叠时回调）
+    const px = this.player.x, py = this.player.y;
+    const pw = 12, ph = 12; // player body size
+
+    let hasInteract = false;
+    this._currentInteractTarget = null;
+
+    for (const t of this.triggers) {
+      // AABB 检测
+      const overlap =
+        px > t.x && px < t.x + t.w &&
+        py > t.y && py < t.y + t.h;
+
+      if (!overlap) {
+        // 离开走入触发区：清除标记（下次再进入可重新触发）
+        this._walkInside.delete(t.name);
+        continue;
+      }
+
+      if (t.once && this._triggerFiredOnce.has(t.name)) continue;
+
+      if (t.type === "walk" && ENABLE_WALK_TRIGGER) {
+        if (!this._walkInside.has(t.name)) {
+          this._walkInside.add(t.name);
+          this._fireTrigger(t);
+        }
+      } else if (t.type === "interact" || t.type === "door") {
+        hasInteract = true;
+        this._currentInteractTarget = t;
+      }
+    }
+
+    // 清理不在重叠中的 walkInside（用 AABB 重新检查）
+    for (const name of this._walkInside) {
+      const t = this.triggers.find(tr => tr.name === name);
+      if (!t) { this._walkInside.delete(name); continue; }
+      const stillOverlap =
+        px > t.x && px < t.x + t.w &&
+        py > t.y && py < t.y + t.h;
+      if (!stillOverlap) this._walkInside.delete(name);
+    }
+
+    // E 键交互
+    if (Phaser.Input.Keyboard.JustDown(this.eKey) && this._currentInteractTarget) {
+      this._fireTrigger(this._currentInteractTarget);
+    }
+
+    // 交互提示
+    if (hasInteract && this._currentInteractTarget) {
+      this.interactHintEl.classList.add("show");
+      const t = this._currentInteractTarget;
+      const lbl = t.sceneId ? `${t.name} → ${t.sceneId}` : t.name;
+      this.interactHintEl.textContent = `🅴  ${lbl}`;
+    } else {
+      this.interactHintEl.classList.remove("show");
+    }
+
+    // DOM 标签跟随相机
+    this._updateDOMLabels();
+
+    // HUD
+    const firedCount = this.triggers.filter(t => t.fired).length;
+    this.hudEl.innerHTML =
+      `WASD 移动 | E 交互<br>` +
+      `坐标 (${Math.round(this.player.x)}, ${Math.round(this.player.y)})<br>` +
+      `碰撞 ${this.collisionObjs.length} 个 | 触发 ${this.triggers.length} 个 (已触发 ${firedCount})`;
+  }
+}
+
+// ═══════════════════════════════════════
+// 工具栏
+// ═══════════════════════════════════════
+function loadCustomJSON() { document.getElementById("fileInput").click(); }
+function onFileSelected(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      document.getElementById("loading").textContent = "已加载: " + file.name + "，刷新页面生效...";
+      setTimeout(() => location.reload(), 300);
+    } catch (e) {
+      document.getElementById("loading").textContent = "解析失败: " + e.message;
+    }
+  };
+  reader.readAsText(file);
+}
+function resetToDefault() { localStorage.removeItem(LS_KEY); location.reload(); }
+
+// ═══════════════════════════════════════
+// 加载 & 启动
+// ═══════════════════════════════════════
+async function loadMapData() {
+  const stored = localStorage.getItem(LS_KEY);
+  if (stored) {
+    try {
+      MAP_DATA = JSON.parse(stored);
+      document.getElementById("info-src").textContent = "📝 编辑器导出";
+      const colN = MAP_DATA.layers.find(l => l.name === "collision")?.objects.length || 0;
+      const trgN = MAP_DATA.layers.find(l => l.name === "triggers")?.objects.length || 0;
+      document.getElementById("loading").textContent = `加载成功（导出，${colN}碰撞 + ${trgN}触发）`;
+      return;
+    } catch (e) {}
+  }
+  try {
+    const res = await fetch(MAP_JSON_URL);
+    MAP_DATA = await res.json();
+    document.getElementById("info-src").textContent = "📁 磁盘文件";
+    const colN = MAP_DATA.layers.find(l => l.name === "collision")?.objects.length || 0;
+    const trgN = MAP_DATA.layers.find(l => l.name === "triggers")?.objects.length || 0;
+    document.getElementById("loading").textContent = `加载成功（磁盘，${colN}碰撞 + ${trgN}触发）`;
+  } catch (e) {
+    document.getElementById("loading").textContent = "map.json 加载失败: " + e.message;
+    MAP_DATA = null;
+  }
+}
+
+(async () => {
+  await loadMapData();
+  new Phaser.Game({
+    type: Phaser.AUTO,
+    width: MAP_DATA ? MAP_DATA.width * MAP_DATA.tilewidth : 1376,
+    height: MAP_DATA ? MAP_DATA.height * MAP_DATA.tileheight : 768,
+    parent: "game-container",
+    backgroundColor: "#222",
+    physics: {
+      default: "arcade",
+      arcade: { gravity: { y: 0 }, debug: false }
+    },
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [TestScene]
+  });
+})();
+</script>
+</body>
+</html>
