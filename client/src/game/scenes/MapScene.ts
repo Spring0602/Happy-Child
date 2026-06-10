@@ -12,6 +12,7 @@ export class MapScene extends Phaser.Scene {
   private interactionSys!: InteractionSystem;
   private triggerSys!: TriggerSystem;
   private collisionGroup!: Phaser.Physics.Arcade.StaticGroup;
+  private groundImage: Phaser.GameObjects.Image | null = null;
   private currentMapId = "";
 
   constructor() {
@@ -59,7 +60,7 @@ export class MapScene extends Phaser.Scene {
       this.registry.set("currentMapId", mapId);
 
       // === 1. 铺地面底图 ===
-      this.add.image(0, 0, entry.groundKey).setOrigin(0, 0).setDepth(0);
+      this.groundImage = this.add.image(0, 0, entry.groundKey).setOrigin(0, 0).setDepth(0);
 
       // === 2. 解析 tilemap JSON（仅用于读取对象层） ===
       // 关键修复：dormitory 等 map JSON 没有 tilesets 字段，Phaser make.tilemap 内部
@@ -136,17 +137,7 @@ export class MapScene extends Phaser.Scene {
       this.playerCtrl = new PlayerController(this, this.player);
       this.interactionSys = new InteractionSystem(this, this.player);
       this.interactionSys.setOnSit((chairY, sitInFront) => {
-        // 先传送到椅子前的坐下出生点，再坐下（面朝上，显示 sit_back）
-        const spawnLayer = this.map.getObjectLayer("player_spawn");
-        if (spawnLayer) {
-          const sitSpawn = spawnLayer.objects.find((o) => o.name === "spawn_sit_chair");
-          if (sitSpawn) {
-            this.player.x = sitSpawn.x! + (sitSpawn.width ?? 32) / 2;
-            this.player.y = sitSpawn.y! + (sitSpawn.height ?? 32) / 2;
-          }
-        }
-        this.playerCtrl?.setDirection("up");
-        this.playerCtrl?.sit(chairY, sitInFront, entry.height);
+        this.sitPlayerAtChair(chairY, sitInFront);
       });
       // 设置站起后的回调：传送到椅子坐下出生点
       this.playerCtrl.setOnStandUp(() => {
@@ -583,14 +574,40 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
+  /** 统一坐下逻辑：传送到 spawn_sit_chair → 面朝上 → 坐下 */
+  private sitPlayerAtChair(chairY?: number, sitInFront = true) {
+    const spawnLayer = this.map.getObjectLayer("player_spawn");
+    if (spawnLayer) {
+      const sitSpawn = spawnLayer.objects.find((o) => o.name === "spawn_sit_chair");
+      if (sitSpawn) {
+        this.player.x = sitSpawn.x! + (sitSpawn.width ?? 32) / 2;
+        this.player.y = sitSpawn.y! + (sitSpawn.height ?? 32) / 2;
+        // 同步物理体，防止残留速度导致位置漂移
+        const body = this.player.body as Phaser.Physics.Arcade.Body | null;
+        if (body) {
+          body.reset(this.player.x, this.player.y);
+          body.setVelocity(0, 0);
+        }
+      }
+    }
+    // 若未传入 chairY，从 trigger_chair 的底部计算
+    const finalChairY = chairY ?? (() => {
+      const triggerLayer = this.map.getObjectLayer("triggers");
+      const chairTrigger = triggerLayer?.objects.find((o) => o.name === "trigger_chair");
+      return chairTrigger ? chairTrigger.y! + (chairTrigger.height ?? 79) : this.player.y;
+    })();
+    const entry = MapRegistry[(this.registry.get("currentMapId") as string) || ""];
+    const mapHeight = entry?.height || this.map.heightInPixels || 600;
+    this.playerCtrl?.setDirection("up");
+    this.playerCtrl?.sit(finalChairY, sitInFront, mapHeight);
+  }
+
   /** 处理剧情事件 */
   private handleStoryEvent(eventId: string, payload?: Record<string, unknown>) {
     console.log(`[MapScene] 📖 剧情事件: ${eventId}`, payload);
     switch (eventId) {
       case "player_sit_down": {
-        // 玩家在当前位置坐下（朝上/背对镜头，显示 sit_back 帧）
-        this.playerCtrl?.setDirection("up");
-        this.playerCtrl?.sit(this.player.y, false, this.map.heightInPixels || 600);
+        this.sitPlayerAtChair();
         break;
       }
       case "player_stand_up": {
@@ -725,10 +742,37 @@ export class MapScene extends Phaser.Scene {
         this.cameras.main.resetFX();
         break;
       }
+      case "change_ground_image": {
+        // 动态切换地图底图（用于宿舍夜景电脑开关等）
+        const key = payload?.key as string;
+        if (key && this.groundImage) {
+          this.groundImage.setTexture(key);
+        }
+        break;
+      }
+      case "flash_red": {
+        // 红色闪屏效果（死亡场景）
+        const duration = (payload?.duration as number) || 500;
+        const flash = this.add.rectangle(
+          this.cameras.main.width / 2,
+          this.cameras.main.height / 2,
+          this.cameras.main.width,
+          this.cameras.main.height,
+          0xff0000, 0.8
+        ).setDepth(10001).setScrollFactor(0);
+        this.tweens.add({
+          targets: flash,
+          alpha: 0,
+          duration,
+          onComplete: () => flash.destroy(),
+        });
+        break;
+      }
       case "spawn_npc": {
-        // 在指定出生点生成 NPC 精灵
+        // 在指定出生点生成 NPC 精灵（帧动画版本）
         const spawnId = payload?.spawnId as string;
         const npcKey = payload?.npcKey as string;
+        const framesPrefix = (payload?.framesPrefix as string) || npcKey;
         if (!spawnId || !npcKey) break;
         const spawnLayer = this.map.getObjectLayer("player_spawn");
         if (spawnLayer) {
@@ -736,8 +780,10 @@ export class MapScene extends Phaser.Scene {
           if (spawn) {
             const cx = spawn.x! + (spawn.width ?? 32) / 2;
             const cy = spawn.y! + (spawn.height ?? 32) / 2;
-            const scale = (payload?.scale as number) || 2;
-            const sprite = this.add.sprite(cx, cy, npcKey).setScale(scale);
+            const scale = (payload?.scale as number) || 0.75;
+            // 使用帧纹理创建精灵（默认正面站立）
+            const initTexture = `${framesPrefix}_stand_front_0`;
+            const sprite = this.add.sprite(cx, cy, initTexture).setScale(scale);
             sprite.setDepth(cy / (this.map.heightInPixels || 1000));
             // 碰撞体
             const bodyW = (payload?.bodyWidth as number) || 24;
@@ -745,23 +791,31 @@ export class MapScene extends Phaser.Scene {
             const zone = this.add.zone(cx, cy, bodyW, bodyH);
             this.physics.add.existing(zone, true);
             this.collisionGroup.add(zone);
-            // 存储 NPC 引用
-            const npcList = (this.registry.get("npcSprites") as Map<string, Phaser.GameObjects.Sprite>) || new Map();
-            npcList.set(npcKey, sprite);
+            // 存储 NPC 引用（含 framesPrefix 用于方向切换）
+            const npcList = (this.registry.get("npcSprites") as Map<string, { sprite: Phaser.GameObjects.Sprite; framesPrefix: string }>) || new Map();
+            npcList.set(npcKey, { sprite, framesPrefix });
             this.registry.set("npcSprites", npcList);
           }
         }
         break;
       }
       case "set_npc_direction": {
-        // 设置 NPC 朝向（left/right 通过 setFlipX 镜像，front/back 不翻转）
+        // 设置 NPC 朝向（使用帧动画切换 stand_{dir}_0 纹理）
         const npcKey = payload?.npcKey as string;
         const direction = payload?.direction as string;
         if (!npcKey || !direction) break;
-        const npcList = this.registry.get("npcSprites") as Map<string, Phaser.GameObjects.Sprite> | undefined;
-        const sprite = npcList?.get(npcKey);
-        if (sprite) {
-          sprite.setFlipX(direction === "left");
+        const npcList = this.registry.get("npcSprites") as Map<string, { sprite: Phaser.GameObjects.Sprite; framesPrefix: string }> | undefined;
+        const entry = npcList?.get(npcKey);
+        if (entry) {
+          // 映射方向到帧方向名
+          const dirMap: Record<string, string> = { front: "front", back: "back", left: "left", right: "right", down: "front", up: "back" };
+          const frameDir = dirMap[direction] || "front";
+          const frameKey = `${entry.framesPrefix}_stand_${frameDir}_0`;
+          // 仅当纹理存在且不同于当前纹理时切换
+          if (this.textures.exists(frameKey) && entry.sprite.texture.key !== frameKey) {
+            entry.sprite.setTexture(frameKey);
+          }
+          // 所有角色已补全 stand_right 帧图，无需翻转
         }
         break;
       }

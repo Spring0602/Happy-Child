@@ -15,7 +15,7 @@ import Phaser from "phaser";
  * - 站立：{角色}_idle_{方向}（如 ly_idle_left）
  * - 坐下：{角色}_sit_{方向}（如 ly_sit_left）
  * 
- * 向右动画：使用向左动画 + setFlipX(true)（镜像方案，不注册独立动画）
+ * 向右动画：使用独立 right 帧图注册动画（v8.3，已补全所有角色 right 帧）
  */
 
 // 辅助函数：生成动画帧数组
@@ -181,9 +181,29 @@ export function createPlayerAnimations(scene: Phaser.Scene) {
     repeat: 0,
   });
 
-  // ========== 向右（镜像方案，不注册独立动画） ==========
-  // 向右跑步 = "ly_run_left" + setFlipX(true)
-  // 向右站立 = "ly_idle_left" + setFlipX(true)
-  // 向右坐下 = "ly_sit_left" + setFlipX(true)
-  // 详见 PlayerController.ts
+  // ========== yps 向右动画 ==========
+  
+  // 向右跑步（6帧：yps_frames_right_0 ~ yps_frames_right_5）
+  scene.anims.create({
+    key: "yps_run_right",
+    frames: createFrames("yps", "right", 6),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  // 向右站立（1帧：yps_frames_stand_right_0）
+  scene.anims.create({
+    key: "yps_idle_right",
+    frames: createSingleFrame("yps", "stand_right"),
+    frameRate: 1,
+    repeat: 0,
+  });
+
+  // 向右坐下（1帧：yps_frames_sit_right_0）
+  scene.anims.create({
+    key: "yps_sit_right",
+    frames: createSingleFrame("yps", "sit_right"),
+    frameRate: 1,
+    repeat: 0,
+  });
 }

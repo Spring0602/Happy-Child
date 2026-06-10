@@ -121,13 +121,22 @@ export const AssetManifest = {
       tilesetKey: "tileset_balcony_night",
       tilesetImage: "/assets/maps/balcony/tileset.png",
     },
-    /** 宿舍白天版（复用 dormitory map.json + 白天底图） */
+    /** 宿舍白天版（使用 map1.json + 白天底图，用于第三幕） */
     dormitory_day: {
       mapKey: "map_dormitory_day",
-      mapJson: "/assets/maps/dormitory/map.json",
+      mapJson: "/assets/maps/dormitory/map1.json",
       groundKey: "ground_dormitory_day",
       groundImage: "/assets/maps/dormitory/宿舍.png",
       tilesetKey: "tileset_dormitory_day",
+      tilesetImage: "/assets/maps/dormitory/tileset.png",
+    },
+    /** 宿舍第四幕（使用 map2.json + 夜晚电脑关底图） */
+    dormitory_act4: {
+      mapKey: "map_dorm_act4",
+      mapJson: "/assets/maps/dormitory/map2.json",
+      groundKey: "ground_dorm_act4",
+      groundImage: "/assets/maps/dormitory/宿舍_夜晚_电脑关.png",
+      tilesetKey: "tileset_dorm_act4",
       tilesetImage: "/assets/maps/dormitory/tileset.png",
     },
   },

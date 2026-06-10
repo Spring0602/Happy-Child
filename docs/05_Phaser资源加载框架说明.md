@@ -80,7 +80,7 @@ client/
 
 ## 3. AssetManifest 示例
 
-> **当前方案（v8.2）**：角色动画使用AI工具直接分割的独立PNG帧，无需spritesheet或GIF中间格式，在PreloadScene中通过循环动态加载。
+> **当前方案（v8.3）**：角色动画使用AI工具直接分割的独立PNG帧（含 right 方向），无需spritesheet或GIF中间格式，在PreloadScene中通过循环动态加载。
 
 ```ts
 export const AssetManifest = {
@@ -216,12 +216,12 @@ export const MapRegistry = {
 
 ## 6. AnimationRegistry 示例
 
-> **当前方案（v8.2）**：使用AI工具分割的独立PNG帧，每个方向独立目录，帧键名清晰可读。
+> **当前方案（v8.3）**：使用AI工具分割的独立PNG帧，每个方向独立目录（含 right），帧键名清晰可读。
 > 
 > - 跑步：6帧循环（`frameRate=10, repeat=-1`）
 > - 站立：1帧静态（`frameRate=1, repeat=0`）
 > - 坐下：1帧静态（`frameRate=1, repeat=0`）
-> - 向右：可使用独立PNG帧注册动画，或使用向左动画 + `setFlipX(true)`（镜像方案）
+> - 向右：使用独立 right 帧注册动画，无需 `setFlipX`
 
 ```ts
 // 辅助函数：生成帧引用
@@ -248,10 +248,10 @@ export function createPlayerAnimations(scene: Phaser.Scene) {
   scene.anims.create({ key: "yps_idle_down", frames: [{ key: "yps_frames_stand_front_0" }], frameRate: 1, repeat: 0 });
   scene.anims.create({ key: "yps_sit_down", frames: [{ key: "yps_frames_sit_front_0" }], frameRate: 1, repeat: 0 });
 
-  // 向右：可使用独立PNG帧注册动画（如下），或使用向左动画 + setFlipX(true)（镜像方案）
-  // yps_run_right: 使用 yps_frames_right 帧
+  // 向右（right方向，独立帧）
   scene.anims.create({ key: "yps_run_right", frames: createFrames("yps", "right", 6), frameRate: 10, repeat: -1 });
   scene.anims.create({ key: "yps_idle_right", frames: [{ key: "yps_frames_stand_right_0" }], frameRate: 1, repeat: 0 });
+  scene.anims.create({ key: "yps_sit_right", frames: [{ key: "yps_frames_sit_right_0" }], frameRate: 1, repeat: 0 });
 }
 ```
 
