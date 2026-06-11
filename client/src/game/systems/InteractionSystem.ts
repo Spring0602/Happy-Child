@@ -24,6 +24,9 @@ export class InteractionSystem {
   private interactHint: Phaser.GameObjects.Text | null = null;
   private onSitCallback: ((chairY: number, sitInFront: boolean) => void) | null = null;
   private _loggedKeys = false;
+  private readonly onInteractKeyDown = () => {
+    this._triggerInteract();
+  };
 
   constructor(scene: Phaser.Scene, player: Phaser.GameObjects.Sprite) {
     this.scene = scene;
@@ -36,9 +39,7 @@ export class InteractionSystem {
     }
     this.interactKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     // 双重监听：JustDown（帧检测）+ Key.on('down')（事件检测，更可靠）
-    this.interactKey.on("down", () => {
-      this._triggerInteract();
-    });
+    this.interactKey.on("down", this.onInteractKeyDown);
     console.log("[InteractionSystem] ✅ 初始化完成，E 键已注册（JustDown + Key.on('down')）");
   }
 
@@ -50,6 +51,14 @@ export class InteractionSystem {
   registerInteractable(obj: Interactable) {
     this.interactables.push(obj);
     console.log(`[InteractionSystem] 📍 注册可交互: ${obj.id} (${obj.type}) at (${obj.x}, ${obj.y})`);
+  }
+
+  destroy() {
+    this.interactKey?.off("down", this.onInteractKeyDown);
+    this.interactHint?.destroy();
+    this.interactHint = null;
+    this.interactables = [];
+    this.onSitCallback = null;
   }
 
   /** 找到最近的交互对象 */

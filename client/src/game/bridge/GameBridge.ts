@@ -14,12 +14,18 @@ type Listener<T> = (event: T) => void;
 class GameBridge {
   private phaserListeners = new Map<string, Listener<ReactToPhaserCommand>[]>();
   private reactListeners = new Map<string, Listener<PhaserToReactEvent>[]>();
+  private pendingPhaserCommands: ReactToPhaserCommand[] = [];
+  private lastChangeMapCommand: ReactToPhaserCommand | null = null;
   private _gameState: GameState | null = null;
 
   /** Phaser 侧调用：监听 React 发来的指令 */
   onReactCommand(type: string, handler: Listener<ReactToPhaserCommand>) {
     if (!this.phaserListeners.has(type)) this.phaserListeners.set(type, []);
     this.phaserListeners.get(type)!.push(handler);
+
+    const pending = this.pendingPhaserCommands.filter(command => command.type === type);
+    this.pendingPhaserCommands = this.pendingPhaserCommands.filter(command => command.type !== type);
+    pending.forEach(handler);
   }
 
   /** React 侧调用：监听 Phaser 发来的事件 */
@@ -30,7 +36,19 @@ class GameBridge {
 
   /** React → Phaser */
   sendToPhaser(command: ReactToPhaserCommand) {
+    if (command.type === "CHANGE_MAP") {
+      this.lastChangeMapCommand = command;
+    }
     const handlers = this.phaserListeners.get(command.type) || [];
+    if (handlers.length === 0) {
+      if (command.type === "CHANGE_MAP") {
+        this.pendingPhaserCommands = this.pendingPhaserCommands.filter(
+          pending => pending.type !== "CHANGE_MAP"
+        );
+      }
+      this.pendingPhaserCommands.push(command);
+      return;
+    }
     handlers.forEach((h) => h(command));
   }
 
@@ -48,6 +66,12 @@ class GameBridge {
   removeAllListeners() {
     this.phaserListeners.clear();
     this.reactListeners.clear();
+    if (
+      this.lastChangeMapCommand &&
+      !this.pendingPhaserCommands.some(command => command.type === "CHANGE_MAP")
+    ) {
+      this.pendingPhaserCommands.push(this.lastChangeMapCommand);
+    }
   }
 }
 

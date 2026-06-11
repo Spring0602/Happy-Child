@@ -575,15 +575,14 @@ NPC：
 图片：空（屏幕全黑）
 [NPC：室友A]我的天，叶卷卷这是怎么了？真卷起一阵风了。
 [旁白]陈煜浩轻轻瞥了眼我离开的方向，眸光一暗。
-> 第七部分待续，末尾跳转目标 sceneId 待补。
 
 ---
 ## 七、赛前准备
 ### [地图]校园小卖部
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-出生点：XXX（播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front）
+出生点：spawn_shop_school_entrance（播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front）
 冻结主角：是
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 [主角]（整整十五天的口粮，我必须要攒够，样样都买一点吧。）
 [旁白]我像个打劫的不法分子，开始把整个小卖部洗劫一空。
 进入自由探索

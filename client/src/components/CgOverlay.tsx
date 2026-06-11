@@ -141,6 +141,10 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
           : { backgroundColor: "#000" }}
       />
 
+      {scene.id === "ch1_game_eve_countdown" && (
+        <div className="cg-countdown-display">00:00</div>
+      )}
+
       {/* 立绘（仅主角说话时在左下角显示） */}
       {showPortrait && (
         <div className="cg-portrait-area">

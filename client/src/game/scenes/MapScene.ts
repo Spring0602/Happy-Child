@@ -14,6 +14,8 @@ export class MapScene extends Phaser.Scene {
   private collisionGroup!: Phaser.Physics.Arcade.StaticGroup;
   private groundImage: Phaser.GameObjects.Image | null = null;
   private currentMapId = "";
+  /** 全屏黑幕遮罩，防止地图切换时闪现旧底图 */
+  private transitionOverlay: Phaser.GameObjects.Rectangle | null = null;
 
   constructor() {
     super({ key: "MapScene" });
@@ -27,6 +29,15 @@ export class MapScene extends Phaser.Scene {
     console.log(`[MapScene] 🚀 create() 被调用, mapId=${this.currentMapId}`);
     try {
       this.loadMap(this.currentMapId);
+
+      // 覆盖全屏黑幕，防止初始底图（如 dormitory sleep.png）在
+      // 读档/首个场景转换到来之前闪现一帧
+      this.transitionOverlay = this.add.rectangle(
+        this.scale.width / 2, this.scale.height / 2,
+        this.scale.width, this.scale.height,
+        0x000000
+      ).setDepth(20000).setScrollFactor(0).setAlpha(1);
+
       this.listenBridge();
       console.log(`[MapScene] ✅ create() 完成`);
     } catch (e) {
@@ -53,8 +64,11 @@ export class MapScene extends Phaser.Scene {
 
     try {
       // 清理旧场景对象
+      this.interactionSys?.destroy();
       this.children.removeAll(true);
       this.rainParticles = null;
+      this.registry.set("npcSprites", new Map());
+      this.registry.set("pendingNpcDirections", new Map());
 
       // 注册当前地图到 scene registry
       this.registry.set("currentMapId", mapId);
@@ -716,10 +730,44 @@ export class MapScene extends Phaser.Scene {
       }
       case "spawn_npc": {
         // 在指定出生点生成 NPC 精灵（帧动画版本）
+        // 支持重复调用：若 npcKey 已存在则先销毁旧精灵
         const spawnId = payload?.spawnId as string;
         const npcKey = payload?.npcKey as string;
         const framesPrefix = (payload?.framesPrefix as string) || npcKey;
         if (!spawnId || !npcKey) break;
+
+        const initTexture = `${framesPrefix}_stand_front_0`;
+        if (!this.textures.exists(initTexture)) {
+          const texturePath = `/assets/sprites/frames/${framesPrefix}/${framesPrefix}_stand_front/frame_00.png`;
+          console.warn(`[MapScene] ⚠ NPC 纹理未预加载，正在即时补载: ${initTexture}`);
+          this.load.image(initTexture, texturePath);
+          this.load.once(`filecomplete-image-${initTexture}`, () => {
+            this.handleStoryEvent("spawn_npc", payload);
+          });
+          this.load.once("loaderror", (file: Phaser.Loader.File) => {
+            if (file.key === initTexture) {
+              console.error(`[MapScene] ❌ NPC 纹理补载失败: ${initTexture} (${texturePath})`);
+            }
+          });
+          if (!this.load.isLoading()) {
+            this.load.start();
+          }
+          break;
+        }
+
+        const npcList = (this.registry.get("npcSprites") as Map<string, {
+          sprite: Phaser.GameObjects.Sprite;
+          zone: Phaser.GameObjects.Zone;
+          framesPrefix: string;
+        }>) || new Map();
+        // 若 NPC 已存在则销毁旧精灵和旧碰撞体
+        const existing = npcList.get(npcKey);
+        if (existing) {
+          existing.sprite.destroy();
+          existing.zone.destroy();
+          npcList.delete(npcKey);
+        }
+
         const spawnLayer = this.map.getObjectLayer("player_spawn");
         if (spawnLayer) {
           const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
@@ -728,7 +776,6 @@ export class MapScene extends Phaser.Scene {
             const cy = spawn.y! + (spawn.height ?? 32) / 2;
             const scale = (payload?.scale as number) || 0.75;
             // 使用帧纹理创建精灵（默认正面站立）
-            const initTexture = `${framesPrefix}_stand_front_0`;
             const sprite = this.add.sprite(cx, cy, initTexture).setScale(scale);
             sprite.setDepth(cy / (this.map.heightInPixels || 1000));
             // 碰撞体
@@ -738,9 +785,14 @@ export class MapScene extends Phaser.Scene {
             this.physics.add.existing(zone, true);
             this.collisionGroup.add(zone);
             // 存储 NPC 引用（含 framesPrefix 用于方向切换）
-            const npcList = (this.registry.get("npcSprites") as Map<string, { sprite: Phaser.GameObjects.Sprite; framesPrefix: string }>) || new Map();
-            npcList.set(npcKey, { sprite, framesPrefix });
+            npcList.set(npcKey, { sprite, zone, framesPrefix });
             this.registry.set("npcSprites", npcList);
+            const pendingDirections = this.registry.get("pendingNpcDirections") as Map<string, string> | undefined;
+            const pendingDirection = pendingDirections?.get(npcKey);
+            if (pendingDirection) {
+              pendingDirections?.delete(npcKey);
+              this.handleStoryEvent("set_npc_direction", { npcKey, direction: pendingDirection });
+            }
           }
         }
         break;
@@ -750,18 +802,34 @@ export class MapScene extends Phaser.Scene {
         const npcKey = payload?.npcKey as string;
         const direction = payload?.direction as string;
         if (!npcKey || !direction) break;
-        const npcList = this.registry.get("npcSprites") as Map<string, { sprite: Phaser.GameObjects.Sprite; framesPrefix: string }> | undefined;
+        const npcList = this.registry.get("npcSprites") as Map<string, {
+          sprite: Phaser.GameObjects.Sprite;
+          zone: Phaser.GameObjects.Zone;
+          framesPrefix: string;
+        }> | undefined;
         const entry = npcList?.get(npcKey);
         if (entry) {
           // 映射方向到帧方向名
           const dirMap: Record<string, string> = { front: "front", back: "back", left: "left", right: "right", down: "front", up: "back" };
           const frameDir = dirMap[direction] || "front";
           const frameKey = `${entry.framesPrefix}_stand_${frameDir}_0`;
-          // 仅当纹理存在且不同于当前纹理时切换
           if (this.textures.exists(frameKey) && entry.sprite.texture.key !== frameKey) {
             entry.sprite.setTexture(frameKey);
+          } else if (!this.textures.exists(frameKey)) {
+            const texturePath = `/assets/sprites/frames/${entry.framesPrefix}/${entry.framesPrefix}_stand_${frameDir}/frame_00.png`;
+            this.load.image(frameKey, texturePath);
+            this.load.once(`filecomplete-image-${frameKey}`, () => {
+              if (entry.sprite.active) entry.sprite.setTexture(frameKey);
+            });
+            if (!this.load.isLoading()) {
+              this.load.start();
+            }
           }
           // 所有角色已补全 stand_right 帧图，无需翻转
+        } else {
+          const pendingDirections = (this.registry.get("pendingNpcDirections") as Map<string, string> | undefined) || new Map<string, string>();
+          pendingDirections.set(npcKey, direction);
+          this.registry.set("pendingNpcDirections", pendingDirections);
         }
         break;
       }
@@ -844,23 +912,68 @@ export class MapScene extends Phaser.Scene {
     console.log(`[MapScene] 🌧️ 下雨特效已创建, emitter=`, this.rainParticles);
   }
 
-  /** 地图切换（淡入淡出） */
+  /** 地图切换（淡入淡出） — 使用自控黑幕遮罩，杜绝旧底图闪现 */
   private transitionToMap(mapId: string, spawnId: string) {
     console.log(`[MapScene] 🗺️ 开始切换地图: ${mapId} (spawn=${spawnId})`);
+
     // 清理下雨效果
     if (this.rainParticles) {
       this.rainParticles.destroy();
       this.rainParticles = null;
     }
-    this.cameras.main.fadeOut(300, 0, 0, 0);
-    this.cameras.main.once("camerafadeoutcomplete", () => {
-      // 清理旧子系统引用（loadMap 中 children.removeAll 会销毁所有游戏对象）
-      this.playerCtrl = null as unknown as PlayerController;
-      this.triggerSys = null as unknown as TriggerSystem;
-      this.interactionSys = null as unknown as InteractionSystem;
 
-      this.loadMap(mapId, spawnId);
-      this.cameras.main.fadeIn(300, 0, 0, 0);
+    // 如果已有遮罩（如 create() 中创建的黑幕）但 tween 正在运行则先停止
+    if (this.transitionOverlay) {
+      this.tweens.killTweensOf(this.transitionOverlay);
+    } else {
+      // 没有遮罩时补建一个（正常游戏过程中的地图切换）
+      this.transitionOverlay = this.add.rectangle(
+        this.scale.width / 2, this.scale.height / 2,
+        this.scale.width, this.scale.height,
+        0x000000
+      ).setDepth(20000).setScrollFactor(0);
+    }
+
+    // 确保遮罩存在（防御）
+    const overlay = this.transitionOverlay!;
+
+    // 阶段 1：遮罩淡入至完全不透明 → 隐藏当前底图
+    this.tweens.add({
+      targets: overlay,
+      alpha: 1,
+      duration: 300,
+      onComplete: () => {
+        // 清理旧子系统引用
+        this.playerCtrl = null as unknown as PlayerController;
+        this.triggerSys = null as unknown as TriggerSystem;
+        this.interactionSys?.destroy();
+        this.interactionSys = null as unknown as InteractionSystem;
+
+        this.loadMap(mapId, spawnId);
+
+        // loadMap 会清理旧地图的所有显示对象，因此需要为新地图重新创建黑幕。
+        const fadeOverlay = this.add.rectangle(
+          this.scale.width / 2, this.scale.height / 2,
+          this.scale.width, this.scale.height,
+          0x000000
+        ).setDepth(20000).setScrollFactor(0).setAlpha(1);
+        this.transitionOverlay = fadeOverlay;
+
+        // 等一帧确保新底图已提交到 GPU，再淡出遮罩
+        this.time.delayedCall(50, () => {
+          this.tweens.add({
+            targets: fadeOverlay,
+            alpha: 0,
+            duration: 300,
+            onComplete: () => {
+              if (fadeOverlay.active) {
+                fadeOverlay.destroy();
+                this.transitionOverlay = null;
+              }
+            },
+          });
+        });
+      },
     });
   }
 

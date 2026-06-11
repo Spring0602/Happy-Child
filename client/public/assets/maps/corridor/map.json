@@ -1,0 +1,25 @@
+{
+  "compressionlevel": -1,
+  "height": 16,
+  "infinite": false,
+  "layers": [
+    { "id": 1, "name": "ground", "type": "imagelayer", "image": "走廊.png", "x": 0, "y": 0 },
+    { "id": 2, "name": "collision", "type": "objectgroup", "objects": [] },
+    { "id": 3, "name": "furniture_objects", "type": "objectgroup", "objects": [] },
+    { "id": 4, "name": "triggers", "type": "objectgroup", "objects": [] },
+    { "id": 5, "name": "player_spawn", "type": "objectgroup", "objects": [
+      { "id": 1, "name": "spawn_corridor_default", "x": 1016, "y": 400, "width": 32, "height": 32 }
+    ] },
+    { "id": 6, "name": "npcs", "type": "objectgroup", "objects": [] },
+    { "id": 7, "name": "items", "type": "objectgroup", "objects": [] }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 2,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 65
+}
