@@ -38,6 +38,35 @@ function normalizeLoadedState(loaded: GameState): {
   };
 }
 
+function restoreDynamicMapActors(loaded: GameState) {
+  setTimeout(() => {
+    if (loaded.currentMapId !== "shop") return;
+
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_3", npcKey: "npc_male_assistant", scale: 0.75, framesPrefix: "shop_assistant_male_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_male_assistant", direction: "back" } });
+
+    const confrontationScenes = ["ch1_shop_confrontation", "ch1_shop_confront_", "ch1_shop_lzx_leave"];
+    const isConfrontation = confrontationScenes.some(prefix => loaded.currentSceneId.startsWith(prefix));
+    if (isConfrontation) {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_2", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_mysterious", direction: "right" } });
+      return;
+    }
+
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_6", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+    if (
+      loaded.currentSceneId.startsWith("ch1_shop_exchange_") &&
+      loaded.currentSceneId !== "ch1_shop_exchange_1"
+    ) {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_lzx", direction: "back" } });
+    }
+  }, 800);
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
@@ -151,6 +180,7 @@ export default function App() {
     const normalized = normalizeLoadedState(loaded);
     dispatch({ type: "LOAD", state: normalized.state });
     gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: normalized.mapId, spawnId: normalized.spawnId });
+    restoreDynamicMapActors(normalized.state);
     setDialogHistory([]);
     prevSceneIdRef.current = "";
     setGamePhase("playing");
@@ -214,6 +244,11 @@ export default function App() {
   function handleNext(nextSceneId: string) {
     if (!nextSceneId) {
       const currentScene = dialogScene;
+      if (currentScene?.id === "ch1_game_start_system") {
+        dispatch({ type: "DIALOG_END" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        return;
+      }
       if (currentScene?.onCgEnd) {
         if (currentScene.onCgEnd === "enter_dormitory_playable") {
           dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_chair", position: { x: 0, y: 0 } });
@@ -372,6 +407,12 @@ export default function App() {
       return;
     }
 
+    if (nextSceneId === "ch1_shop_exchange_2") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_lzx", direction: "back" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
     // 第四幕入口
     if (nextSceneId === "dorm_act4_return_dorm") {
       dispatch({ type: "CHANGE_MAP", mapId: "dormitory_act4", spawnId: "spawn_spawn_4", position: { x: 0, y: 0 } });
@@ -475,6 +516,7 @@ export default function App() {
 
     // ── 第一章结尾：进入人类进化计划候场区 ──
     if (nextSceneId === "ch1_game_start") {
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
       dispatch({ type: "CHANGE_MAP", mapId: "waiting", spawnId: "spawn_waiting_default", position: { x: 0, y: 0 } });
       gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "waiting", spawnId: "spawn_waiting_default" });
       dispatch({ type: "DIALOG_END" });
@@ -528,6 +570,12 @@ export default function App() {
 
   function handleCloseDialog() {
     const currentScene = dialogScene;
+
+    if (currentScene?.id === "ch1_game_start_system") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      return;
+    }
 
     if (currentScene?.id === "balcony_night_narrate_2") {
       dispatch({ type: "DIALOG_END" });
@@ -682,7 +730,6 @@ export default function App() {
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_6", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_lzx", direction: "back" } });
         gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
         dispatch({ type: "DIALOG_END" });
         setTimeout(() => {
@@ -865,6 +912,7 @@ export default function App() {
             const normalized = normalizeLoadedState(loaded);
             dispatch({ type: "LOAD", state: normalized.state });
             gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: normalized.mapId, spawnId: normalized.spawnId });
+            restoreDynamicMapActors(normalized.state);
             setDialogHistory([]);
             prevSceneIdRef.current = "";
             setGameMenuOpen(false);

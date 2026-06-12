@@ -870,6 +870,7 @@ NPC：id：npc_male_assistant，精灵：G:\混沌\happy-child-game-scaffold\hap
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\waiting\进入界面.png
 效果：淡入
 出生点：地图中央，播放：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
+冻结主角：是
 [旁白]四周数字如星辰点点，星云摇曳，而我漂浮于宇宙中，并无失重感，甚至能正常呼吸。
 [NPC：系统]欢迎参赛者来到“人类进化计划”候场区~
 （第一章完）

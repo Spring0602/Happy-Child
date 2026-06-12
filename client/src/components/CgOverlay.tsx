@@ -137,7 +137,7 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
       <div
         className="cg-background"
         style={scene.background
-          ? { backgroundImage: `url(${scene.background})` }
+          ? { backgroundImage: `url(${scene.background})`, backgroundColor: "#000" }
           : { backgroundColor: "#000" }}
       />
 

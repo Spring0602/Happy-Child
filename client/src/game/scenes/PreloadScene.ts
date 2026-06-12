@@ -46,14 +46,20 @@ export class PreloadScene extends Phaser.Scene {
       const baseDir = `/assets/sprites/frames/${character.key}`;
       const folderPrefix = "folderPrefix" in character ? character.folderPrefix : character.key;
       const directoryOverrides = "directoryOverrides" in character ? character.directoryOverrides : undefined;
+      const frameFileOverrides = "frameFileOverrides" in character ? character.frameFileOverrides : undefined;
+      const runFrameStartOverrides = "runFrameStartOverrides" in character ? character.runFrameStartOverrides : undefined;
 
       if ("run" in character && character.run) {
         for (const direction of runDirs) {
           const subDir = `${folderPrefix}_${direction}`;
+          const frameStart = runFrameStartOverrides?.[direction as keyof typeof runFrameStartOverrides];
           for (let index = 0; index < 6; index++) {
+            const frameFile = frameStart === undefined
+              ? `frame_${index.toString().padStart(2, "0")}.png`
+              : `frame_${(frameStart + index).toString().padStart(3, "0")}.png`;
             this.load.image(
               `${character.key}_${direction}_${index}`,
-              `${baseDir}/${subDir}/frame_${index.toString().padStart(2, "0")}.png`
+              `${baseDir}/${subDir}/${frameFile}`
             );
           }
         }
@@ -68,9 +74,10 @@ export class PreloadScene extends Phaser.Scene {
           const actionDirection = `${action}_${direction}`;
           const override = directoryOverrides?.[actionDirection as keyof typeof directoryOverrides];
           const subDir = override || `${folderPrefix}_${actionDirection}`;
+          const frameFile = frameFileOverrides?.[actionDirection as keyof typeof frameFileOverrides] || "frame_00.png";
           this.load.image(
             `${character.key}_${actionDirection}_0`,
-            `${baseDir}/${subDir}/frame_00.png`
+            `${baseDir}/${subDir}/${frameFile}`
           );
         }
       }

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { MapRegistry } from "../config/mapRegistry";
+import { AssetManifest } from "../config/assetManifest";
 import { gameBridge } from "../bridge/GameBridge";
 import { PlayerController } from "../systems/PlayerController";
 import { InteractionSystem } from "../systems/InteractionSystem";
@@ -14,6 +15,7 @@ export class MapScene extends Phaser.Scene {
   private collisionGroup!: Phaser.Physics.Arcade.StaticGroup;
   private groundImage: Phaser.GameObjects.Image | null = null;
   private currentMapId = "";
+  private playerFrozen = false;
   /** 全屏黑幕遮罩，防止地图切换时闪现旧底图 */
   private transitionOverlay: Phaser.GameObjects.Rectangle | null = null;
 
@@ -63,6 +65,7 @@ export class MapScene extends Phaser.Scene {
     }
 
     try {
+      this.currentMapId = mapId;
       // 清理旧场景对象
       this.interactionSys?.destroy();
       this.children.removeAll(true);
@@ -149,6 +152,7 @@ export class MapScene extends Phaser.Scene {
 
       // === 5. 初始化子系统（必须在 processObjectLayers 之前） ===
       this.playerCtrl = new PlayerController(this, this.player);
+      if (this.playerFrozen) this.playerCtrl.freeze();
       this.interactionSys = new InteractionSystem(this, this.player);
       this.interactionSys.setOnSit((chairY, sitInFront) => {
         this.sitPlayerAtChair(chairY, sitInFront);
@@ -174,10 +178,26 @@ export class MapScene extends Phaser.Scene {
       // === 7. 注册玩家 vs 碰撞组 collider（必须在 collisionGroup 和碰撞体都已创建之后） ===
       this.physics.add.collider(this.player, this.collisionGroup);
 
+      this.spawnPersistentMapActors(mapId);
       console.log(`[MapScene] ✅ 地图加载完成: ${mapId}`);
     } catch (e) {
       console.error(`[MapScene] ❌ 地图加载失败: ${mapId}`, e);
     }
+  }
+
+  private spawnPersistentMapActors(mapId: string) {
+    if (mapId !== "shop_school") return;
+
+    this.handleStoryEvent("spawn_npc", {
+      spawnId: "spawn_spawn_47",
+      npcKey: "npc_female_assistant",
+      scale: 0.75,
+      framesPrefix: "shop_assistant_female_frames",
+    });
+    this.handleStoryEvent("set_npc_direction", {
+      npcKey: "npc_female_assistant",
+      direction: "back",
+    });
   }
 
   /** 处理 Tiled 对象层 */
@@ -523,9 +543,11 @@ export class MapScene extends Phaser.Scene {
       }
     });
     gameBridge.onReactCommand("FREEZE_PLAYER", () => {
+      this.playerFrozen = true;
       this.playerCtrl?.freeze();
     });
     gameBridge.onReactCommand("UNFREEZE_PLAYER", () => {
+      this.playerFrozen = false;
       this.playerCtrl?.unfreeze();
     });
     gameBridge.onReactCommand("STORY_EVENT", (cmd) => {
@@ -738,7 +760,7 @@ export class MapScene extends Phaser.Scene {
 
         const initTexture = `${framesPrefix}_stand_front_0`;
         if (!this.textures.exists(initTexture)) {
-          const texturePath = `/assets/sprites/frames/${framesPrefix}/${framesPrefix}_stand_front/frame_00.png`;
+          const texturePath = this.getNpcStandTexturePath(framesPrefix, "front");
           console.warn(`[MapScene] ⚠ NPC 纹理未预加载，正在即时补载: ${initTexture}`);
           this.load.image(initTexture, texturePath);
           this.load.once(`filecomplete-image-${initTexture}`, () => {
@@ -774,7 +796,11 @@ export class MapScene extends Phaser.Scene {
           if (spawn) {
             const cx = spawn.x! + (spawn.width ?? 32) / 2;
             const cy = spawn.y! + (spawn.height ?? 32) / 2;
-            const scale = (payload?.scale as number) || 0.75;
+            const frameManifest = AssetManifest.frames.find((entry) => entry.key === framesPrefix) as
+              | { displayScaleMultiplier?: number }
+              | undefined;
+            const displayScaleMultiplier = frameManifest?.displayScaleMultiplier ?? 1;
+            const scale = ((payload?.scale as number) || 0.75) * displayScaleMultiplier;
             // 使用帧纹理创建精灵（默认正面站立）
             const sprite = this.add.sprite(cx, cy, initTexture).setScale(scale);
             sprite.setDepth(cy / (this.map.heightInPixels || 1000));
@@ -816,7 +842,7 @@ export class MapScene extends Phaser.Scene {
           if (this.textures.exists(frameKey) && entry.sprite.texture.key !== frameKey) {
             entry.sprite.setTexture(frameKey);
           } else if (!this.textures.exists(frameKey)) {
-            const texturePath = `/assets/sprites/frames/${entry.framesPrefix}/${entry.framesPrefix}_stand_${frameDir}/frame_00.png`;
+            const texturePath = this.getNpcStandTexturePath(entry.framesPrefix, frameDir);
             this.load.image(frameKey, texturePath);
             this.load.once(`filecomplete-image-${frameKey}`, () => {
               if (entry.sprite.active) entry.sprite.setTexture(frameKey);
@@ -975,6 +1001,17 @@ export class MapScene extends Phaser.Scene {
         });
       },
     });
+  }
+
+  /** 从 Tiled properties 数组提取值 */
+  private getNpcStandTexturePath(framesPrefix: string, direction: string): string {
+    const character = AssetManifest.frames.find(entry => entry.key === framesPrefix);
+    const actionDirection = `stand_${direction}`;
+    const frameFileOverrides = character && "frameFileOverrides" in character
+      ? character.frameFileOverrides
+      : undefined;
+    const frameFile = frameFileOverrides?.[actionDirection as keyof typeof frameFileOverrides] || "frame_00.png";
+    return `/assets/sprites/frames/${framesPrefix}/${framesPrefix}_${actionDirection}/${frameFile}`;
   }
 
   /** 从 Tiled properties 数组提取值 */
