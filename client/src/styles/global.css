@@ -462,6 +462,20 @@ body {
   image-rendering: auto;
 }
 
+.cg-countdown-display {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: clamp(4rem, 12vw, 9rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
 /* CG 立绘区域 — 左下角，底部贴合屏幕底部 */
 .cg-portrait-area {
   position: absolute;
@@ -1219,5 +1233,4 @@ body {
   80%  { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
 }
-
 

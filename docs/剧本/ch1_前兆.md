@@ -2,7 +2,18 @@
 
 > 翻译自 `client/src/data/scenes.ts`
 > NPC 设定见 `_npc设定.md`
-
+补充本章重要NPC设定：
+@角色设定 ？？？
+  身份：来自中国古代的穿越者兼轮回者 / 萍水相逢/ 不知是敌是友
+  能力：武力值极高，经历过多次游戏轮回，有一定“全知”和“预言”能力
+  性格：内敛含蓄，沉着冷静，杀伐果断，睿智有远见，经历过太多生死对世道颇有见地，除非触及底线否则一般对任何事件都作壁上观不会插手
+  初始态度：观察为主，对主角有些好奇，因为他在过往轮回中没见过主角
+  AI权限：副本一结束后根据对主角的印象决定是否提供帮助
+  禁止行为：
+    - 不能直接说出人类进化计划的规则本质
+    - 不能直接帮助主角逃离
+    - 不能直接帮助主角打败系统
+    - 隐瞒自己间接灭绝了人类的真相
 ---
 
 ## 一、序幕 CG：完成项目
@@ -564,48 +575,47 @@ NPC：
 图片：空（屏幕全黑）
 [NPC：室友A]我的天，叶卷卷这是怎么了？真卷起一阵风了。
 [旁白]陈煜浩轻轻瞥了眼我离开的方向，眸光一暗。
-> 第七部分待续，末尾跳转目标 sceneId 待补。
 
 ---
 ## 七、赛前准备
 ### [地图]校园小卖部
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-出生点：XXX（播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front）
+出生点：spawn_shop_school_entrance（播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front）
 冻结主角：是
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 [主角]（整整十五天的口粮，我必须要攒够，样样都买一点吧。）
 [旁白]我像个打劫的不法分子，开始把整个小卖部洗劫一空。
 进入自由探索
 ### [地图]小卖部自由探索
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-出生点：XXX（播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front）
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+出生点：spawn_shop_school_entrance（播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front）
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 可交互点
 @trigger_drink
   提示文字：E饮品
-  设置flag
+  设置flag_drink=false，交互后flag_drink=true
   触发：[对话]
         [主角]（充足的水分是很重要的。）
 @trigger_food
   提示文字：E压缩饼干
-  设置falg
+  设置falg_food=false，交互后flag_food=true
   触发：[对话]
         [主角]（体积小易携带，是个好选择。）
 @trigger_chips
   提示文字：E膨化食品
-  设置falg
+  设置falg_chips=false，交互后flag_chips=true
   触发：[对话]
         [主角]（我是很爱吃，但是条件估计不允许。）\n\n（诶，命苦的我。）
 @trigger_1
   提示文字：E肉脯
-  设置falg
+  设置falg_1=false，交互后flag_1=true
   触发：[对话]
         [主角]（这个好吃，要了。）
 @trigger_2
   提示文字：E果脯
-  设置falg
+  设置falg_2=false，交互后flag_2=true
   触发：[对话]
-        [主角]（我可不想得坏血病。买了）
+        [主角]（我可不想得坏血病。买了。）
 @trigger_door
   提示文字：E离开
   触发：[对话]
@@ -623,7 +633,7 @@ NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\h
 跳转到下一场景
 ### [地图]去结账（探索）
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 可交互点
 @trigger_drink
   提示文字：E饮品
@@ -655,7 +665,7 @@ NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\h
   触发：跳转下一场景
 ### [地图]结账完成
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 冻结主角：是
 [旁白]商品已经没剩多少了，老板娘吓了一跳，好奇地问，
 [NPC：老板娘]小伙子，你买这么多东西干什么？
@@ -669,7 +679,7 @@ NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\h
 跳转到下一场景
 ### [地图]离开小卖部（探索）
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 可交互点
 @trigger_drink
   提示文字：E饮品
@@ -700,7 +710,7 @@ NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\h
         [主角]（该去下一个目的地了。）
 ### [地图]离开小卖部（告别）
 切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop_school\便利店.png
-NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：XXX
+NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_female_frames\shop_assistant_female_frames_stand_back，出生点：spawn_spawn_47
 冻结主角：是
 [旁白]我忽然像是想起了什么，下意识朝老板娘挥挥手，
 跳转播放动作：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
@@ -709,8 +719,161 @@ NPC：id：npc_female_assistant，精灵：G:\混沌\happy-child-game-scaffold\h
 切换到下一场景
 ### [CG]思考
 图片：无（屏幕全黑）
-[旁白]不过采购完食品以后，我又遇到了一个问题——学校内不允许售卖刀具，宿舍内刀具则是违禁品，我要买防身用品的话只能到校外，或者点外卖送达。\n\n现在是23：32，点外卖也要30分钟起步，还不如在学校附近找找呢。\n\n我骑着小电驴来到了离校最近的厨房用品店，我走进店内时，柜台前已经排了4个人。
+[旁白]不过采购完食品以后，我又遇到了一个问题——学校内不允许售卖刀具，宿舍内刀具则是违禁品，我要买防身用品的话只能到校外，或者点外卖送达。\n\n现在是23：32，点外卖也要30分钟起步，还不如在学校附近找找呢。\n\n我骑着小电驴来到了离校最近的厨房用品店，我走进店内时，柜台前已经排了3个人。
 切换到下一场景
+### [地图]厨房用品店
+切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop\厨具便利店.png
+出生点：spawn_spawn_1，播放：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
+NPC：id：npc_male_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_male_frames\shop_assistant_male_frames_stand_back，出生点：spawn_spawn_3
+    id：npc_lzx，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\lzx_frames\lzx_frames_stand_front，出生点：spawn_spawn_5
+    id：npc_delinquent teenager，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\delinquent teenagers_frames\delinquent teenagers_frames_stand_front，出生点：spawn_spawn_6
+    id：npc_？？？，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\？？？_frames\？？？_frames_stand_front，出生点：spawn_spawn_7
+冻结主角：是
+[主角]（这一片区域是大学城，时效最高的有且仅有这一家厨房用品店，不过往常这个时候，店里应该基本没人才对。）
+[旁白]这3个人1女2男，看着都像附近的大学生。
+[主角]（除非他们也是和我一样的“变数”。）
+[旁白]邮件中提到禁止将比赛信息泄露给无关人员。同为参赛者的话应该不会涉及泄密问题吧？\n\n如果能在赛前确认哪怕一小部分信息，赛中都将获得巨大的优势。就算风险很大，但我也认为这值得我赌一把。\n\n我在手机备忘录里用最大号字体输入了自己的姓名，然后又用正常字体写下了几个需要和其他参赛者确认的问题。
+[主角]（接下来先找把趁手的防身武器。）
+跳转到下一场景
+### [地图]厨房用品店（探索）
+切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop\厨具便利店.png
+NPC：id：npc_male_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_male_frames\shop_assistant_male_frames_stand_back，出生点：spawn_spawn_3
+    id：npc_lzx，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\lzx_frames\lzx_frames_stand_front，出生点：spawn_spawn_5
+    id：npc_delinquent teenager，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\delinquent teenagers_frames\delinquent teenagers_frames_stand_front，出生点：spawn_spawn_6
+    id：npc_？？？，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\？？？_frames\？？？_frames_stand_front，出生点：spawn_spawn_7
+可交互点
+@trigger_9
+  提示文字：E水果刀
+  设置flag_fruit_knife=false，触发后为true
+  触发：[对话]
+        [主角]（这个不错，就拿它吧。）
+@trigger_10
+  提示文字：E勺铲
+  触发：[对话]
+        [主角]（没啥用。）
+@trigger_11
+  提示文字：E菜刀
+  触发：[对话]
+        [主角]（太笨重了，不适合随身携带。）
+@trigger_12
+  提示文字：E平底锅
+  触发：[对话]
+        [主角]（这是红太狼的专武，不是我的。）
+@trigger_8
+  提示文字：E排队
+  触发：[对话]
+        若flag_fruit_knife=false
+        [主角]（我还没选商品。）
+        否则
+        跳转到下一场景
+### [地图]交换线索
+切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop\厨具便利店.png
+效果：闪现
+出生点：spawn_spawn_4，播放：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
+NPC：id：npc_male_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_male_frames\shop_assistant_male_frames_stand_back，出生点：spawn_spawn_3
+    id：npc_lzx，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\lzx_frames\lzx_frames_stand_front，出生点：spawn_spawn_5
+    id：npc_delinquent teenager，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\delinquent teenagers_frames\delinquent teenagers_frames_stand_front，出生点：spawn_spawn_6
+    id：npc_？？？，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\？？？_frames\？？？_frames_stand_front，出生点：spawn_spawn_7
+冻结主角：是
+[旁白]此时是23：40，时间够晚，基本可以确定这附近参赛者数目不少。\n\n时间紧迫，我拍了拍排在我前面的女生的肩膀，她立即像一只受惊的小白兔一样转过身来。
+npc_lzx播放动作：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\lzx_frames\lzx_frames_stand_back
+[旁白]我随即将手机举到她面前，然后仔细观察她的面部表情。\n\n看到第一个问题后，她脸上纯良的表情逐渐变得狠戾。
+[主角说]【我们的规则是什么？】
+[NPC：女生]【没有具体规则。】
+[旁白]我暗自松了口气。
+[主角]（赌对了。）
+[主角说]【你怎么理解第三条提示？】
+[旁白]女生沉默了，随即警觉地看着我。\n\n好吧，她需要我先展示诚意。
+跳转到下一场景
+[主角说]【这只是我的猜测。网络上最近很流行把一个人的气质和具有的能量称为“磁场”，从逻辑角度分析，第三条提示中的“磁场”按这个意思理解是合理的。不过结合邮件的用词风格来看，发件人对社会现状并不是很了解，因此，我不是很确定。】
+[NPC：女生]【我认可你的想法，但我认为这里的“磁场”还有更广义的意思。既然筛选对象是人类，那么这个词用来描述人类不假。它应该既可以描述个体，也可以描述群体。】
+[主角说]【什么意思？】
+[NPC：女生]【点到为止。】
+[主角]（哈，算盘打得挺精啊。）
+[旁白]我也没有死缠烂打，毕竟这个场合不宜搞出太大动静。\n\n最后她给我透露了她的姓名——林芷萱，以及联系方式。
+[主角]（看来还是和她有合作可能的。）
+跳转到下一场景
+### [CG]过渡
+图片：无（屏幕全黑）
+效果：淡入
+[旁白]不知不觉排到了林芷萱，而这时不速之客却找上了门。\n\n是个红毛不良少年。
+### [地图]挑衅
+切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\shop\厨具便利店.png
+出生点：spawn_spawn_6，播放：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_back
+NPC：id：npc_male_assistant，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\shop_assistant_male_frames\shop_assistant_male_frames_stand_back，出生点：spawn_spawn_3
+    id：npc_lzx，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\lzx_frames\lzx_frames_stand_front，出生点：spawn_spawn_7
+    id：npc_delinquent teenager，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\delinquent teenagers_frames\delinquent teenagers_frames_stand_front，出生点：spawn_spawn_5
+    id：npc_？？？，精灵：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\？？？_frames\？？？_frames_stand_right，出生点：spawn_spawn_2
+冻结主角：是
+[NPC：红毛]呵，在店里都不忘把妹呢。你小子，和她聊什么聊这么开心？和我也说说呗。
+[旁白]我不爽地皱眉。\n\n看来用手机交流还是太显眼了。\n\n我决定——
+->选项：你小子找茬是吧？我长这么大，向来有仇必当场报
+    AI标签：果断、冲动、个性、勇敢、反叛、自私
+    NPC目睹：？？？
+    设置flag_clear=false
+    剧情：
+      [NPC：红毛]你说什么？是想在这里和老子打架么？刚好把你手机抢过来瞧瞧！
+      [旁白]老板一边帮林芷萱结账一边不耐烦道，
+      [NPC：老板]这位客人，麻烦不要在店里闹事。
+      [NPC：红毛]你也活腻了是不是？
+      [旁白]老板瞬间闭了嘴。
+    跳转到下一场景
+->选项：嗐，还能聊什么。我能聊的内容，像哥们你这么帅的人不应该早知道了么？
+    AI标签：圆滑、理性、稳重、机敏、有大局观、有趣
+    NPC目睹：？？？
+    设置flag_clear=true
+    剧情：
+      [旁白]我看着手机上提示的23：47，手心早已布满汗水。\n\n如果我没能在零点之前将一切都准备好，我很有可能活不过第一天。
+      [NPC：红毛]拍马屁老子见多了。还拿这蠢话术骗谁呢！？把你手机交出来！
+      [旁白]老板一边帮林芷萱结账一边不耐烦道，
+      [NPC：老板]这位客人，麻烦不要在店里闹事。
+      [NPC：红毛]你也活腻了是不是？
+      [旁白]老板瞬间闭了嘴。
+    跳转到下一场景
+### [CG]林芷萱离开
+图片：无（屏幕全黑）
+效果：淡入
+[旁白]林芷萱结完账，趁乱逃离了店铺。
+若flag_clear=true：
+  [旁白]已经没多少时间了，我得赶紧把他们支开。这人要抢我手机，我估计在场没人会主动帮我。\n\n我得自救。\n\n我注意到最先结账的男生一言不发地藏匿在角落里并没有离开，而是冷漠地看着这场闹戏。\n\n他头上宽大的兜帽在他脸上投下一片阴影，我看不清他的脸。但好在他身着作战服，隐隐勾勒出肌肉的轮廓，我看得出来这人很能打。
+  [主角]（话说，他怎么有时间买作战服的？）
+  [旁白]算了，这不是重点。
+  [旁白]我冲那个男生喊道，
+  [主角说]大哥，你快来替我收拾他！他抢我手机！
+  [旁白]对付混混，就该用魔法打败魔法。\n\n角落里的男生抬起头，眼中多了一丝惊愕。\n\n红毛慌了神，
+  [NPC：红毛]什么？
+  [旁白]太好了，他的注意力不在我身上了。
+  ->NPC观念更新：？？？
+其他：
+  [旁白]我正要对他出手，却有一只强有力的臂弯拦住了我。
+  [主角说]？
+  [NPC:？？？]你走。
+  [旁白]红毛慌了神，
+  [NPC：红毛]什么？
+  [旁白]我愣了一下，随即意识到他是在为我解围。
+[旁白]我赶紧把商品递给老板，他扫码的过程都战战兢兢的，生怕那红毛又纠缠回来。\n\n我偷瞄那边的情况。那男生一言不发，走到了红毛面前，我甚至都能感受到他身上散发的强烈杀气。
+[NPC：红毛]你……你不是走了吗？
+[主角]（嗯？看来他俩之前认识？诶，两个都不好惹，我还是快点溜吧。）
+[旁白]我收好水果刀，路过两人时又谄媚地说了句“谢谢大哥”，就骑上小电驴一骑绝尘。
+### [CG]参赛前夕
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\前兆\书桌.png
+效果：淡入
+[旁白]回到寝室已经是23：55分了。
+[主角]（极限五分钟！）
+[旁白]我火急火燎地收拾行囊，柜子都来不及关上。
+[NPC：室友A]我靠……真·高速小马达。
+[旁白]我顾不上和室友顶嘴。开赛前30妙，我终于换好了一身运动装，背上了行囊。
+切换图片：全黑，屏幕中间显示电子数字00:00
+[旁白]我眼前一黑，下一秒就置身于仿佛一个小型宇宙的空间中。
+切换到下一场景
+### [地图]游戏开始
+切换地图底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\waiting\进入界面.png
+效果：淡入
+出生点：地图中央，播放：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
+冻结主角：是
+[旁白]四周数字如星辰点点，星云摇曳，而我漂浮于宇宙中，并无失重感，甚至能正常呼吸。
+[NPC：系统]欢迎参赛者来到“人类进化计划”候场区~
+（第一章完）
 ## 章末备注
 
 ### 宿舍第一幕出生点

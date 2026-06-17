@@ -8,32 +8,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    const { width, height } = this.cameras.main;
-
-    // 进度条
-    const progressBox = this.add.graphics();
-    progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
-
-    const progressBar = this.add.graphics();
-    const loadingText = this.add
-      .text(width / 2, height / 2 - 50, "加载中...", {
-        fontSize: "20px",
-        color: "#ffffff",
-      })
-      .setOrigin(0.5);
-
-    this.load.on("progress", (value: number) => {
-      progressBar.clear();
-      progressBar.fillStyle(0x00ff00, 1);
-      progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
-    });
-
-    this.load.on("complete", () => {
-      progressBar.destroy();
-      progressBox.destroy();
-      loadingText.destroy();
-    });
+    this.cameras.main.setBackgroundColor("#000000");
 
     // 加载地图 JSON
     for (const map of Object.values(AssetManifest.maps)) {
@@ -64,37 +39,49 @@ export class PreloadScene extends Phaser.Scene {
     // 加载角色精灵图帧（从GIF提取的PNG序列帧）
     // 目录结构：/assets/sprites/frames/{角色}_frames/{角色}_frames_{动作方向}/frame_XX.png
     // 帧键名：{角色}_frames_{动作方向}_{帧号}  (如 yps_frames_left_0)
-    const charDirs = ["ly_frames", "yps_frames", "cyh_frames", "roommateA_frames", "roommateB_frames"];
-    // 跑步方向（每个方向6帧，帧号00-05）
     const runDirs = ["left", "right", "front", "back"];
-    // 坐下/站立方向（每个方向1帧，帧号00）
-    const staticDirs = [
-      "sit_left", "sit_right", "sit_front", "sit_back",
-      "stand_left", "stand_right", "stand_front", "stand_back",
-    ];
+    const directions = ["left", "right", "front", "back"];
 
-    for (const charDir of charDirs) {
-      const baseDir = `assets/sprites/frames/${charDir}`;
-      // 跑步帧
-      for (const dir of runDirs) {
-        const subDir = `${charDir}_${dir}`;
-        for (let i = 0; i < 6; i++) {
-          const frameKey = `${charDir}_${dir}_${i}`;
-          const filePath = `${baseDir}/${subDir}/frame_${i.toString().padStart(2, "0")}.png`;
-          this.load.image(frameKey, filePath);
+    for (const character of AssetManifest.frames) {
+      const baseDir = `/assets/sprites/frames/${character.key}`;
+      const folderPrefix = "folderPrefix" in character ? character.folderPrefix : character.key;
+      const directoryOverrides = "directoryOverrides" in character ? character.directoryOverrides : undefined;
+      const frameFileOverrides = "frameFileOverrides" in character ? character.frameFileOverrides : undefined;
+      const runFrameStartOverrides = "runFrameStartOverrides" in character ? character.runFrameStartOverrides : undefined;
+
+      if ("run" in character && character.run) {
+        for (const direction of runDirs) {
+          const subDir = `${folderPrefix}_${direction}`;
+          const frameStart = runFrameStartOverrides?.[direction as keyof typeof runFrameStartOverrides];
+          for (let index = 0; index < 6; index++) {
+            const frameFile = frameStart === undefined
+              ? `frame_${index.toString().padStart(2, "0")}.png`
+              : `frame_${(frameStart + index).toString().padStart(3, "0")}.png`;
+            this.load.image(
+              `${character.key}_${direction}_${index}`,
+              `${baseDir}/${subDir}/${frameFile}`
+            );
+          }
         }
       }
-      // 坐下/站立帧
-      for (const dir of staticDirs) {
-        const subDir = `${charDir}_${dir}`;
-        const frameKey = `${charDir}_${dir}_0`;
-        const filePath = `${baseDir}/${subDir}/frame_00.png`;
-        this.load.image(frameKey, filePath);
+
+      for (const action of ["sit", "stand"] as const) {
+        const hasAction = action === "sit"
+          ? ("sit" in character && character.sit)
+          : ("stand" in character && character.stand);
+        if (!hasAction) continue;
+        for (const direction of directions) {
+          const actionDirection = `${action}_${direction}`;
+          const override = directoryOverrides?.[actionDirection as keyof typeof directoryOverrides];
+          const subDir = override || `${folderPrefix}_${actionDirection}`;
+          const frameFile = frameFileOverrides?.[actionDirection as keyof typeof frameFileOverrides] || "frame_00.png";
+          this.load.image(
+            `${character.key}_${actionDirection}_0`,
+            `${baseDir}/${subDir}/${frameFile}`
+          );
+        }
       }
     }
-
-    // 修复 roommateB 的 stand_back 目录命名异常（磁盘上是 roommateB2_frames_stand_back）
-    this.load.image("roommateB_frames_stand_back_0", "assets/sprites/frames/roommateB_frames/roommateB2_frames_stand_back/frame_00.png");
 
     // NPC 精灵帧已在上面 charDirs 中统一加载，不再使用静态图片
 

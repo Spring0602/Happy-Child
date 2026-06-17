@@ -16,11 +16,56 @@ import { GameMenu } from "./components/GameMenu";
 import { Backlog, type DialogLogEntry } from "./components/Backlog";
 import { PersonalityPortrait } from "./components/PersonalityPortrait";
 import { gameBridge } from "./game/bridge/GameBridge";
+import { MapRegistry } from "./game/config/mapRegistry";
 import { analyzeChoice, generateNpcDialogue, judgeEnding } from "./services/aiClient";
 import type { AITrace, Choice, GameState } from "./types/game";
 import "./styles/global.css";
 
 type GamePhase = "menu" | "playing";
+
+function normalizeLoadedState(loaded: GameState): {
+  state: GameState;
+  mapId: string;
+  spawnId: string;
+} {
+  const mapId = loaded.currentMapId && MapRegistry[loaded.currentMapId]
+    ? loaded.currentMapId
+    : initialGameState.currentMapId;
+  return {
+    state: { ...loaded, currentMapId: mapId },
+    mapId,
+    spawnId: MapRegistry[mapId].defaultSpawn,
+  };
+}
+
+function restoreDynamicMapActors(loaded: GameState) {
+  setTimeout(() => {
+    if (loaded.currentMapId !== "shop") return;
+
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_3", npcKey: "npc_male_assistant", scale: 0.75, framesPrefix: "shop_assistant_male_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_male_assistant", direction: "back" } });
+
+    const confrontationScenes = ["ch1_shop_confrontation", "ch1_shop_confront_", "ch1_shop_lzx_leave"];
+    const isConfrontation = confrontationScenes.some(prefix => loaded.currentSceneId.startsWith(prefix));
+    if (isConfrontation) {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_2", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_mysterious", direction: "right" } });
+      return;
+    }
+
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_6", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+    if (
+      loaded.currentSceneId.startsWith("ch1_shop_exchange_") &&
+      loaded.currentSceneId !== "ch1_shop_exchange_1"
+    ) {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_lzx", direction: "back" } });
+    }
+  }, 800);
+}
 
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
@@ -120,6 +165,11 @@ export default function App() {
   function handleNewGame() {
     clearSave();
     dispatch({ type: "RESET" });
+    gameBridge.sendToPhaser({
+      type: "CHANGE_MAP",
+      mapId: initialGameState.currentMapId,
+      spawnId: MapRegistry[initialGameState.currentMapId].defaultSpawn,
+    });
     setDialogHistory([]);
     prevSceneIdRef.current = "";
     setGamePhase("playing");
@@ -127,8 +177,10 @@ export default function App() {
 
   // ── 读取存档进入游戏 ──
   function handleLoadGame(loaded: GameState) {
-    dispatch({ type: "LOAD", state: loaded });
-    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: loaded.currentMapId, spawnId: "spawn_spawn_52" });
+    const normalized = normalizeLoadedState(loaded);
+    dispatch({ type: "LOAD", state: normalized.state });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: normalized.mapId, spawnId: normalized.spawnId });
+    restoreDynamicMapActors(normalized.state);
     setDialogHistory([]);
     prevSceneIdRef.current = "";
     setGamePhase("playing");
@@ -165,6 +217,11 @@ export default function App() {
       return;
     }
 
+    // 7.2 厨房用品店：圆滑应对 → 设 flag_clear 标记后续分支
+    if (choice.id === "ch1_shop_smooth_talk") {
+      dispatch({ type: "SET_FLAG", flag: "flag_clear" });
+    }
+
     // AI分析静默运行
     if (choice.needAIAnalysis) {
       try {
@@ -187,10 +244,20 @@ export default function App() {
   function handleNext(nextSceneId: string) {
     if (!nextSceneId) {
       const currentScene = dialogScene;
+      if (currentScene?.id === "ch1_game_start_system") {
+        dispatch({ type: "DIALOG_END" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        return;
+      }
       if (currentScene?.onCgEnd) {
         if (currentScene.onCgEnd === "enter_dormitory_playable") {
           dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_chair", position: { x: 0, y: 0 } });
           gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_chair" });
+          setTimeout(() => {
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "player_sit_down" });
+            dispatch({ type: "DIALOG_START", sceneId: "dorm_cg_end_think" });
+          }, 600);
+          dispatch({ type: "DIALOG_END" });
           return;
         }
         if (currentScene.onCgEnd === "dorm_return_chair_right") {
@@ -244,21 +311,6 @@ export default function App() {
     // 检测 CG 结束后的场景转换效果
     const nextScene = scenes[nextSceneId];
     if (nextScene?.onCgEnd) {
-      if (nextScene.onCgEnd === "enter_dormitory") {
-        dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_desk", position: { x: 0, y: 0 } });
-        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_desk" });
-        setTimeout(() => {
-          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "darken_overlay", payload: { alpha: 0.55 } });
-          setTimeout(() => {
-            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spotlight_player" });
-          }, 200);
-          setTimeout(() => {
-            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "player_sit_down" });
-          }, 400);
-        }, 800);
-        dispatch({ type: "GO_NEXT", nextSceneId });
-        return;
-      }
       if (nextScene.onCgEnd === "enter_balcony") {
         dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77", position: { x: 0, y: 0 } });
         gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77" });
@@ -280,6 +332,7 @@ export default function App() {
           gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "player_sit_down" });
           dispatch({ type: "DIALOG_START", sceneId: "dorm_cg_end_think" });
         }, 600);
+        dispatch({ type: "DIALOG_END" });
         return;
       }
       if (nextScene.onCgEnd === "dorm_enter_explore") {
@@ -302,23 +355,6 @@ export default function App() {
     }
 
     // 剧情事件触发
-    if (nextSceneId === "ch1_chenyuhao") {
-      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_screen", payload: { duration: 200 } });
-      setTimeout(() => {
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "remove_dark_overlay" });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "player_stand_up" });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "teleport_to_spawn", payload: { spawnId: "spawn_stand_by_chair" } });
-      }, 300);
-      dispatch({ type: "GO_NEXT", nextSceneId });
-      return;
-    }
-
-    if (nextSceneId === "ch1_afternoon") {
-      dispatch({ type: "DIALOG_END" });
-      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
-      return;
-    }
-
     if (nextSceneId === "balcony_night_narrate_2") {
       gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
       dispatch({ type: "GO_NEXT", nextSceneId });
@@ -371,6 +407,12 @@ export default function App() {
       return;
     }
 
+    if (nextSceneId === "ch1_shop_exchange_2") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_lzx", direction: "back" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
     // 第四幕入口
     if (nextSceneId === "dorm_act4_return_dorm") {
       dispatch({ type: "CHANGE_MAP", mapId: "dormitory_act4", spawnId: "spawn_spawn_4", position: { x: 0, y: 0 } });
@@ -417,6 +459,86 @@ export default function App() {
       return;
     }
 
+    // ── 7.1 校园小卖部：进入 ──
+    if (nextSceneId === "ch1_shop_school_enter") {
+      dispatch({ type: "CHANGE_MAP", mapId: "shop_school", spawnId: "spawn_shop_school_entrance", position: { x: 0, y: 0 } });
+      gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "shop_school", spawnId: "spawn_shop_school_entrance" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_47", npcKey: "npc_female_assistant", scale: 0.75, framesPrefix: "shop_assistant_female_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_female_assistant", direction: "back" } });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+      }, 600);
+      dispatch({ type: "DIALOG_END" });
+      return;
+    }
+
+    // ── 7.2 厨房用品店：进入 ──
+    if (nextSceneId === "ch1_shop_enter") {
+      dispatch({ type: "CHANGE_MAP", mapId: "shop", spawnId: "spawn_spawn_1", position: { x: 0, y: 0 } });
+      gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "shop", spawnId: "spawn_spawn_1" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_3", npcKey: "npc_male_assistant", scale: 0.75, framesPrefix: "shop_assistant_male_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_6", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_male_assistant", direction: "back" } });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+      }, 600);
+      dispatch({ type: "DIALOG_END" });
+      return;
+    }
+
+    // ── 7.2 厨房用品店：CG过渡回到地图挑衅 ──
+    if (nextSceneId === "ch1_shop_confrontation") {
+      // 玩家传送到 spawn_spawn_6，面朝上（stand_back）
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_screen", payload: { duration: 180 } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "teleport_to_spawn", payload: { spawnId: "spawn_spawn_6" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "up" } });
+      // NPC 重排到挑衅位置
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_2", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_mysterious", direction: "right" } });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    // ── 7.2 厨房用品店：林芷萱离开后分支路由 ──
+    if (nextSceneId === "ch1_shop_lzx_leave_branch") {
+      const isClear = state.flags["flag_clear"];
+      const branchId = isClear ? "ch1_shop_clear_smooth_path" : "ch1_shop_hard_path";
+      dispatch({ type: "GO_NEXT", nextSceneId: branchId });
+      return;
+    }
+
+    // ── 第一章结尾：进入人类进化计划候场区 ──
+    if (nextSceneId === "ch1_game_start") {
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "CHANGE_MAP", mapId: "waiting", spawnId: "spawn_waiting_default", position: { x: 0, y: 0 } });
+      gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "waiting", spawnId: "spawn_waiting_default" });
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+      }, 600);
+      return;
+    }
+
+    // ── 7.1 校园小卖部：告别挥手 → 播放 stand_front 动画 ──
+    if (dialogScene?.id === "ch1_shop_school_farewell") {
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "down" } });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "GO_NEXT", nextSceneId });
+      }, 600);
+      dispatch({ type: "DIALOG_END" });
+      return;
+    }
+
     dispatch({ type: "GO_NEXT", nextSceneId });
   }
 
@@ -449,6 +571,12 @@ export default function App() {
   function handleCloseDialog() {
     const currentScene = dialogScene;
 
+    if (currentScene?.id === "ch1_game_start_system") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      return;
+    }
+
     if (currentScene?.id === "balcony_night_narrate_2") {
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
@@ -476,6 +604,81 @@ export default function App() {
       dispatch({ type: "DIALOG_END" });
       dispatch({ type: "SET_FLAG", flag: "dorm_act3" });
       dispatch({ type: "DIALOG_START", sceneId: "dorm_act3_reflection" });
+      return;
+    }
+
+    // ── 7.1 校园小卖部：购买阶段交互收集 ──
+    if (state.flags["shop_school_buying"]) {
+      const itemFlagMap: Record<string, string> = {
+        "shop_school_interact_drink": "shop_drink",
+        "shop_school_interact_food": "shop_food",
+        "shop_school_interact_chips": "shop_chips",
+        "shop_school_interact_meat": "shop_meat",
+        "shop_school_interact_fruit": "shop_fruit",
+      };
+      if (itemFlagMap[currentScene?.id ?? ""]) {
+        dispatch({ type: "SET_FLAG", flag: itemFlagMap[currentScene!.id] });
+        const updatedFlags = { ...state.flags, [itemFlagMap[currentScene!.id]]: true };
+        const allCollected = ["shop_drink", "shop_food", "shop_chips", "shop_meat", "shop_fruit"].every(f => updatedFlags[f]);
+        if (allCollected) {
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_END" });
+          setTimeout(() => {
+            dispatch({ type: "DIALOG_START", sceneId: "ch1_shop_school_buy_done" });
+          }, 300);
+          return;
+        }
+      }
+    }
+
+    // ── 7.1 校园小卖部：进入后解放玩家 ──
+    if (currentScene?.id === "ch1_shop_school_enter_narrate") {
+      dispatch({ type: "SET_FLAG", flag: "shop_school_buying" });
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
+
+    // ── 7.1 校园小卖部：买完 → 进入结账阶段 ──
+    if (currentScene?.id === "ch1_shop_school_buy_done") {
+      dispatch({ type: "SET_FLAG", flag: "shop_school_checkout_phase" });
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
+
+    // ── 7.1 校园小卖部：告别挥手 → 播放 stand_front 动画 ──
+    if (currentScene?.id === "ch1_shop_school_farewell") {
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "down" } });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "GO_NEXT", nextSceneId: currentScene.nextSceneId! });
+      }, 600);
+      dispatch({ type: "DIALOG_END" });
+      return;
+    }
+
+    // ── 7.1 校园小卖部：结账完成 → 进入离开阶段 ──
+    if (currentScene?.id === "ch1_shop_school_checkout_think") {
+      dispatch({ type: "SET_FLAG", flag: "shop_school_leave_phase" });
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
+
+    // ── 7.2 厨房用品店：进入后解放玩家 ──
+    if (currentScene?.id === "ch1_shop_enter_weapon") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
+
+    // ── 7.2 厨房用品店：获得水果刀 ──
+    if (currentScene?.id === "ch1_shop_interact_knife") {
+      dispatch({ type: "SET_FLAG", flag: "shop_fruit_knife" });
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
       return;
     }
 
@@ -517,6 +720,31 @@ export default function App() {
         dispatch({ type: "DIALOG_END" });
         return;
       }
+      // ── 7.2 厨房用品店：排队 → 开始线索交换 ──
+      if (currentScene.onCgEnd === "shop_exchange_start") {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_screen", payload: { duration: 180 } });
+        // 玩家传送到 spawn_spawn_4，面朝前（stand_front）
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "teleport_to_spawn", payload: { spawnId: "spawn_spawn_4" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "down" } });
+        // NPC 重排到交换线索位置（spawn_npc 现在支持覆盖已存在的 NPC）
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_5", npcKey: "npc_lzx", scale: 0.75, framesPrefix: "lzx_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_6", npcKey: "npc_delinquent", scale: 0.75, framesPrefix: "delinquent teenagers_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_7", npcKey: "npc_mysterious", scale: 0.75, framesPrefix: "？？？_frames" } });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_END" });
+        setTimeout(() => {
+          dispatch({ type: "DIALOG_START", sceneId: "ch1_shop_exchange_1" });
+        }, 400);
+        return;
+      }
+      // ── 7.2 厨房用品店：对峙结束 → 林芷萱离开CG ──
+      if (currentScene.onCgEnd === "shop_lzx_leave") {
+        dispatch({ type: "DIALOG_END" });
+        setTimeout(() => {
+          dispatch({ type: "DIALOG_START", sceneId: "ch1_shop_lzx_leave" });
+        }, 300);
+        return;
+      }
     }
     dispatch({ type: "DIALOG_END" });
     gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
@@ -539,6 +767,55 @@ export default function App() {
       }
     }
 
+    // ── 7.1 校园小卖部：阶段重定向 ──
+    const shopSchoolCheckoutPhase = state.flags["shop_school_checkout_phase"];
+    const shopSchoolLeavePhase = state.flags["shop_school_leave_phase"];
+
+    if (shopSchoolLeavePhase) {
+      const leaveRedirect: Record<string, string> = {
+        "shop_school_interact_drink": "shop_school_leave_drink",
+        "shop_school_interact_food": "shop_school_leave_food",
+        "shop_school_interact_chips": "shop_school_leave_chips",
+        "shop_school_interact_meat": "shop_school_leave_meat",
+        "shop_school_interact_fruit": "shop_school_leave_fruit",
+        "shop_school_interact_exit": "ch1_shop_school_farewell",
+        "shop_school_interact_checkout": "shop_school_leave_checkout",
+        "shop_school_interact_floor": "shop_school_leave_floor",
+      };
+      if (leaveRedirect[actualSceneId]) {
+        dispatch({ type: "DIALOG_START", sceneId: leaveRedirect[actualSceneId] });
+        return;
+      }
+    } else if (shopSchoolCheckoutPhase) {
+      const checkoutRedirect: Record<string, string> = {
+        "shop_school_interact_drink": "shop_school_checkout_drink",
+        "shop_school_interact_food": "shop_school_checkout_food",
+        "shop_school_interact_chips": "shop_school_checkout_chips",
+        "shop_school_interact_meat": "shop_school_checkout_meat",
+        "shop_school_interact_fruit": "shop_school_checkout_fruit",
+        "shop_school_interact_exit": "shop_school_checkout_exit",
+        "shop_school_interact_checkout": "ch1_shop_school_checkout_done",
+        "shop_school_interact_floor": "shop_school_checkout_floor",
+      };
+      if (checkoutRedirect[actualSceneId]) {
+        dispatch({ type: "DIALOG_START", sceneId: checkoutRedirect[actualSceneId] });
+        return;
+      }
+    }
+
+    // ── 7.2 厨房用品店：空 sceneId trigger 名称映射 ──
+    const shopTriggerMap: Record<string, string> = {
+      "trigger_8": state.flags["shop_fruit_knife"] ? "ch1_shop_interact_queue" : "ch1_shop_interact_queue_no_weapon",
+      "trigger_9": "ch1_shop_interact_knife",
+      "trigger_10": "ch1_shop_interact_spatula",
+      "trigger_11": "ch1_shop_interact_cleaver",
+      "trigger_12": "ch1_shop_interact_pan",
+    };
+    if (state.currentMapId === "shop" && shopTriggerMap[actualSceneId]) {
+      dispatch({ type: "DIALOG_START", sceneId: shopTriggerMap[actualSceneId] });
+      return;
+    }
+
     const scene = scenes[actualSceneId];
     if (scene?.onCgEnd) {
       if (scene.onCgEnd === "enter_balcony") {
@@ -557,7 +834,7 @@ export default function App() {
       }
     }
     dispatch({ type: "DIALOG_START", sceneId: actualSceneId });
-  }, [state.flags]);
+  }, [state.flags, state.currentMapId]);
 
   // 当前对话预览（用于存档）
   const dialogPreview = dialogScene
@@ -632,7 +909,12 @@ export default function App() {
           state={state}
           onClose={() => setGameMenuOpen(false)}
           onLoadState={(loaded) => {
-            dispatch({ type: "LOAD", state: loaded });
+            const normalized = normalizeLoadedState(loaded);
+            dispatch({ type: "LOAD", state: normalized.state });
+            gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: normalized.mapId, spawnId: normalized.spawnId });
+            restoreDynamicMapActors(normalized.state);
+            setDialogHistory([]);
+            prevSceneIdRef.current = "";
             setGameMenuOpen(false);
           }}
           onRestart={handleRestart}

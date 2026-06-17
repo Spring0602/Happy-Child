@@ -1,14 +1,14 @@
 {
   "compressionlevel": -1,
-  "height": 30,
+  "height": 40,
   "infinite": false,
   "layers": [
-    { "id": 1, "name": "ground", "type": "imagelayer", "image": "进入界面.png", "x": 0, "y": 0 },
+    { "id": 1, "name": "ground", "type": "imagelayer", "image": "校门白天.png", "x": 0, "y": 0 },
     { "id": 2, "name": "collision", "type": "objectgroup", "objects": [] },
     { "id": 3, "name": "furniture_objects", "type": "objectgroup", "objects": [] },
     { "id": 4, "name": "triggers", "type": "objectgroup", "objects": [] },
     { "id": 5, "name": "player_spawn", "type": "objectgroup", "objects": [
-      { "id": 1, "name": "spawn_waiting_default", "x": 820, "y": 454, "width": 32, "height": 32 }
+      { "id": 1, "name": "spawn_gate_default", "x": 407, "y": 1120, "width": 32, "height": 32 }
     ] },
     { "id": 6, "name": "npcs", "type": "objectgroup", "objects": [] },
     { "id": 7, "name": "items", "type": "objectgroup", "objects": [] }
@@ -21,5 +21,5 @@
   "tilewidth": 32,
   "type": "map",
   "version": "1.10",
-  "width": 53
+  "width": 27
 }
