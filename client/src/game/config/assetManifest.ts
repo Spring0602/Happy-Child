@@ -24,6 +24,7 @@ export const AssetManifest = {
         { key: "item_13", path: "/assets/maps/livingroom/客厅物品_sprites/item_13.png" },
         { key: "item_14", path: "/assets/maps/livingroom/客厅物品_sprites/item_14.png" },
         { key: "item_15", path: "/assets/maps/livingroom/客厅物品_sprites/item_15.png" },
+        { key: "item_16", path: "/assets/maps/livingroom/客厅物品_sprites/item_16.png" },
       ],
     },
     bathroom: {
