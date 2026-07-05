@@ -78,6 +78,7 @@ export class MapScene extends Phaser.Scene {
 
       // === 1. 铺地面底图 ===
       this.groundImage = this.add.image(0, 0, entry.groundKey).setOrigin(0, 0).setDepth(0);
+      this.groundImage.setDisplaySize(entry.width, entry.height);
 
       // === 2. 解析 tilemap JSON（仅用于读取对象层） ===
       // 关键修复：dormitory 等 map JSON 没有 tilesets 字段，Phaser make.tilemap 内部
@@ -280,8 +281,18 @@ export class MapScene extends Phaser.Scene {
               offCanvas.width = bw;
               offCanvas.height = bh;
               const offCtx = offCanvas.getContext('2d')!;
-              // 从底图裁剪包围盒区域
-              offCtx.drawImage(groundImg, minX, minY, bw, bh, 0, 0, bw, bh);
+              const sourceWidth = groundImg.naturalWidth || groundImg.width;
+              const sourceHeight = groundImg.naturalHeight || groundImg.height;
+              const sourceScaleX = sourceWidth / entry.width;
+              const sourceScaleY = sourceHeight / entry.height;
+              const sourceX = minX * sourceScaleX;
+              const sourceY = minY * sourceScaleY;
+              const sourceW = bw * sourceScaleX;
+              const sourceH = bh * sourceScaleY;
+
+              // 从底图裁剪包围盒区域：map.json 使用地图显示坐标，
+              // 但底图文件可能是更高分辨率，需要换算到原图像素坐标。
+              offCtx.drawImage(groundImg, sourceX, sourceY, sourceW, sourceH, 0, 0, bw, bh);
 
               // 应用多边形裁剪（destination-in 保留多边形内部）
               offCtx.globalCompositeOperation = 'destination-in';

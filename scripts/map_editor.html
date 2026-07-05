@@ -152,6 +152,7 @@ const ca = $('ca');
 
 // ── 状态 ──────────────────────────────
 let baseImg = null, baseW = 0, baseH = 0;
+let mapSizeFromJson = false;
 let scale = 1, minSc = 0.05, maxSc = 8;
 let currentMode = 'collision'; // collision | occlusion | trigger | spawn
 
@@ -267,14 +268,18 @@ function onBaseMapSelected(ev){
   const f = ev.target.files[0]; if(!f) return;
   const u = URL.createObjectURL(f), im = new Image();
   im.onload = ()=>{
-    baseImg = im; baseW = im.width; baseH = im.height;
+    baseImg = im;
+    if(!mapSizeFromJson){
+      baseW = im.width;
+      baseH = im.height;
+    }
     $('ground-file').value = f.name;
     // 初始化撤销栈
     undoStack = []; undoIndex = -1;
     saveState();
     fitView();
-    log('✅ 底图: '+f.name+' ('+baseW+'×'+baseH+'px)', 'o');
-    $('stmsg').textContent = '底图已加载: '+f.name+' ('+baseW+'×'+baseH+')';
+    log('✅ 底图: '+f.name+' (原图 '+im.width+'×'+im.height+'px，编辑坐标 '+baseW+'×'+baseH+')', 'o');
+    $('stmsg').textContent = '底图已加载: '+f.name+' (编辑坐标 '+baseW+'×'+baseH+')';
   };
   im.src = u;
 }
@@ -475,12 +480,16 @@ function drawOcclusion(obj, isSel){
   // 用 clip 限制绘制区域为多边形内部
   ctx.clip();
   
-  // 从底图裁剪对应区域绘制（源坐标 = 画布坐标 / scale → 原图坐标）
+  // 从底图裁剪对应区域绘制。
+  // 注意：baseW/baseH 是 map.json 的编辑坐标尺寸；baseImg 可能是更高分辨率原图。
+  // 因此源坐标必须从地图坐标换算到原图像素坐标，否则会裁到目标左上侧的错误内容。
   if(baseImg){
-    const srcX = obj.x + bounds.minX;
-    const srcY = obj.y + bounds.minY;
-    const srcW = bounds.maxX - bounds.minX;
-    const srcH = bounds.maxY - bounds.minY;
+    const sourceScaleX = baseImg.naturalWidth / baseW;
+    const sourceScaleY = baseImg.naturalHeight / baseH;
+    const srcX = (obj.x + bounds.minX) * sourceScaleX;
+    const srcY = (obj.y + bounds.minY) * sourceScaleY;
+    const srcW = (bounds.maxX - bounds.minX) * sourceScaleX;
+    const srcH = (bounds.maxY - bounds.minY) * sourceScaleY;
     // drawImage 从底图原始坐标裁剪对应矩形区域，拉伸填充到画布多边形包围盒
     ctx.drawImage(baseImg, srcX, srcY, srcW, srcH, sx, sy, sw, sh);
   }
@@ -1215,6 +1224,7 @@ function onMapJSONSelected(ev){
       if(groundLayer){
         baseW = groundLayer.width || data.width * 32;
         baseH = groundLayer.height || data.height * 32;
+        mapSizeFromJson = true;
       }
       
       selectedIdx = -1;

@@ -1,90 +1,614 @@
 {
   "compressionlevel": -1,
-  "height": 20,
+  "height": 24,
   "infinite": false,
   "layers": [
     {
+      "id": 1,
       "name": "ground",
       "type": "imagelayer",
       "image": "父母房间.png",
       "x": 0,
       "y": 0,
-      "id": 1,
-      "visible": true,
-      "opacity": 1
+      "width": 1408,
+      "height": 768
     },
     {
-      "draworder": "topdown",
       "id": 2,
       "name": "collision",
       "type": "objectgroup",
-      "visible": true,
-      "opacity": 1,
-      "objects": [
-        { "id": 1, "name": "wall_top", "type": "collision", "x": 0, "y": 0, "width": 960, "height": 32 },
-        { "id": 2, "name": "wall_bottom", "type": "collision", "x": 0, "y": 608, "width": 960, "height": 32 },
-        { "id": 3, "name": "wall_left", "type": "collision", "x": 0, "y": 0, "width": 32, "height": 640 },
-        { "id": 4, "name": "wall_right", "type": "collision", "x": 928, "y": 0, "width": 32, "height": 640 }
-      ]
-    },
-    {
       "draworder": "topdown",
-      "id": 3,
-      "name": "player_spawn",
-      "type": "objectgroup",
-      "visible": true,
-      "opacity": 1,
-      "objects": [
-        { "id": 1, "name": "spawn_bedroom_parents_door", "type": "spawn", "x": 480, "y": 560, "width": 32, "height": 48 }
-      ]
-    },
-    {
-      "draworder": "topdown",
-      "id": 4,
-      "name": "triggers",
-      "type": "objectgroup",
-      "visible": true,
-      "opacity": 1,
       "objects": [
         {
-          "id": 1, "name": "door_livingroom", "type": "door",
-          "x": 440, "y": 560, "width": 80, "height": 80,
+          "id": 1,
+          "name": "collision_1",
+          "x": 145,
+          "y": 13,
+          "width": 104.3342649724188,
+          "height": 732.8240039729415
+        },
+        {
+          "id": 2,
+          "name": "collision_2",
+          "x": 189,
+          "y": 51,
+          "width": 94.39766830837891,
+          "height": 350.2650324074059
+        },
+        {
+          "id": 3,
+          "name": "collision_3",
+          "x": 261,
+          "y": 53,
+          "width": 47.198834154189456,
+          "height": 317.9710932492763
+        },
+        {
+          "id": 4,
+          "name": "collision_4",
+          "x": 313,
+          "y": 53,
+          "width": 111.78671247044872,
+          "height": 293.12960158917656
+        },
+        {
+          "id": 5,
+          "name": "collision_5",
+          "x": 138,
+          "y": 1,
+          "width": 1085.7685680650322,
+          "height": 298.65613568883924
+        },
+        {
+          "id": 6,
+          "name": "collision_6",
+          "x": 142,
+          "y": 710,
+          "width": 789.9036112144065,
+          "height": 36.28532489677491
+        },
+        {
+          "id": 7,
+          "name": "collision_7",
+          "x": 1041,
+          "y": 713,
+          "width": 187.00898216030123,
+          "height": 30.702967220348
+        },
+        {
+          "id": 8,
+          "name": "collision_8",
+          "x": 934,
+          "y": 732,
+          "width": 111.64715352853796,
+          "height": 11.164715352853818
+        },
+        {
+          "id": 9,
+          "name": "collision_9",
+          "x": 1180,
+          "y": -9,
+          "width": 44.658861411415046,
+          "height": 750
+        },
+        {
+          "id": 10,
+          "name": "collision_10",
+          "x": 250,
+          "y": 554,
+          "width": 10.884553497848287,
+          "height": 52.60867523960019
+        },
+        {
+          "id": 11,
+          "name": "collision_11",
+          "x": 484,
+          "y": 630,
+          "width": 328.35069718509067,
+          "height": 117.91599622669003
+        },
+        {
+          "id": 12,
+          "name": "collision_12",
+          "x": 442,
+          "y": 242,
+          "width": 74.37778223529682,
+          "height": 90.70461248206922
+        },
+        {
+          "id": 13,
+          "name": "collision_13",
+          "x": 785,
+          "y": 242,
+          "width": 81.63415123386221,
+          "height": 90.70461248206922
+        },
+        {
+          "id": 14,
+          "name": "collision_14",
+          "x": 892,
+          "y": 124,
+          "width": 157.82602571880045,
+          "height": 214.06288545768342
+        },
+        {
+          "id": 15,
+          "name": "collision_15",
+          "x": 983,
+          "y": 383,
+          "width": 90.70461248206925,
+          "height": 83
+        },
+        {
+          "id": 16,
+          "name": "collision_16",
+          "x": 1019,
+          "y": 280,
+          "width": 151,
+          "height": 154
+        },
+        {
+          "id": 17,
+          "name": "collision_17",
+          "x": 1119,
+          "y": 469,
+          "width": 59.86504423816564,
+          "height": 226.76153120517313
+        },
+        {
+          "id": 18,
+          "name": "collision_19",
+          "x": 524,
+          "y": 131,
+          "width": 248.52961436225974,
+          "height": 394
+        },
+        {
+          "id": 19,
+          "name": "collision_25",
+          "x": 1182,
+          "y": 113,
+          "width": 60,
+          "height": 364
+        },
+        {
+          "id": 20,
+          "name": "collision_26",
+          "x": 158,
+          "y": 474,
+          "width": 92.55321912013466,
+          "height": 234.810944804786
+        },
+        {
+          "id": 21,
+          "name": "collision_27",
+          "x": 158,
+          "y": 254,
+          "width": 90.83927061790996,
+          "height": 250.23648132480855
+        },
+        {
+          "id": 22,
+          "name": "collision_28",
+          "x": 233,
+          "y": 146,
+          "width": 54.84635207119089,
+          "height": 231.38304780033667
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "occlusion_21",
+          "type": "furniture",
+          "x": 485,
+          "y": 568,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 60,
+              "y": 0
+            },
+            {
+              "x": 263,
+              "y": 2
+            },
+            {
+              "x": 265,
+              "y": 63
+            },
+            {
+              "x": 325,
+              "y": 63
+            },
+            {
+              "x": 325,
+              "y": 98
+            },
+            {
+              "x": 2,
+              "y": 98
+            },
+            {
+              "x": 0,
+              "y": 63
+            },
+            {
+              "x": 60,
+              "y": 62
+            },
+            {
+              "x": 59,
+              "y": 3
+            }
+          ],
           "properties": [
-            { "name": "triggerType", "type": "string", "value": "walk" },
-            { "name": "targetMap", "type": "string", "value": "livingroom" },
-            { "name": "targetSpawn", "type": "string", "value": "spawn_from_bedroom_parents" }
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "occlusion_22",
+          "type": "furniture",
+          "x": 1116,
+          "y": 437,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 74
+            },
+            {
+              "x": 1,
+              "y": 30
+            },
+            {
+              "x": 20,
+              "y": 30
+            },
+            {
+              "x": 20,
+              "y": 1
+            },
+            {
+              "x": 32,
+              "y": 0
+            },
+            {
+              "x": 35,
+              "y": 4
+            },
+            {
+              "x": 35,
+              "y": 16
+            },
+            {
+              "x": 39,
+              "y": 25
+            },
+            {
+              "x": 41,
+              "y": 30
+            },
+            {
+              "x": 62,
+              "y": 29
+            },
+            {
+              "x": 62,
+              "y": 77
+            },
+            {
+              "x": 0,
+              "y": 72
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "occlusion_23",
+          "type": "furniture",
+          "x": 985,
+          "y": 371,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 22
+            },
+            {
+              "x": 30,
+              "y": 1
+            },
+            {
+              "x": 37,
+              "y": 0
+            },
+            {
+              "x": 64,
+              "y": 16
+            },
+            {
+              "x": 1,
+              "y": 23
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "occlusion_24",
+          "type": "furniture",
+          "x": 1044,
+          "y": 254,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 59
+            },
+            {
+              "x": 30,
+              "y": 46
+            },
+            {
+              "x": 32,
+              "y": 29
+            },
+            {
+              "x": 35,
+              "y": 17
+            },
+            {
+              "x": 41,
+              "y": 8
+            },
+            {
+              "x": 52,
+              "y": 0
+            },
+            {
+              "x": 59,
+              "y": 1
+            },
+            {
+              "x": 72,
+              "y": 10
+            },
+            {
+              "x": 88,
+              "y": 23
+            },
+            {
+              "x": 102,
+              "y": 32
+            },
+            {
+              "x": 119,
+              "y": 43
+            },
+            {
+              "x": 123,
+              "y": 70
+            },
+            {
+              "x": 120,
+              "y": 91
+            },
+            {
+              "x": 0,
+              "y": 61
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
           ]
         }
       ]
     },
     {
+      "id": 4,
+      "name": "triggers",
+      "type": "objectgroup",
       "draworder": "topdown",
+      "objects": [
+        {
+          "id": 100,
+          "name": "trigger_29",
+          "x": 341,
+          "y": 319,
+          "width": 62.90020975871266,
+          "height": 50.66961341674073,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "??"
+            }
+          ]
+        },
+        {
+          "id": 101,
+          "name": "trigger_30",
+          "x": 507,
+          "y": 371,
+          "width": 48.92238536788767,
+          "height": 83.86694634495018,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "?"
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "name": "trigger_31",
+          "x": 920,
+          "y": 289,
+          "width": 83.86694634495018,
+          "height": 64.64743780756578,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "??"
+            }
+          ]
+        },
+        {
+          "id": 103,
+          "name": "trigger_32",
+          "x": 1088,
+          "y": 520,
+          "width": 64.64743780756567,
+          "height": 96.09754268692211,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "??"
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "name": "trigger_33",
+          "x": 934,
+          "y": 672,
+          "width": 103.08645488233458,
+          "height": 68.14189390527201,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "????"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": 5,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 200,
+          "name": "spawn_spawn_20",
+          "x": 966,
+          "y": 683,
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    {
+      "id": 6,
       "name": "npcs",
       "type": "objectgroup",
-      "visible": true,
-      "opacity": 1,
+      "draworder": "topdown",
       "objects": []
     },
     {
-      "draworder": "topdown",
-      "id": 6,
+      "id": 7,
       "name": "items",
       "type": "objectgroup",
-      "visible": true,
-      "opacity": 1,
+      "draworder": "topdown",
       "objects": []
     }
   ],
-  "nextlayerid": 7,
-  "nextobjectid": 10,
+  "nextlayerid": 8,
+  "nextobjectid": 251,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",
   "tileheight": 32,
-  "tilesets": [],
   "tilewidth": 32,
   "type": "map",
   "version": "1.10",
-  "width": 30
+  "width": 44
 }
