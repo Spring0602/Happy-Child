@@ -4,12 +4,13 @@ import { getAllSaves, loadSlot, type SaveSlot } from "../engine/save";
 
 interface Props {
   onNewGame: () => void;
+  onStartChapter4?: () => void;
   onLoadGame: (state: GameState) => void;
   onShowPortrait: () => void;
   onExit: () => void;
 }
 
-export function StartMenu({ onNewGame, onLoadGame, onShowPortrait, onExit }: Props) {
+export function StartMenu({ onNewGame, onStartChapter4, onLoadGame, onShowPortrait, onExit }: Props) {
   const [showLoadPanel, setShowLoadPanel] = useState(false);
   const [saves, setSaves] = useState<SaveSlot[]>([]);
 
@@ -46,6 +47,11 @@ export function StartMenu({ onNewGame, onLoadGame, onShowPortrait, onExit }: Pro
             <button className="start-btn" onClick={onNewGame}>
               新的游戏
             </button>
+            {onStartChapter4 && (
+              <button className="start-btn" onClick={onStartChapter4}>
+                从第四章开始
+              </button>
+            )}
             <button className="start-btn" onClick={openLoadPanel}>
               继续游戏
             </button>

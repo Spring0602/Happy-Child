@@ -870,6 +870,81 @@ export class MapScene extends Phaser.Scene {
         }
         break;
       }
+      case "fill_classroom_seats": {
+        const start = (payload?.start as number) ?? 115;
+        const end = (payload?.end as number) ?? 155;
+        const exclude = new Set<string>((payload?.exclude as string[]) || []);
+        const framePrefixes = ((payload?.framesPrefixes as string[]) || ["npc_female1_frames", "npc_male_frames"]);
+        const spawnLayer = this.map.getObjectLayer("player_spawn");
+        if (!spawnLayer) break;
+
+        const npcList = (this.registry.get("npcSprites") as Map<string, {
+          sprite: Phaser.GameObjects.Sprite;
+          zone: Phaser.GameObjects.Zone;
+          framesPrefix: string;
+        }>) || new Map();
+
+        for (const obj of spawnLayer.objects) {
+          const spawnName = obj.name || "";
+          const match = /^spawn_spawn_(\d+)$/.exec(spawnName);
+          if (!match) continue;
+          const index = Number(match[1]);
+          if (index < start || index > end || exclude.has(spawnName)) continue;
+
+          const npcKey = `classroom_seat_${spawnName}`;
+          const existing = npcList.get(npcKey);
+          if (existing) {
+            existing.sprite.destroy();
+            existing.zone.destroy();
+            npcList.delete(npcKey);
+          }
+
+          const framesPrefix = framePrefixes[index % framePrefixes.length];
+          const textureKey = `${framesPrefix}_sit_back_0`;
+          if (!this.textures.exists(textureKey)) continue;
+
+          const cx = obj.x! + (obj.width ?? 32) / 2;
+          const cy = obj.y! + (obj.height ?? 32) / 2;
+          const sprite = this.add.sprite(cx, cy, textureKey).setScale(0.75);
+          sprite.setDepth(cy / (this.map.heightInPixels || 1000));
+          const zone = this.add.zone(cx, cy, 24, 36);
+          this.physics.add.existing(zone, true);
+          this.collisionGroup.add(zone);
+          npcList.set(npcKey, { sprite, zone, framesPrefix });
+        }
+        this.registry.set("npcSprites", npcList);
+        break;
+      }
+      case "move_npc_path": {
+        const npcKey = payload?.npcKey as string;
+        const path = (payload?.path as string[]) || [];
+        if (!npcKey || path.length === 0) break;
+        const npcList = this.registry.get("npcSprites") as Map<string, {
+          sprite: Phaser.GameObjects.Sprite;
+          zone: Phaser.GameObjects.Zone;
+          framesPrefix: string;
+        }> | undefined;
+        const entry = npcList?.get(npcKey);
+        if (!entry) break;
+        this.moveSpriteAlongSpawns(entry.sprite, entry.zone, path, (payload?.speed as number) || 120, () => {
+          const direction = payload?.direction as string | undefined;
+          if (direction) this.handleStoryEvent("set_npc_direction", { npcKey, direction });
+        });
+        break;
+      }
+      case "move_player_path": {
+        const path = (payload?.path as string[]) || [];
+        if (!this.player || path.length === 0) break;
+        this.moveSpriteAlongSpawns(this.player, undefined, path, (payload?.speed as number) || 120, () => {
+          const direction = payload?.direction as string | undefined;
+          if (direction) this.handleStoryEvent("set_player_anim", { direction });
+          if (payload?.freezeAfter) {
+            this.playerFrozen = true;
+            this.playerCtrl?.freeze();
+          }
+        });
+        break;
+      }
       case "set_player_anim": {
         // 设置玩家朝向动画
         const direction = payload?.direction as string;
@@ -1012,6 +1087,64 @@ export class MapScene extends Phaser.Scene {
         });
       },
     });
+  }
+
+  private getSpawnCenter(spawnId: string): { x: number; y: number } | null {
+    const spawnLayer = this.map.getObjectLayer("player_spawn");
+    const spawn = spawnLayer?.objects.find((object) => object.name === spawnId);
+    if (!spawn) return null;
+    return {
+      x: spawn.x! + (spawn.width ?? 32) / 2,
+      y: spawn.y! + (spawn.height ?? 32) / 2,
+    };
+  }
+
+  private moveSpriteAlongSpawns(
+    sprite: Phaser.GameObjects.Sprite,
+    zone: Phaser.GameObjects.Zone | undefined,
+    path: string[],
+    speed: number,
+    onComplete?: () => void
+  ) {
+    const points = path
+      .map((spawnId) => this.getSpawnCenter(spawnId))
+      .filter((point): point is { x: number; y: number } => Boolean(point));
+    if (points.length === 0) {
+      onComplete?.();
+      return;
+    }
+
+    const moveTo = (index: number) => {
+      const point = points[index];
+      const distance = Phaser.Math.Distance.Between(sprite.x, sprite.y, point.x, point.y);
+      const duration = Math.max(80, (distance / speed) * 1000);
+      this.tweens.add({
+        targets: sprite,
+        x: point.x,
+        y: point.y,
+        duration,
+        onUpdate: () => {
+          sprite.setDepth(sprite.y / (this.map.heightInPixels || 1000));
+          if (zone) {
+            zone.setPosition(sprite.x, sprite.y);
+            const body = zone.body as Phaser.Physics.Arcade.StaticBody | undefined;
+            body?.updateFromGameObject();
+          } else {
+            const body = sprite.body as Phaser.Physics.Arcade.Body | undefined;
+            body?.reset(sprite.x, sprite.y);
+          }
+        },
+        onComplete: () => {
+          if (index + 1 < points.length) {
+            moveTo(index + 1);
+          } else {
+            onComplete?.();
+          }
+        },
+      });
+    };
+
+    moveTo(0);
   }
 
   /** 从 Tiled properties 数组提取值 */

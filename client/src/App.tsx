@@ -175,6 +175,20 @@ export default function App() {
     setGamePhase("playing");
   }
 
+  function handleStartChapter4() {
+    clearSave();
+    dispatch({ type: "RESET" });
+    dispatch({ type: "DIALOG_START", sceneId: "ch4_exploration_progress" });
+    gameBridge.sendToPhaser({
+      type: "CHANGE_MAP",
+      mapId: "waiting",
+      spawnId: "spawn_waiting_default",
+    });
+    setDialogHistory([]);
+    prevSceneIdRef.current = "";
+    setGamePhase("playing");
+  }
+
   // ── 读取存档进入游戏 ──
   function handleLoadGame(loaded: GameState) {
     const normalized = normalizeLoadedState(loaded);
@@ -292,6 +306,11 @@ export default function App() {
             dispatch({ type: "DIALOG_START", sceneId: "dorm_act3_notice_pc" });
           }, 800);
           dispatch({ type: "DIALOG_END" });
+          return;
+        }
+        if (currentScene.onCgEnd === "ch4_free_classroom_lunch") {
+          dispatch({ type: "DIALOG_END" });
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
           return;
         }
       }
@@ -524,6 +543,69 @@ export default function App() {
         gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
         dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
       }, 600);
+      return;
+    }
+
+    // ── 第4章：跳过第2、3章后直接进入规则发现 ──
+    if (nextSceneId === "ch4_find_brochure") {
+      enterClassroomScene("spawn_spawn_145", nextSceneId, () => {
+        fillClassroomSeats(["spawn_spawn_145"]);
+      });
+      return;
+    }
+
+    if (nextSceneId === "ch4_morning_classroom") {
+      enterClassroomScene("spawn_spawn_132", nextSceneId, setupMorningClassroom);
+      return;
+    }
+
+    if (nextSceneId === "ch4_roster_test_liuyu_scene") {
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_player_path",
+        payload: {
+          path: ["spawn_spawn_246", "spawn_spawn_252", "spawn_spawn_250", "spawn_spawn_247"],
+          direction: "left",
+          freezeAfter: true,
+          speed: 160,
+        },
+      });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch4_physics_observe") {
+      enterClassroomScene("spawn_spawn_132", nextSceneId, () => setupLessonClassroom("npc_teacher_li", "teacher_frames"));
+      return;
+    }
+
+    if (nextSceneId === "ch4_zhou_lunch_approach") {
+      enterClassroomScene("spawn_spawn_246", nextSceneId, setupLunchClassroom);
+      return;
+    }
+
+    if (nextSceneId === "ch4_art_class_start") {
+      enterClassroomScene("spawn_spawn_132", nextSceneId, () => setupLessonClassroom("npc_wang_teacher", "wql_frames"));
+      return;
+    }
+
+    if (nextSceneId === "ch4_show_painting") {
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: {
+          npcKey: "npc_wang_teacher",
+          path: ["spawn_spawn_249", "spawn_spawn_246"],
+          direction: "left",
+          speed: 140,
+        },
+      });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch4_greenbelt_start") {
+      enterGateScene("spawn_spawn_166", nextSceneId);
       return;
     }
 
@@ -816,6 +898,28 @@ export default function App() {
       return;
     }
 
+    // ── 第4章：教室午休探索触发器 ──
+    if (state.currentMapId === "classroom") {
+      const isCh4Lunch = state.currentSceneId === "" && (
+        state.choiceHistory.includes("ch4_lunch_punished") ||
+        state.choiceHistory.includes("ch4_lunch_not_punished")
+      );
+      if (isCh4Lunch) {
+        const classroomTriggerMap: Record<string, string> = {
+          trigger_247: state.choiceHistory.includes("ch4_lunch_not_punished") ? "ch4_zhou_help" : "ch4_zhou_question_method",
+          trigger_249: "ch4_liuyu_lunch_tease",
+          trigger_248: "ch4_seat_busy",
+          trigger_246: "ch4_empty_seat_lunch",
+          trigger_250: "ch4_classroom_noticeboard",
+          trigger_251: "ch4_classroom_slogan",
+        };
+        if (classroomTriggerMap[actualSceneId]) {
+          dispatch({ type: "DIALOG_START", sceneId: classroomTriggerMap[actualSceneId] });
+          return;
+        }
+      }
+    }
+
     const scene = scenes[actualSceneId];
     if (scene?.onCgEnd) {
       if (scene.onCgEnd === "enter_balcony") {
@@ -834,12 +938,92 @@ export default function App() {
       }
     }
     dispatch({ type: "DIALOG_START", sceneId: actualSceneId });
-  }, [state.flags, state.currentMapId]);
+  }, [state.flags, state.currentMapId, state.currentSceneId, state.choiceHistory]);
 
   // 当前对话预览（用于存档）
   const dialogPreview = dialogScene
     ? `[${dialogScene.speaker || "旁白"}] ${dialogScene.text.slice(0, 20)}`
     : "";
+
+  const fillClassroomSeats = useCallback((exclude: string[]) => {
+    gameBridge.sendToPhaser({
+      type: "STORY_EVENT",
+      eventId: "fill_classroom_seats",
+      payload: {
+        start: 115,
+        end: 155,
+        exclude: [
+          ...exclude,
+          "spawn_spawn_145",
+          "spawn_spawn_156",
+          "spawn_spawn_157",
+          "spawn_spawn_246",
+          "spawn_spawn_247",
+          "spawn_spawn_248",
+          "spawn_spawn_249",
+          "spawn_spawn_250",
+          "spawn_spawn_251",
+          "spawn_spawn_252",
+          "spawn_spawn_253",
+        ],
+        framesPrefixes: ["npc_female1_frames", "npc_male_frames"],
+      },
+    });
+  }, []);
+
+  const enterClassroomScene = useCallback((spawnId: string, sceneId: string, setup?: () => void) => {
+    dispatch({ type: "CHANGE_MAP", mapId: "classroom", spawnId, position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "classroom", spawnId });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      setup?.();
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, []);
+
+  const setupMorningClassroom = useCallback(() => {
+    fillClassroomSeats(["spawn_spawn_132", "spawn_spawn_126", "spawn_spawn_146", "spawn_spawn_127"]);
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_156", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "left" } });
+    setTimeout(() => {
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: {
+          npcKey: "npc_liuyu",
+          path: ["spawn_spawn_248", "spawn_spawn_250", "spawn_spawn_252", "spawn_spawn_246"],
+          direction: "left",
+          speed: 160,
+        },
+      });
+    }, 500);
+  }, [fillClassroomSeats]);
+
+  const setupLessonClassroom = useCallback((teacherKey = "npc_teacher_li", teacherFrames = "teacher_frames") => {
+    fillClassroomSeats(["spawn_spawn_132", "spawn_spawn_127", "spawn_spawn_117"]);
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_157", npcKey: teacherKey, scale: 0.75, framesPrefix: teacherFrames } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_127", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: teacherKey, direction: "down" } });
+  }, [fillClassroomSeats]);
+
+  const setupLunchClassroom = useCallback(() => {
+    fillClassroomSeats(["spawn_spawn_127", "spawn_spawn_117"]);
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_127", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
+  }, [fillClassroomSeats]);
+
+  const enterGateScene = useCallback((spawnId: string, sceneId: string) => {
+    dispatch({ type: "CHANGE_MAP", mapId: "gate", spawnId, position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "gate", spawnId });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_166", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, []);
 
   // ── 开始菜单阶段 ──
   if (gamePhase === "menu") {
@@ -847,6 +1031,7 @@ export default function App() {
       <div style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", background: "#000" }}>
         <StartMenu
           onNewGame={handleNewGame}
+          onStartChapter4={handleStartChapter4}
           onLoadGame={handleLoadGame}
           onShowPortrait={() => setShowPortraitPanel(true)}
           onExit={() => {

@@ -8139,11 +8139,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "???"
             }
           ]
         },
@@ -8164,11 +8159,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -8189,11 +8179,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         }
@@ -8356,6 +8341,14 @@
           "y": 651,
           "width": 32,
           "height": 32
+        },
+        {
+          "id": 219,
+          "name": "spawn_spawn_183",
+          "x": 366,
+          "y": 987,
+          "width": 32,
+          "height": 32
         }
       ]
     },
@@ -8375,7 +8368,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 269,
+  "nextobjectid": 270,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

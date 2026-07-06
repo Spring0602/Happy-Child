@@ -3,26 +3,29 @@
 ## 一、说服自己
 ### [CG]探索进度提升
 场景ID：ch4_exploration_progress
-图片：待补
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\意识\与“我”对话.png
 效果：fade_in
 [旁白]要是我没有看那段文字的话，是不是就可以避免“我”的负面思想？但是，如果我不选择冒险探寻“我”内心真实的想法，又怎么让我得到真正的快乐呢？
 [NPC:系统]参赛者寻找到“被遗弃的呐喊碎片1”，副本探索度达5%。
 [旁白]为了拿到足够通关奖励，我需要努力把探索度加到100%。每天解锁一片碎片，一周可以增加35%的探索度。\n\n要安全收集碎片，必须每天创造让“我”快乐的回忆。
 [旁白]我合上计划本，打开手机通讯录，给刘宇发了条信息，就上床睡觉了。\n\n当然，我这一夜睡得并不好。
-[旁白]第二天，我早早来到学校，在教室所在楼层绕了一圈，没有发现任何规则。\n\n我回到教室，在多出来的空位上坐下。
+[旁白]第二天，我早早来到学校，在教室所在楼层绕了一圈，没有发现任何规则。
 → 跳转：ch4_find_brochure
 ### [地图]寻找宣传册（探索）
 场景ID：ch4_find_brochure
 地图：classroom
 效果：fade_in
-出生点：spawn_classroom_default
-玩家状态：sit_up
+出生点：spawn_spawn_145
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
 冻结玩家：是
-[旁白]过了一分钟，周围的同学没有注意到我，我身上也没有发生任何怪异的事。\n\n确认不会违规后，我开始调查抽屉。除了一堆作业之外，我还意外发现了一张活动宣传手册。
+NPC:
+  - id: npc_classmate, 名字: 同学A, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames\npc_female1_frames_sit_back, 位置: spawn_spawn_146
+  - id: npc_classmate_2, 名字: 同学B, 精灵:G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames\npc_male _frames_sit_back, 位置: spawn_spawn_126
+[旁白]我回到教室，在多出来的空位上坐下。\n\n过了一分钟，周围的同学没有注意到我，我身上也没有发生任何怪异的事。\n\n确认不会违规后，我开始调查抽屉。除了一堆作业之外，我还意外发现了一张活动宣传手册。
 → 跳转：ch4_classroom_rules
 ### [CG]教室规则
 场景ID：ch4_classroom_rules
-图片：待补
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\一班规则.png
 效果：fade_in
 [旁白]手册里夹着一张纸，我取出那张纸，看到了熟悉的猩红字迹。
 [旁白]1.严格遵照课程表安排的课程上课，上课须专心，禁止交头接耳（讨论和回答问题除外），禁止离开座位，禁止进食。\n\n2.课堂问题回答错误会受到惩罚。\n\n3.午餐和晚餐由学校统一提供，禁止浪费。\n\n4.每日晚自习进行周测，阅卷完毕后由各科老师公布成绩和排名，请学生们努力学习。\n\n5.各班单科周测成绩排名后五名将进行为期一周的课外辅导，请在晚自习开始前30分钟准时到达各班教室参加辅导。\n\n6.当天作业通过学习平板提交，请注意作业截止时间，禁止缺交。\n\n7.晚自习禁止进食、交头接耳、离开座位。非必要不要抬头。\n\n8.学生要听老师的话，禁止忤逆老师。\n\n9.晚自习中有30分钟的答疑时间，各科老师会在门口待命，答疑时间及科目每天由各班班长在后黑板更新，请有疑问的同学积极提问。
@@ -33,30 +36,36 @@
 → 跳转：ch4_brochure_content
 ### [CG]宣传册内容
 场景ID：ch4_brochure_content
-图片：待补
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\宣传册.png
 效果：fade_in
 [旁白]这是一个校园试胆活动的宣传册，活动时间是本周六晚19：00，也就是即将通过副本的那一天。扫二维码即可报名，限制名额五人。
 [主角]（这活动我是肯定要报名的。）
-[旁白]此次试胆活动的主题是调查在学校内流传已久的怪谈，具体内容将在报名后告知。
+[旁白]此次试胆活动的主题是调查在学校内流传已久的怪谈，具体内容将在报名后告知。\n\n我拿走宣传册，回到自己的座位上，开始按计划表学习。
 → 跳转：ch4_morning_classroom
 ### [地图]早上教室
 场景ID：ch4_morning_classroom
 地图：classroom
 效果：fade_in
-出生点：spawn_classroom_default
-玩家状态：sit_up
-NPC：
-  - id: npc_liuyu, 名字: 刘宇, 精灵: ly_frames, 位置: spawn_liuyu_seat, 朝向: 下
+出生点：spawn_spawn_132
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
 冻结玩家：是
-[旁白]我拿走宣传册，回到自己的座位上，开始按计划表学习。
-[旁白]十五分钟后，刘宇来了，他径直走到我面前，把一张花名册扔到我桌上。
+NPC：
+  - id: npc_liuyu, 名字: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_left, 位置: spawn_spawn_156
+  - id: npc_classmate, 名字: 同学A, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames\npc_female1_frames_sit_back, 位置: spawn_spawn_146
+  - id: npc_classmate_2, 名字: 同学B, 精灵:G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames\npc_male _frames_sit_back, 位置: spawn_spawn_126
+座位填充：
+  所有座位出生点：spawn_spawn_115～spawn_spawn_155
+  已占用座位：主角 spawn_spawn_132, 同学A spawn_spawn_146, 同学B spawn_spawn_126
+  保持空位：spawn_spawn_145
+  其余座位：随机用 npc_female1_frames_sit_back / npc_male_frames_sit_back 填充
 NPC动作：
-  npc_liuyu → 播放动画: walk_down → 移动至: spawn_player_desk → 面朝: 主角
+  npc_liuyu → 从: spawn_spawn_156 → 经由: spawn_spawn_248, spawn_spawn_250, spawn_spawn_252 → 移动至: spawn_spawn_246 → 面朝: 主角
+[旁白]十五分钟后，刘宇来了，他径直走到我面前，把一张花名册扔到我桌上。
 [NPC:刘宇]哝，你要的东西。
 [主角说]（笑）谢谢，帮大忙了。
 [NPC:刘宇]没事。我先收作业去了。
 NPC动作：
-  npc_liuyu → 播放动画: walk_up → 移动至: spawn_liuyu_seat → 播放动画: sit_up
+  npc_liuyu → 从: spawn_spawn_246 → 经由: spawn_spawn_252, spawn_spawn_250 → 移动至: spawn_spawn_127 → 播放动画: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_sit_back
 [主角]（作为班长，刘宇要遵守的规则是不是更多？但同样地，他知道的情报会比其他学生更多，甚至还掌握部分老师的信息。）
 [旁白]我暗做打算，然后端详起花名册。
 → 跳转：ch4_roster_anomaly
@@ -73,8 +82,8 @@ NPC动作：
 ### [CG]花名册异常
 场景ID：ch4_roster_anomaly
 
-图片：花名册特写（待补）
-效果：slight_defocus（待扩展）
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\花名册.png
+效果：淡入
 [旁白]花名册上共有三十九人。大部分名字都很熟悉，唯独多出来的那个人——
 [主角]（……？）
 [旁白]那明明是三个端正的汉字，我却无法理解它们。每当视线试图聚焦，笔画便像水中的倒影一样散开。\n\n我打算——
@@ -97,14 +106,10 @@ NPC动作：
     设置flag: ch4_roster_test_liuyu
     跳转：ch4_roster_test_liuyu
 
-### [地图]直接询问同学
+### [CG]直接询问同学
 场景ID：ch4_roster_ask_student
-
-地图：classroom
-出生点：spawn_classroom_default
-冻结玩家：是
-NPC动作：
-  npc_classmate → 坐下方向面朝: 主角
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\花名册.png
+效果：fade_in
 [主角说]同学，你知道这三个字是什么吗？
 [NPC:同学]你是不是傻啊？这不是我们班的——
 → 音效: tinnitus (once)
@@ -118,8 +123,13 @@ NPC动作：
 场景ID：ch4_roster_observe
 
 地图：classroom
-出生点：spawn_classroom_default
+出生点：spawn_spawn_132
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
 冻结玩家：是
+NPC：
+  - id: npc_liuyu, 名字: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_sit_back, 位置: spawn_spawn_127
+  - id: npc_classmate, 名字: 同学A, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames\npc_female1_frames_sit_back, 位置: spawn_spawn_146
+  - id: npc_classmate_2, 名字: 同学B, 精灵:G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames\npc_male _frames_sit_back, 位置: spawn_spawn_126
 [旁白]我没有立刻开口询问，而是借着整理作业的动作，逐一核对座位与花名册。
 [旁白]四十一个名字，四十张在我眼中正常使用的桌椅，以及一张所有人都会自然绕开的空座位。
 [主角]（似乎只有我不能看见“他”。而在NPC们眼中，那里坐着一个活生生的人。）
@@ -129,12 +139,25 @@ NPC动作：
 → NPC观念更新: 刘宇
 → 跳转：ch4_roster_converge
 
-### [AI对话]用花名册试探刘宇
+### [AI片段]用花名册试探刘宇
 场景ID：ch4_roster_test_liuyu
 
+地图：classroom
+出生点：spawn_spawn_132
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
+玩家动作：
+  从: spawn_spawn_132 → 经由: spawn_spawn_246, spawn_spawn_252, spawn_spawn_250 → 移动至: spawn_spawn_247 → 面朝: 左 → 冻结玩家：是
+NPC：
+  - id: npc_liuyu, 名字: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_sit_back, 位置: spawn_spawn_127
+  - id: npc_classmate, 名字: 同学A, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames\npc_female1_frames_sit_back, 位置: spawn_spawn_146
+  - id: npc_classmate_2, 名字: 同学B, 精灵:G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames\npc_male _frames_sit_back, 位置: spawn_spawn_126
 背景：早晨教室，刘宇正在收作业，其他学生在场
-NPC自主扮演: 刘宇
-AI提示：主角没有公开提问，而是把花名册异常位置推给刘宇看。
+参与角色：主角, 刘宇, 同学A, 同学B
+AI提示：根据玩家此前表现生成一段4～8行剧本编码格式片段。主角没有公开提问，而是把花名册异常位置推给刘宇看。
+        输出格式：
+        - 允许使用 [旁白]、[主角]、[主角说]、[NPC:刘宇]、[NPC:同学A]、[NPC:同学B]。
+        - 允许使用 NPC动作，但不要生成新选项。
+        - 不要生成跳转，片段结束后由固定流程跳转。
         固定事实：刘宇知道主角无法读取那个名字，但不能说出名字、身份或原因。
         根据刘宇对主角当前印象回应：
         - 若主角此前表现谨慎且愿意合作，刘宇用玩笑掩饰，提醒“有些东西看不清就别硬看”，并认可主角的默契。
@@ -146,6 +169,7 @@ AI提示：主角没有公开提问，而是把花名册异常位置推给刘宇
 ### [CG]花名册结论
 场景ID：ch4_roster_converge
 
+图片：无
 [旁白]无论通过视觉、语言还是他人的反应，我都无法知道第四十一个学生是谁。
 [主角]（那个人，会是我吗？）
 [旁白]我把花名册收进抽屉。这件事之后再查吧。
@@ -159,6 +183,8 @@ AI提示：主角没有公开提问，而是把花名册异常位置推给刘宇
 ### [CG]前三节课
 场景ID：ch4_class_montage
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室白天.png
+效果：fade_in
 [旁白]前三节课风平浪静地过去了。
 [旁白]期间没有学生主动回答问题。老师不断重复讲题、做题、对答案，再讲题。所有人都在认真忍受，像一群被卡在同一分钟里的钟表。
 [主角]（四十个活人沉默得像四十具尸体。啊，令人讨厌的氛围。）
@@ -168,14 +194,21 @@ AI提示：主角没有公开提问，而是把花名册异常位置推给刘宇
 场景ID：ch4_physics_observe
 
 地图：classroom
-出生点：spawn_classroom_default
+出生点：spawn_spawn_132
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
 冻结玩家：是
 NPC：
-  - id: npc_teacher_li, 名字: 李老师, 精灵: teacher_frames, 位置: spawn_teacher_front, 朝向: 下
+  - id: npc_teacher_li, 名字: 李老师, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\teacher_frames\teacher_frames_stand_front, 位置: spawn_spawn_157
+  - id: npc_liuyu, 名字: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_sit_back, 位置: spawn_spawn_127
+  - id: npc_zhouqirui, 名字: 周骐瑞, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\zqr_frames\zqr_frames_sit_back, 位置: spawn_spawn_117
+座位填充：
+  所有座位出生点：spawn_spawn_115～spawn_spawn_155
+  已占用座位：主角 spawn_spawn_132, 刘宇 spawn_spawn_127, 周骐瑞 spawn_spawn_117
+  保持空位：spawn_spawn_145
+  非座位路径点/讲台点：spawn_spawn_156, spawn_spawn_157, spawn_spawn_246, spawn_spawn_247, spawn_spawn_248, spawn_spawn_249, spawn_spawn_250, spawn_spawn_251, spawn_spawn_252, spawn_spawn_253
+  其余座位：随机用 npc_female1_frames_sit_back / npc_male_frames_sit_back 填充
 [旁白]第四节是物理课。李老师严格、古板，尤其擅长用带有人身攻击性的批评摧毁学生的自信。
 [旁白]反常的是，在她的威压之下，反而有不少学生主动举手，故意回答错误。
-NPC动作：
-  npc_teacher_li → 播放动画: idle_down
 [NPC:李老师]这么简单的问题都不会？你们到底有没有认真听课？拿这种状态去高考吗？
 [旁白]被骂的学生低下头，神情却悄悄放松下来。没有举手的人身子坐得笔直，仿佛一堵危墙，那双浑浊的眼空洞地盯着讲台。
 [主角]（能通过选拔进入这个班的，除了被驯化的异类，没有傻子。而他们不惜被骂也要获得的东西，是老师的惩罚。）
@@ -197,13 +230,12 @@ NPC动作：
 场景ID：ch4_physics_wrong_answer
 
 地图：classroom
-→ 玩家状态: stand_up
+→ 玩家状态: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_back
 冻结玩家：是
-NPC动作：
-  npc_teacher_li → 面朝: 主角
 [主角说]老师，我认为答案是……
 [旁白]我给出了一个听起来经过思考、实际上错得恰到好处的答案。
 [NPC:李老师]错得离谱！下课后给我好好反省！
+→ 玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
 [旁白]她骂完便继续讲课，熟练得像完成了一项每日任务。
 [主角]（好人机的骂人方式……）
 [旁白]之后周骐瑞也在李老师抛出问题时主动举手，平静地给出了错误答案。被骂之后，他甚至没有皱一下眉。
@@ -221,7 +253,8 @@ NPC动作：
 
 ### [CG]午饭惩罚公布
 场景ID：ch4_lunch_punishment_reveal
-图片：待补
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室白天.png
+效果：fade_in
 [旁白]到了午饭时间，物理课代表拿了张名单，念了一遍，然后说，
 [NPC:物理课代表]名单上的同学课上回答问题错误，受到的惩罚是——不准吃午饭。
 [主角]（我的天，这个惩罚好啊。）
@@ -270,7 +303,8 @@ NPC动作：
 ### [CG]把盒饭带出教室
 场景ID：ch4_lunch_outside_test
 
-图片：待补
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室白天.png
+效果：fade_in
 [旁白]我接过盒饭，起身走向教室门口。既然规则特意强调“教室内不能浪费食物”，那么门外或许就是漏洞。
 [NPC:刘宇]你要去哪？
 [主角说]教室里闷得慌。吃饭总得找个空气好的地方吧。
@@ -318,11 +352,11 @@ NPC动作：
 [旁白]刘宇伸手想抓住我，却只穿过了一片逐渐消散的轮廓。\n\n直到最后一刻我才明白，刘宇递来的并不是一份必须吃掉的午饭，而是一次看我会不会开口求助的试探。\n\n而我把试探当成了谋杀，又用真正的杀意回应了它。\n\n我不是被刘宇害死了，而是被我自己的恶意害死了。
 → 跳转：title_screen
 
-### [地图]拒绝刘宇的盒饭
+### [CG]拒绝刘宇的盒饭
 场景ID：ch4_lunch_refuse
 
-地图：classroom
-冻结玩家：是
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室白天.png
+效果：fade_in
 [旁白]他一脸无辜，
 [NPC:刘宇]放不回去。
 [主角说]为什么？
@@ -336,11 +370,11 @@ NPC动作：
 → NPC观念更新: 刘宇
 → 跳转：ch4_zhou_lunch_approach
 
-### [地图]用玩笑试探刘宇
+### [CG]用玩笑试探刘宇
 场景ID：ch4_lunch_tease
 
-地图：classroom
-冻结玩家：是
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室白天.png
+效果：fade_in
 [NPC:刘宇]周骐瑞被罚不准吃饭可是稀罕事，我可不能便宜了他。
 [旁白]周骐瑞忽然打了个喷嚏，抬头看了我们一眼，又面无表情地低下头，无视了两个打哑谜的蠢货。
 [NPC:刘宇]况且，这盒饭本来就是你的，你不能忘了拿。
@@ -369,30 +403,64 @@ NPC动作：
 场景ID：ch4_zhou_lunch_approach
 
 地图：classroom
-出生点：spawn_classroom_default
+出生点：spawn_spawn_246
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_right
 冻结玩家：否
 NPC：
-  - id: npc_zqr, 名字: 周骐瑞, 精灵: zqr_frames, 位置: spawn_zqr_seat, 朝向: 下
+  - id: npc_liuyu, 名字: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_sit_back, 位置: spawn_spawn_127
+  - id: npc_zhouqirui, 名字: 周骐瑞, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\zqr_frames\zqr_frames_sit_back, 位置: spawn_spawn_117
+座位填充：
+  所有座位出生点：spawn_spawn_115～spawn_spawn_155
+  已占用座位：刘宇 spawn_spawn_127, 周骐瑞 spawn_spawn_117
+  保持空位：spawn_spawn_145
+  非座位路径点/讲台点：spawn_spawn_156, spawn_spawn_157, spawn_spawn_246, spawn_spawn_247, spawn_spawn_248, spawn_spawn_249, spawn_spawn_250, spawn_spawn_251, spawn_spawn_252, spawn_spawn_253
+  其余座位：随机用 npc_female1_frames_sit_back / npc_male_frames_sit_back 填充
 
-@trigger_zqr_lunch
+@trigger_247
   条件：ch4_lunch_punished
   提示文字：E询问周骐瑞
   触发：[对话]
     [NPC:周骐瑞]怎么，有事找我？
     → 跳转：ch4_zhou_question_method
 
-@trigger_zqr_lunch
+@trigger_247
   条件：ch4_lunch_not_punished
   提示文字：E询问周骐瑞
   触发：[对话]
     [NPC:周骐瑞]怎么，有事找我？
     → 跳转：ch4_zhou_help
 
+@trigger_249
+  提示文字：E刘宇
+  触发：[对话]
+    [NPC:刘宇]哦？小叶同学这是要求我帮忙吗？先叫一声爸爸听听。
+    [主角说]是我贱，我就不该找你。
+
+@trigger_248
+  提示文字：E坐下
+  触发：[对话]
+    [主角]（事情还没处理。）
+
+@trigger_246
+  提示文字：E空座位
+  触发：[对话]
+    [主角]（现在不是调查这位透明人同学的时候。）
+
+@trigger_251
+  提示文字：E标语
+  触发：[对话]
+    [主角]（让人很不舒服的标语。学生真学死了学校又不得了。）
+
+@trigger_250
+  提示文字：E公告栏
+  触发：[对话]
+    [主角]（这周小班辅导的名单。没有我，真可惜。）
+
 ### [地图]向周骐瑞求助
 场景ID：ch4_zhou_help
+冻结主角：是
 
-[旁白]我抱着那盒属于自己的午饭，在周骐瑞桌边停下。
-[主角]（刘宇的暗示已经很明确了，他想让我找周骐瑞帮忙，接下来我该怎么请求他比较好？）
+[旁白]他的目光淡淡地扫向我，没有一丝惊愕，似乎早就料到我会来找他。
 
 → 选项：周骐瑞，你饿不饿，要不要吃点？
     AI标签：委婉求助, 尊重边界, 社交策略
@@ -412,12 +480,16 @@ NPC：
     设置flag: ch4_zhou_help_referred
     跳转：ch4_zhou_fixed_help
 
-### [AI对话]周骐瑞的帮助
+### [AI片段]周骐瑞的帮助
 场景ID：ch4_zhou_fixed_help
 
 背景：午休教室，主角拿着属于自己的盒饭向被罚不准吃午饭的周骐瑞求助
-NPC自主扮演: 周骐瑞
-AI提示：根据主角请求帮助的方式、此前的调查表现与周骐瑞对主角的印象，生成简短回应。
+参与角色：主角, 周骐瑞
+AI提示：根据主角请求帮助的方式、此前的调查表现与周骐瑞对主角的印象，生成一段4～8行剧本编码格式片段。
+        输出格式：
+        - 允许使用 [旁白]、[主角]、[主角说]、[NPC:周骐瑞]。
+        - 允许使用 NPC动作，但不要生成新选项。
+        - 不要生成跳转，片段结束后由固定流程跳转。
         固定事实：
         - 周骐瑞知道学校盒饭的危险，也知道吃“不属于自己”的盒饭不会触发食物的侵蚀效果。
         - 周骐瑞被罚不准吃自己的午饭，但可以替主角吃掉主角的盒饭。
@@ -449,25 +521,66 @@ AI提示：根据主角请求帮助的方式、此前的调查表现与周骐瑞
 ### [地图]选择提问方式
 场景ID：ch4_zhou_question_method
 
-[主角]（我还需要尽可能多地打探情报。NPC也受规则限制，他可能无法直接回答。问题怎么问，决定了他是否愿意继续帮我。）
+[主角]（我还需要尽可能多地打探情报。NPC也受规则限制，他可能无法直接回答。）
 
 → 选项：我有个问题想问你。但也许你无法直接回答。因此，我会用提问的方式找到我想要的答案，你只用回答是或否
     AI标签：尊重边界, 逻辑推理, 谨慎合作
     NPC目睹：周骐瑞
     设置flag: ch4_zhou_respectful
-    跳转：ch4_zhou_fixed_questions
+    跳转：ch4_zhou_respectful_intro
 
 → 选项：周骐瑞，能稍微给我透露一些学校区域探索的方向吗？
     AI标签：坦诚求助, 信任, 暴露脆弱
     NPC目睹：周骐瑞
     设置flag: ch4_zhou_frank
-    跳转：ch4_zhou_fixed_questions
+    跳转：ch4_zhou_frank_intro
 
-→ 选项：吃得这么香，我看你是饿坏了。那你何必故意答错问题遭这个罪呢？你肯定知道那道物理题的正确答案是什么
+→ 选项：瞧你饿得——你何必故意答错问题遭这个罪呢？你肯定知道那道物理题的正确答案是什么
     AI标签：试探, 自我保护, 控制信息, 机智
     NPC目睹：周骐瑞
     设置flag: ch4_zhou_testing
-    跳转：ch4_zhou_fixed_questions
+    跳转：ch4_zhou_testing_intro
+
+### [地图]尊重边界的提问
+场景ID：ch4_zhou_respectful_intro
+
+地图：classroom
+冻结玩家：是
+
+[主角说]我有个问题想问你。但也许你无法直接回答。因此，我会用提问的方式找到我想要的答案。
+[主角说]你只用回答是或否。
+[旁白]周骐瑞咽下嘴里的饭，抬眼看了我一下。
+[NPC:周骐瑞]可以。
+[主角]（很好。至少他愿意配合这种边界明确的问法。）
+→ 跳转：ch4_zhou_fixed_questions
+
+### [地图]坦诚求助的提问
+场景ID：ch4_zhou_frank_intro
+
+地图：classroom
+冻结玩家：是
+
+[主角说]周骐瑞，能稍微给我透露一些学校区域探索的方向吗？
+[旁白]他没有立刻回答，只是把筷子放下，视线扫过教室里埋头吃饭的学生。
+[NPC:周骐瑞]方向这种东西，说出来就不是方向了。
+[主角说]那我换一种问法。你不用主动透露，我问，你只回答是或否。
+[NPC:周骐瑞]这样可以。
+[主角]（他拒绝了直接指路，但接受了有限问答。规则边界比我想象中更窄。）
+→ 跳转：ch4_zhou_fixed_questions
+
+### [地图]试探式提问
+场景ID：ch4_zhou_testing_intro
+
+地图：classroom
+冻结玩家：是
+
+[主角说]瞧你饿得——你何必故意答错问题遭这个罪呢？你肯定知道那道物理题的正确答案是什么。
+[旁白]周骐瑞掀起眼皮，面无表情地看着我。
+[NPC:周骐瑞]你想问的是“为什么”，不是“是不是”。
+[主角说]行，那我不问为什么。我问几个是非题，你能答就答，不能答就沉默。
+[NPC:周骐瑞]可以。别绕太远。
+[主角]（他不喜欢被试探，但并不排斥这种低风险的信息交换。）
+→ 跳转：ch4_zhou_fixed_questions
 
 ### [地图]周骐瑞固定问答
 场景ID：ch4_zhou_fixed_questions
@@ -493,12 +606,16 @@ AI提示：根据主角请求帮助的方式、此前的调查表现与周骐瑞
 [主角]（看来这个活动并不是副本单独为我开放的某种关卡。）
 → 跳转：ch4_zhou_dynamic_response
 
-### [AI对话]周骐瑞判断主角
+### [AI片段]周骐瑞判断主角
 场景ID：ch4_zhou_dynamic_response
 
 背景：午饭时教室，周围学生安静吃饭
-NPC自主扮演: 周骐瑞
-AI提示：根据玩家本章的调查方式、物理课选择与提问方式，判断周骐瑞对主角的印象。
+参与角色：主角, 周骐瑞
+AI提示：根据玩家本章的调查方式、物理课选择与提问方式，生成一段4～8行剧本编码格式片段，表现周骐瑞对主角的判断。
+        输出格式：
+        - 允许使用 [旁白]、[主角]、[主角说]、[NPC:周骐瑞]。
+        - 允许使用 NPC动作，但不要生成新选项。
+        - 不要生成跳转，片段结束后由固定流程跳转。
         固定事实不能改变：大部分副本食物危险；主角的学校盒饭可由不属于它的人安全食用；存在其他处理方法；周骐瑞参加周六活动。
         动态回应范围：
         - 若周骐瑞替主角吃了盒饭：认可主角最终愿意开口求助，但提醒“别把别人愿意帮忙当成理所当然”。
@@ -523,12 +640,20 @@ AI提示：根据玩家本章的调查方式、物理课选择与提问方式，
 场景ID：ch4_art_class_start
 
 地图：classroom
-出生点：spawn_classroom_default
+出生点：spawn_spawn_132
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_sit_back
 冻结玩家：是
 NPC：
-  - id: npc_wang_teacher, 名字: 王沁林, 精灵: teacher_frames, 位置: spawn_teacher_front, 朝向: 下
-NPC动作：
-  npc_wang_teacher → 播放动画: walk_down → 移动至: spawn_teacher_front → 面朝: 下
+  - id: npc_wang_teacher, 名字: 美术老师, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\wql_frames\wql_frames_stand_front, 位置: spawn_spawn_157
+  - id: npc_liuyu, 名字: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_sit_back, 位置: spawn_spawn_127
+  - id: npc_zhouqirui, 名字: 周骐瑞, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\zqr_frames\zqr_frames_sit_back, 位置: spawn_spawn_117
+座位填充：
+  所有座位出生点：spawn_spawn_115～spawn_spawn_155
+  已占用座位：主角 spawn_spawn_132, 刘宇 spawn_spawn_127, 周骐瑞 spawn_spawn_117
+  保持空位：spawn_spawn_145
+  非座位路径点/讲台点：spawn_spawn_156, spawn_spawn_157, spawn_spawn_246, spawn_spawn_247, spawn_spawn_248, spawn_spawn_249, spawn_spawn_250, spawn_spawn_251, spawn_spawn_252, spawn_spawn_253
+  其余座位：随机用 npc_female1_frames_sit_back / npc_male_frames_sit_back 填充
+
 [旁白]周一下午有一节美术课。一位将近七十岁的老人步伐稳健地走进教室，澄澈锐利的眼睛扫过每个人的脸。
 [NPC:美术老师]把桌上的书都收起来吧，什么都别放。
 [旁白]窸窸窣窣的收拾声响起，我望着自己本就空荡荡的书桌，一时感到有些尴尬。\n\n片刻后同学们又像雕塑一样端坐着，好像在等待着老师发布新的标准答案。\n\n之后再一头扎进疯狂竞争的泥潭里。
@@ -574,17 +699,21 @@ NPC动作：
 地图：classroom
 冻结玩家：是
 NPC动作：
-  npc_wang_teacher → 播放动画: walk_down → 移动至: spawn_player_desk → 面朝: 主角
+  npc_wang_teacher → 从: spawn_spawn_157 → 经由: spawn_spawn_249 → 移动至: spawn_spawn_246 → 面朝: 主角
 [旁白]老师拿起我的画饶有兴致地端详起来。
 [NPC:美术老师]哦？这位同学思维很活跃嘛。
 → 跳转：ch4_wang_dynamic_judgment
 
-### [AI对话]王老师评价画作
+### [AI片段]王老师评价画作
 场景ID：ch4_wang_dynamic_judgment
 
 背景：美术课教室，王老师站在主角桌旁，全班能够听见部分对话
-NPC自主扮演: 王沁林
-AI提示：王老师评价玩家选择的画作，并结合七维人格画像判断主角是在真诚表达、策略试探，还是用服从保护自己。
+参与角色：主角, 王沁林
+AI提示：根据玩家选择的画作与七维人格画像，生成一段5～10行剧本编码格式片段，表现王老师对画作和主角状态的评价。
+        输出格式：
+        - 允许使用 [旁白]、[主角]、[主角说]、[NPC:美术老师]。
+        - 允许使用 NPC动作，但不要生成新选项。
+        - 不要生成跳转，片段结束后由固定流程跳转。
         必须遵守：
         - 王老师欣赏矛盾与主体性，但不会无条件赞扬。
         - 必须自然引出“做你自己”这一命题。
@@ -678,6 +807,8 @@ AI提示：王老师评价玩家选择的画作，并结合七维人格画像判
 ### [CG]盒饭难题
 场景ID：ch4_dinner_problem
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室白天.png
+效果：淡入
 [旁白]下午没有物理课，真是可惜。
 [旁白]我看着桌上的盒饭，比面对一道数学压轴题还要焦头烂额。
 [主角]（从中午刘宇和周骐瑞对我的态度，以及美术老师的抛砖引玉来看，NPC们似乎知道我是参赛者，只不过他们愿意陪我演戏。）
@@ -701,12 +832,16 @@ AI提示：王老师评价玩家选择的画作，并结合七维人格画像判
     设置flag: ch4_followed_liuyu
     跳转：ch4_liuyu_food_response
 
-### [AI对话]刘宇决定帮到什么程度
+### [AI片段]刘宇决定帮到什么程度
 场景ID：ch4_liuyu_food_response
 
 背景：晚餐时间的教室门口，学生陆续领取盒饭
-NPC自主扮演: 刘宇
-AI提示：刘宇判断主角是否值得进一步合作。
+参与角色：主角, 刘宇
+AI提示：根据玩家午餐处理方式、对刘宇的信任程度与本章人格画像，生成一段5～9行剧本编码格式片段，表现刘宇判断主角是否值得进一步合作。
+        输出格式：
+        - 允许使用 [旁白]、[主角]、[主角说]、[NPC:刘宇]。
+        - 允许使用 NPC动作，但不要生成新选项。
+        - 不要生成跳转，片段结束后由固定流程跳转。
         固定主线：主角最终会得知厕所可以处理盒饭，并安全避开晚餐。但要想避开走廊学生的视线，除了身份是班委的学生可以独行，普通学生必须结伴而行。
         动态帮助等级：
         - 若午餐时主角曾向周骐瑞求助：刘宇认可主角听懂了自己的暗示，可调侃“这次终于知道直接找人了”。
@@ -726,13 +861,13 @@ AI提示：刘宇判断主角是否值得进一步合作。
 ### [CG]厕所处理盒饭
 场景ID：ch4_dispose_food
 
+图片：无
 [旁白]厕所里已经挤了不少人。没有人交谈，大家默契地把饭倒进隔间，再用水冲掉。
 [主角说]就把饭倒里头就完事了？
 [NPC:刘宇]不然你以为还能怎么样？
 [主角说]这么简单粗暴，真是出乎预料。
 [NPC:刘宇]这是没有办法的办法。幸好来得早，不然待会连给你倒饭的位置都没有。
 [旁白]规则要求教室内“不许浪费”，却没有规定食物最后必须进入谁的胃里。
-[主角]（所谓规则漏洞，往往不是规则没有想到，而是有人在缝隙里替后来者留了一条路。）
 → 设置flag: ch4_school_food_solution_found
 → 跳转：ch4_greenbelt_start
 
@@ -749,19 +884,26 @@ AI提示：刘宇判断主角是否值得进一步合作。
 场景ID：ch4_greenbelt_start
 
 地图：gate
-出生点：spawn_gate_default
+出生点：spawn_spawn_166
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_left
 冻结玩家：是
 NPC：
-  - id: npc_liuyu, 名字: 刘宇, 精灵: ly_frames, 位置: spawn_liuyu_greenbelt, 朝向: 左
+  - id: npc_liuyu, 名字: 刘宇, 精灵: ly_frameG:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_left, 位置: spawn_spawn_166
 [旁白]现在是十八点，离晚自习还有一个小时。
 [旁白]刘宇像是看出了我心中所想，拉着我转身往教学楼外的绿化带走去。
-NPC动作：
-  npc_liuyu → 播放动画: walk_left → 移动至: spawn_liuyu_greenbelt → 面朝: 主角
 [NPC:刘宇]来吧，到那里说。
+NPC动作：
+  npc_liuyu → 播放动画: walk_left → 移动至: spawn_spawn_179
+  npc_liuyu → 播放动画: walk_up → 移动至: spawn_spawn_183
+  npc_liuyu → 播放动画: walk_left → 移动至: spawn_spawn_164，面朝：right
+主角动作：
+  主角 → 播放动画: walk_left → 移动至: spawn_spawn_179
+  主角 → 播放动画: walk_up → 移动至: spawn_spawn_183
+  主角 → 播放动画: walk_left → 移动至: spawn_spawn_165
 [旁白]灌木隔开了来往视线。我们在一张长椅上坐下，这里真是个谈话的好地方。
 → 跳转：ch4_liuyu_fixed_warning
 
-### [CG]刘宇的固定警告
+### [地图]刘宇的固定警告
 场景ID：ch4_liuyu_fixed_warning
 
 [NPC:刘宇]你家的事还牵扯到了学校里？
