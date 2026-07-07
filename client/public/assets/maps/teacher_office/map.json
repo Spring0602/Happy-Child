@@ -872,6 +872,120 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": 12,
+          "name": "occlusion_41",
+          "type": "furniture",
+          "x": 731,
+          "y": 710,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 49
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 622,
+              "y": 2
+            },
+            {
+              "x": 625,
+              "y": 51
+            },
+            {
+              "x": 0,
+              "y": 51
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "occlusion_42",
+          "type": "furniture",
+          "x": 896,
+          "y": 646,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 61
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 272,
+              "y": 0
+            },
+            {
+              "x": 275,
+              "y": 61
+            },
+            {
+              "x": 1,
+              "y": 62
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "occlusion_43",
+          "type": "furniture",
+          "x": 25,
+          "y": 709,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 618,
+              "y": 2
+            },
+            {
+              "x": 616,
+              "y": 51
+            },
+            {
+              "x": 0,
+              "y": 54
+            },
+            {
+              "x": 2,
+              "y": 0
+            },
+            {
+              "x": 618,
+              "y": 0
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
         }
       ]
     },
@@ -911,6 +1025,46 @@
           "y": 241,
           "width": 32,
           "height": 32
+        },
+        {
+          "id": 203,
+          "name": "spawn_spawn_36",
+          "x": 672,
+          "y": 277,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_37",
+          "x": 777,
+          "y": 519,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 205,
+          "name": "spawn_spawn_38",
+          "x": 676,
+          "y": 715,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 206,
+          "name": "spawn_spawn_39",
+          "x": 780,
+          "y": 716,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 207,
+          "name": "spawn_spawn_40",
+          "x": 675,
+          "y": 762,
+          "width": 32,
+          "height": 32
         }
       ]
     },
@@ -930,7 +1084,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 253,
+  "nextobjectid": 258,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

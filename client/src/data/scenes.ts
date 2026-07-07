@@ -2553,12 +2553,986 @@ export const scenes: Record<string, Scene> = {
     text: "????????????????????????\n\n???????????????",
   },
 
+
   ch5_liuyu_negotiate: {
     id: "ch5_liuyu_negotiate",
-    chapter: "?5? ? ??",
-    background: "/assets/maps/gate/???.png",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/gate/????.png",
+    speaker: "???",
+    text: "?????????????????\n\n???????????????????????????????\n\n??????????????????????????????????????????????",
+    nextSceneId: "ch5_liuyu_negotiation_pressure",
+  },
+
+  ch5_liuyu_negotiation_pressure: {
+    id: "ch5_liuyu_negotiation_pressure",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/gate/????.png",
     speaker: "??",
-    text: "???????????????????????",
+    text: "????????????????????????????\n\nNPC??????????????????????????????????????????\n\n????????????????????????????????????????\n\n????????????????",
+    nextSceneId: "ch5_liuyu_negotiation_choice",
+  },
+
+  ch5_liuyu_negotiation_choice: {
+    id: "ch5_liuyu_negotiation_choice",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/gate/????.png",
+    speaker: "???",
+    text: "??????????????????",
+    choices: [
+      { id: "ch5_liuyu_equal_terms", text: "????????????????????????????", nextSceneId: "ch5_liuyu_dynamic_response", effects: { truthDesire: 1, realityJudgment: 1 }, tags: ["????", "????"] },
+      { id: "ch5_liuyu_honest_terms", text: "???????????????????", nextSceneId: "ch5_liuyu_dynamic_response", effects: { authorityResistance: 2, trust: -1 }, tags: ["????", "??"] },
+      { id: "ch5_liuyu_demand_proof", text: "?????????????????????????", nextSceneId: "ch5_liuyu_dynamic_response", effects: { selfProtection: 1, authorityResistance: 1 }, tags: ["????"] },
+      { id: "ch5_liuyu_rule_bluff", text: "??????????????", nextSceneId: "ch5_liuyu_dynamic_response", effects: { selfProtection: 1, trust: -1 }, tags: ["????"] },
+    ],
+  },
+
+  ch5_liuyu_dynamic_response: {
+    id: "ch5_liuyu_dynamic_response",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/gate/????.png",
+    speaker: "??",
+    text: "???????????????????\n\n?????????????????????????????\n\n????????????????????????????????????????????????\n\n??????????????????\n\n??????????????????????\n\n??????????\n\n?????????????",
+    nextSceneId: "ch5_permission_inference",
+  },
+
+  ch5_permission_inference: {
+    id: "ch5_permission_inference",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/gate/????.png",
+    speaker: "???",
+    text: "????????????????????????????????????\n\n???????????????????????????????\n\n????????????????????????????????\n\n???????????\n\n????????????????",
+    choices: [
+      { id: "ch5_permission_rule_inferred", text: "????", nextSceneId: "ch5_liuyu_permission_reaction", effects: { realityJudgment: 1, truthDesire: 1 }, tags: ["????"] },
+      { id: "ch5_permission_rule_withheld", text: "?????????????", nextSceneId: "ch5_liuyu_permission_reaction", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["????"] },
+      { id: "ch5_asked_liuyu_escort", text: "????????????????", nextSceneId: "ch5_liuyu_permission_reaction", effects: { trust: 1, realityJudgment: -1 }, tags: ["????"] },
+    ],
+  },
+
+  ch5_liuyu_permission_reaction: {
+    id: "ch5_liuyu_permission_reaction",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/gate/????.png",
+    speaker: "??",
+    text: "????????????????\n\n??????????????????????????????????\n\n????????????????????????????????????",
+    nextSceneId: "ch5_go_to_wang_gallery",
+  },
+
+  ch5_go_to_wang_gallery: {
+    id: "ch5_go_to_wang_gallery",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/??/????.png",
+    cgMode: true,
+    speaker: "??",
+    text: "?????????????\n\n??????????\n\n???????????\n\n???????????????????????????????????????????????????????????NPC?\n\n?????????",
+    nextSceneId: "ch5_wang_door_open",
+  },
+
+  ch5_wang_door_open: {
+    id: "ch5_wang_door_open",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/?.png",
+    cgMode: true,
+    speaker: "???",
+    text: "??????????????????????????????????????",
+    nextSceneId: "ch5_wang_gallery_enter",
+  },
+
+  ch5_wang_gallery_enter: {
+    id: "ch5_wang_gallery_enter",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "??",
+    text: "????????????\n\n???????????????????????????????????????\n\n????????????????????????\n\n???????????????????????????",
+    nextSceneId: "ch5_gallery_explore",
+  },
+
+  ch5_gallery_explore: {
+    id: "ch5_gallery_explore",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "??",
+    text: "???????????????\n\n?????????????",
+    onCgEnd: "ch5_free_gallery",
+  },
+
+  ch5_gallery_soft: {
+    id: "ch5_gallery_soft",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "??",
+    text: "??????????????????????????????????????????\n\n????????????????????",
+  },
+
+  ch5_gallery_raw: {
+    id: "ch5_gallery_raw",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "??",
+    text: "?????????????????????????????????????\n\n????????????????????????????\n\n??????????????????????????????",
+  },
+
+  ch5_gallery_infer_need_paintings: {
+    id: "ch5_gallery_infer_need_paintings",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "???",
+    text: "?????????",
+  },
+
+  ch5_gallery_inference: {
+    id: "ch5_gallery_inference",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "???",
+    text: "??????????????????????????????????????????????????????????????\n\n?????????????????????",
+  },
+
+  ch5_gallery_materials_wait: {
+    id: "ch5_gallery_materials_wait",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "???",
+    text: "??????????????",
+  },
+
+  ch5_gallery_materials_warning: {
+    id: "ch5_gallery_materials_warning",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "??",
+    text: "?????????????????????????\n\n???????????????\n\n?????????????\n\n????????????????????????????\n\n??????????????????????????????????",
+    nextSceneId: "ch5_return_to_office",
+  },
+
+  ch5_return_to_office: {
+    id: "ch5_return_to_office",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "??",
+    text: "???????????????????????\n\n????????????????????????????\n\n????????????????????\n\n???????????????????",
+    nextSceneId: "ch5_offer_help_choice",
+  },
+
+  ch5_offer_help_choice: {
+    id: "ch5_offer_help_choice",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "???",
+    text: "?????????",
+    choices: [
+      { id: "ch5_zhoujunxiu_respectful_help", text: "??????????????????????", nextSceneId: "ch5_zhoujunxiu_help_response", effects: { empathy: 1, trust: 1 }, tags: ["????"] },
+      { id: "ch5_zhoujunxiu_practical_help", text: "??????????????????????", nextSceneId: "ch5_zhoujunxiu_help_response", effects: { realityJudgment: 1 }, tags: ["????"] },
+      { id: "ch5_zhoujunxiu_forceful_help", text: "????????????????????", nextSceneId: "ch5_zhoujunxiu_help_response", effects: { empathy: -1, authorityResistance: 1 }, tags: ["????"] },
+      { id: "ch5_zhoujunxiu_delayed_help", text: "???????????????", nextSceneId: "ch5_wang_trade_opening", effects: { selfProtection: 1, empathy: -1 }, tags: ["????"] },
+    ],
+  },
+
+  ch5_zhoujunxiu_help_response: {
+    id: "ch5_zhoujunxiu_help_response",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/wang_gallery/????.png",
+    speaker: "???",
+    text: "??????????????\n\n??????????\n\n????????????????????\n\n?????????????",
+    nextSceneId: "ch5_wang_trade_opening",
+  },
+
+  ch5_wang_trade_opening: {
+    id: "ch5_wang_trade_opening",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "?????????????\n\n??????????????????\n\n??????????????????????????????\n\n?????????????????????",
+    nextSceneId: "ch5_wang_pressure_choice",
+  },
+
+  ch5_wang_pressure_choice: {
+    id: "ch5_wang_pressure_choice",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "?????????????????\n\n???????????????????????",
+    choices: [
+      { id: "ch5_wang_apologized", text: "????????????????", nextSceneId: "ch5_wang_trade_terms", effects: { realityJudgment: 1, trust: 1 }, tags: ["????"] },
+      { id: "ch5_wang_asked_price", text: "???????????", nextSceneId: "ch5_wang_trade_terms", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["????"] },
+      { id: "ch5_wang_challenged_teacher", text: "???????????????", nextSceneId: "ch5_wang_boundary_warning", effects: { authorityResistance: 1, selfProtection: -1 }, tags: ["????"] },
+    ],
+  },
+
+  ch5_wang_boundary_warning: {
+    id: "ch5_wang_boundary_warning",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "?????????????????????????\n\n???????????????????\n\n???????????????????????",
+    nextSceneId: "ch5_wang_trade_terms",
+  },
+
+  ch5_wang_trade_terms: {
+    id: "ch5_wang_trade_terms",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "???????\n\n?????????????????????????\n\n???????????????\n\n?????????????",
+    nextSceneId: "ch5_trade_riddles_confirmed",
+  },
+
+  ch5_trade_riddles_confirmed: {
+    id: "ch5_trade_riddles_confirmed",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "????????????????????????????????????\n\n????????????\n\n?????????????????????????????????????",
+    nextSceneId: "ch5_walk_with_zhoujunxiu",
+  },
+
+  ch5_walk_with_zhoujunxiu: {
+    id: "ch5_walk_with_zhoujunxiu",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "??",
+    text: "??????????????????????\n\n???????3???????????????????\n\n????????????????????????????????????\n\n????????????????????????????????",
+    nextSceneId: "ch5_zhoujunxiu_conversation_choice",
+  },
+
+  ch5_zhoujunxiu_conversation_choice: {
+    id: "ch5_zhoujunxiu_conversation_choice",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "??????????????",
+    choices: [
+      { id: "ch5_zhoujunxiu_comforted", text: "???????????????????????", nextSceneId: "ch5_zhoujunxiu_dynamic_reply", effects: { empathy: 1, joyPerception: 1 }, tags: ["????"] },
+      { id: "ch5_zhoujunxiu_questioned", text: "????????", nextSceneId: "ch5_zhoujunxiu_dynamic_reply", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["????"] },
+      { id: "ch5_zhoujunxiu_shared_experience", text: "????????????????????????????", nextSceneId: "ch5_zhoujunxiu_dynamic_reply", effects: { empathy: 1, trust: 1 }, tags: ["????"] },
+      { id: "ch5_zhoujunxiu_observed", text: "??", nextSceneId: "ch5_zhoujunxiu_dynamic_reply", effects: { selfProtection: 1 }, tags: ["????"] },
+    ],
+  },
+
+  ch5_zhoujunxiu_dynamic_reply: {
+    id: "ch5_zhoujunxiu_dynamic_reply",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/????/??.png",
+    cgMode: true,
+    speaker: "???",
+    text: "???????????????????????????????\n\n???????????????3????\n\n?????????3?????????????????",
+    nextSceneId: "ch5_enter_class3",
+  },
+
+  ch5_enter_class3: {
+    id: "ch5_enter_class3",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "??",
+    text: "?????????????????????????????????\n\n?????????3??????\n\n???????????????????\n\n?????????????????",
+    nextSceneId: "ch5_class3_explore",
+  },
+
+  ch5_class3_explore: {
+    id: "ch5_class3_explore",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "??",
+    text: "??????3??",
+    onCgEnd: "ch5_free_class3",
+  },
+
+  ch5_class3_students: {
+    id: "ch5_class3_students",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "??",
+    text: "????????????????????????????\n\n???????????????????????????????\n\n?????????????????????",
+  },
+
+  ch5_class3_slogan: {
+    id: "ch5_class3_slogan",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "???",
+    text: "?????????????????????????",
+  },
+
+  ch5_class3_leave_blocked: {
+    id: "ch5_class3_leave_blocked",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "???",
+    text: "?????????",
+  },
+
+  ch5_class3_rules_wait: {
+    id: "ch5_class3_rules_wait",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "???",
+    text: "?????????????????",
+  },
+
+  ch5_class3_rules: {
+    id: "ch5_class3_rules",
+    chapter: "?5? ? ?????",
+    background: "/assets/maps/classroom_3/??.png",
+    speaker: "??",
+    text: "??????????????????????????????\n\n???????????????????????\n\n???????????????????\n\n????????????????????",
+    nextSceneId: "ch5_class3_disguise_choice",
+  },
+
+  ch5_class3_disguise_choice: {
+    id: "ch5_class3_disguise_choice",
+    chapter: "?5? ? ?????",
+    background: "",
+    cgMode: true,
+    speaker: "??",
+    text: "??????????????????????????????????????????????\n\n?????",
+    choices: [
+      { id: "ch5_class3_disguise_helper", text: "????????????????", nextSceneId: "ch5_class3_exposure", effects: { realityJudgment: 1, selfProtection: 1 }, tags: ["????"] },
+      { id: "ch5_class3_seek_zhoujunxiu", text: "???????????????????", nextSceneId: "ch5_class3_exposure", effects: { trust: 1 }, tags: ["????"] },
+      { id: "ch5_class3_test_student", text: "?????????????????????", nextSceneId: "ch5_class3_exposure", effects: { truthDesire: 1, selfProtection: -1 }, tags: ["?????"] },
+    ],
+  },
+
+  ch5_class3_exposure: {
+    id: "ch5_class3_exposure",
+    chapter: "?5? ? ?????",
+    background: "/assets/CG/3?/??.png",
+    cgMode: true,
+    speaker: "????",
+    text: "????????\n\n?????????????????????????????????????????????????\n\n??????????????\n\n?????",
+    nextSceneId: "ch6_class3_exposure",
+  },
+
+  ch6_class3_exposure: {
+    id: "ch6_class3_exposure",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/3班/突脸.png",
+    cgMode: true,
+    speaker: "陌生同学",
+    text: "你——是——谁——？\n\n那双瞪得浑圆的眼睛死死盯着我。全班学生纷纷转头，像在看一只濒死的虫子。\n\n系统提示在脑中反复炸响：技能“违规提醒”强烈发动中！\n\n将近五十名学生同时起身，朝我簇拥而来。我得想办法逃出去。",
+    nextSceneId: "ch6_class3_first_reaction",
+  },
+
+  ch6_class3_first_reaction: {
+    id: "ch6_class3_first_reaction",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/classroom_3/教室.png",
+    speaker: "旁白",
+    text: "教室门就在不远处，但人群正在合拢。",
+    choices: [
+      { id: "ch6_class3_force_through", text: "我奋力推开挡路的学生，直接冲向教室门", nextSceneId: "ch6_class3_door_locked", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["果断求生", "暴力突破"] },
+      { id: "ch6_class3_call_zhoujunxiu", text: "“周隽秀！帮帮我！”", nextSceneId: "ch6_zhoujunxiu_reaction", effects: { trust: 1, empathy: 1 }, tags: ["依赖关系", "临场合作"] },
+      { id: "ch6_class3_claim_teacher", text: "“喂，我只是个来送画的，别这么不近人情。”", nextSceneId: "ch6_class3_door_locked", effects: { selfProtection: 1, truthDesire: 1 }, tags: ["身份伪装", "规则试探"] },
+    ],
+  },
+
+  ch6_zhoujunxiu_reaction: {
+    id: "ch6_zhoujunxiu_reaction",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/classroom_3/教室.png",
+    speaker: "周隽秀",
+    text: "她张了张嘴，像是想说“他是来帮我的”，可声音被某种看不见的力量扭曲成含混的气音。\n\n那一瞬间的迟疑让靠近我的几名学生慢了半拍。\n\n但她终究没能违抗规则，眼神很快变得陌生。",
+    nextSceneId: "ch6_class3_door_locked",
+  },
+
+  ch6_class3_door_locked: {
+    id: "ch6_class3_door_locked",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/3班/逃生.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我拨开一只只伸来的手，终于挤到教室门口。抓住门把手的瞬间，我往下一摁，却发现门根本打不开。\n\n我后退几步，助跑，然后冲着门一个飞踢。腿部传来阵阵钝痛，门还是打不开。\n\n挂钟显示18:55，距离晚自习铃响还有五分钟。\n\n这时有人抓住我的双腿，把我往教室深处拉去。我死死握住门把手，和这些人拼命。",
+    nextSceneId: "ch6_class3_survival_choice",
+  },
+
+  ch6_class3_survival_choice: {
+    id: "ch6_class3_survival_choice",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/3班/逃生.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "五分钟被无限拉长。我必须撑到晚自习铃响。",
+    choices: [
+      { id: "ch6_class3_counter_pull", text: "突然松开门把手，借后方拉力撞倒人群", nextSceneId: "ch6_class3_counter_standoff", effects: { realityJudgment: 1, selfProtection: 1 }, tags: ["临场反击", "环境利用"] },
+      { id: "ch6_class3_knife_warning", text: "拿出水果刀威慑学生，但不主动伤人", nextSceneId: "ch6_class3_knife_death", effects: { selfProtection: 1, realityJudgment: -1 }, tags: ["武力威慑", "克制暴力"] },
+      { id: "ch6_class3_cut_student", text: "划伤最先抓住自己的人，强迫其他学生后退", nextSceneId: "ch6_class3_cut_standoff", effects: { selfProtection: 2, empathy: -1 }, tags: ["主动伤害", "极端自保"] },
+    ],
+  },
+
+  ch6_class3_knife_death: {
+    id: "ch6_class3_knife_death",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/3班/人群.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我抽出水果刀，刀尖在灯光下闪过一道冷光。\n\n但一旁的学生瞬间把刀夺了过去。抓着我脚踝的学生顺势把我架起，还没等我反应过来，刀尖已经刺入心脏。\n\n生命本就如此脆弱。无论是在副本中，还是副本外的现实生活，本质上并没有什么区别。\n\n我死了。",
+    nextSceneId: "title_screen",
+  },
+
+  ch6_class3_counter_standoff: {
+    id: "ch6_class3_counter_standoff",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/3班/人群.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我突然松开门把手。后方拉扯的力量让我狠狠摔进人群，数名学生失去重心倒在地上，抓住脚踝的手也随之松开。\n\n我趁机翻身爬起，拿出水果刀指向他们。\n\n“谁再靠近，我就用它杀谁。”\n\n五分钟被拉得无比漫长。直到晚自习铃声响起，3班学生迅速而有序地回到座位，紧锁的教室门也终于打开了。\n\n我立即夺门而出，朝自班教室跑去。",
+    nextSceneId: "ch6_corridor_return",
+  },
+
+  ch6_class3_cut_standoff: {
+    id: "ch6_class3_cut_standoff",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/3班/人群.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "水果刀划开最先抓向我的手臂。鲜血涌出，周围学生终于本能地后退了一步，抓住我脚踝的手也随之松开。\n\n我趁机翻身爬起，将刀指向他们。\n\n“谁再靠近，我就用它杀谁。”\n\n直到晚自习铃声响起，3班学生迅速而有序地回到座位，紧锁的教室门也终于打开了。\n\n我立即夺门而出，朝自班教室跑去。",
+    nextSceneId: "ch6_corridor_return",
+  },
+
+  ch6_corridor_return: {
+    id: "ch6_corridor_return",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    speaker: "系统",
+    text: "技能“违规提醒”发动中。\n\n注意：该技能只能保护您20秒！",
+    onCgEnd: "ch6_free_corridor_return",
+  },
+
+  ch6_corridor_wrong_room: {
+    id: "ch6_corridor_wrong_room",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    speaker: "旁白",
+    text: "不是这里。现在没有时间浪费。",
+  },
+
+  ch6_corridor_timeout_death: {
+    id: "ch6_corridor_timeout_death",
+    chapter: "第6章 · 追杀与逃生",
+    background: "",
+    cgMode: true,
+    speaker: "系统",
+    text: "技能“违规提醒”强烈发动中。\n\n我离本班教室只剩最后一段距离，可胸口的窒息感像一只手猛地攥紧了肺。\n\n倒计时归零。被动技能已失效。\n\n最后一口空气从喉咙里被抽走。我伸向门的指尖停在半空，随后无力垂下。\n\n我死了。",
+    nextSceneId: "title_screen",
+  },
+
+  ch6_liuyu_catches_late: {
+    id: "ch6_liuyu_catches_late",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "刘宇",
+    text: "你迟到了，叶平生。\n\n我据理力争：“现在还没到19:01，这也算迟到？”\n\n刘宇漠然地看着我：“已经打铃了。你跟我去见班主任。”\n\n不由得我再狡辩些什么，他一把抓过我的手腕，拖着我往教师办公室走去。",
+    nextSceneId: "ch6_to_teacher_office",
+  },
+
+  ch6_to_teacher_office: {
+    id: "ch6_to_teacher_office",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/美术教室/楼梯.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我感受着手腕上逐渐收紧的力道，竟然莫名觉得安心。\n\n他塞给我一个纸团，小声嘱咐道。",
+    nextSceneId: "ch6_liuyu_route_note",
+  },
+
+  ch6_liuyu_route_note: {
+    id: "ch6_liuyu_route_note",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/美术教室/楼梯.png",
+    cgMode: true,
+    speaker: "刘宇",
+    text: "按纸上的路线跑。教师办公室的门从里面打不开，别试图跟老师硬碰硬。\n\n通风管道通往一楼厕所。水果刀拧不开螺丝，砸老化的角。\n\n周测开始前必须回来，不得旷考。这次算提前通知你了。",
+    nextSceneId: "ch6_teacher_office_enter",
+  },
+
+  ch6_teacher_office_enter: {
+    id: "ch6_teacher_office_enter",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/teacher_office/教师办公室.png",
+    speaker: "班主任",
+    text: "不听话的孩子，就应该受到应有的惩罚。\n\n她的声音逐渐失去人类质感。周围环境迅速变得昏暗，连办公室的布局都变得难以辨认。",
+    nextSceneId: "ch6_office_escape_choice",
+  },
+
+  ch6_office_escape_choice: {
+    id: "ch6_office_escape_choice",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/teacher_office/教师办公室.png",
+    speaker: "旁白",
+    text: "老师的皮肤惨白如纸，牙齿变得尖锐，嘴角咧到了耳根。\n\n门、窗户、通风管道……我必须抓紧时间谨慎行事。",
+    choices: [
+      { id: "ch6_followed_liuyu_map", text: "拿出纸团，按照刘宇给的路线图行动，立刻跑向通风管道", nextSceneId: "ch6_break_vent", effects: { trust: 1, realityJudgment: 1 }, tags: ["信任协作", "执行计划"] },
+      { id: "ch6_verified_escape_route", text: "先检查一下门窗，确认刘宇给的线索是否可靠", nextSceneId: "ch6_verified_route_death", effects: { selfProtection: 1, trust: -1 }, tags: ["谨慎验证", "风险评估"] },
+      { id: "ch6_stalled_teacher", text: "说点什么拖住老师，同时观察办公室结构", nextSceneId: "ch6_break_vent_stall", effects: { realityJudgment: 1, authorityResistance: 1 }, tags: ["冷静周旋", "冒险"] },
+      { id: "ch6_prepared_to_fight_teacher", text: "握紧水果刀，老师要是靠近就正面硬刚", nextSceneId: "ch6_break_vent_fight", effects: { selfProtection: 1, authorityResistance: 1 }, tags: ["战斗倾向", "高风险"] },
+    ],
+  },
+
+  ch6_verified_route_death: {
+    id: "ch6_verified_route_death",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我没有立刻冲向通风管道，而是先去拧办公室门把手。门锁纹丝不动。\n\n正当我准备去检查窗户时，冰冷的气息贴上后颈。\n\n利爪贯穿胸口，剧烈的疼痛把没来得及出口的话钉回肺里。\n\n弥留之际，最后看见的是办公桌上那张被我丢开的路线图。红线仍然指向通风管道。\n\n我死了。",
+    nextSceneId: "title_screen",
+  },
+
+  ch6_break_vent: {
+    id: "ch6_break_vent",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我踮起脚尖，尝试用水果刀拧开通风管道口的螺丝。可惜水果刀无法当一字批头使用。\n\n好在管道有些年头，我用刀柄猛砸老化最明显的一角，它逐渐松动了。\n\n等我抽空回头，怪物已经伸出利爪抓向了我。",
+    nextSceneId: "ch6_teacher_attack_choice",
+  },
+
+  ch6_break_vent_stall: {
+    id: "ch6_break_vent_stall",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "“老师，迟到应该有具体惩罚吧？您不先告诉我吗？”\n\n班主任伸出细长的舌头：“被我吃掉，就是惩罚。”\n\n拖延只换来了几秒，却足够我确认通风管道的位置。我用刀柄猛砸老化的一角，怪物也朝我扑来。",
+    nextSceneId: "ch6_teacher_attack_choice",
+  },
+
+  ch6_break_vent_fight: {
+    id: "ch6_break_vent_fight",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我挥动水果刀，划伤怪物的手臂。她痛苦地呻吟一声，不得不后退几步。\n\n水果刀只能造成很小的伤害。我趁着她恢复的时间，用刀柄猛砸通风管道老化的一角。\n\n怪物再次逼近。",
+    nextSceneId: "ch6_teacher_attack_choice",
+  },
+
+  ch6_teacher_attack_choice: {
+    id: "ch6_teacher_attack_choice",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "管道口即将脱落，怪物的利爪也即将落下。",
+    choices: [
+      { id: "ch6_vent_commit", text: "继续砸击管道，相信自己能抢在攻击前打开出口", nextSceneId: "ch6_vent_escape_commit", effects: { realityJudgment: 1, selfProtection: 1 }, tags: ["专注目标"] },
+      { id: "ch6_blocked_teacher", text: "回身用水果刀格挡利爪，再继续破坏管道", nextSceneId: "ch6_vent_escape_block", effects: { selfProtection: 1, authorityResistance: 1 }, tags: ["战斗反应"] },
+      { id: "ch6_distracted_teacher", text: "把办公桌上物品推向怪物，制造一次阻碍", nextSceneId: "ch6_vent_escape_distract", effects: { realityJudgment: 1, empathy: 1 }, tags: ["环境利用"] },
+    ],
+  },
+
+  ch6_vent_escape_commit: {
+    id: "ch6_vent_escape_commit",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "利爪破空的声音从身后袭来，我立刻闪躲，但还是在最后一刻被划伤小腿。\n\n伤口火辣辣地疼。但我顾不上疼痛，只能用尽全力砸下最后一次。\n\n管道口终于应声脱落。我爬进通风管道，按照刘宇给的示意图拐了好几个弯，最后在一楼厕所落地。",
+    nextSceneId: "ch6_toilet_encounter",
+  },
+
+  ch6_vent_escape_block: {
+    id: "ch6_vent_escape_block",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我回身用水果刀挡向利爪，可惜人类力气不如怪物，刀身瞬间被拍飞，另一只爪子在我小腿上留下深可见骨的伤口。\n\n我强忍疼痛砸下最后一次，管道口终于脱落。我爬进通风管道，最后在一楼厕所落地。",
+    nextSceneId: "ch6_toilet_encounter",
+  },
+
+  ch6_vent_escape_distract: {
+    id: "ch6_vent_escape_distract",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/逼近.jpg",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我将桌上的文件和台灯推向怪物。她的攻击被阻碍了一瞬，利爪仍擦过我的小腿，留下狭长伤口。\n\n我砸下最后一次，管道口终于脱落。我爬进通风管道，按照路线在一楼厕所落地。",
+    nextSceneId: "ch6_toilet_encounter",
+  },
+
+  ch6_toilet_encounter: {
+    id: "ch6_toilet_encounter",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/厕所奇遇.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "厕所里传来压抑的哭声。好像是有同学压力太大了，晚自习偷跑来这里发泄情绪，甚至不惜违反规则。\n\n真勇。不过我也没资格吐槽他，我这是五十步笑百步。",
+    choices: [
+      { id: "ch6_ignored_crying_student", text: "没剩多少时间了，我决定装作没有看见，立刻赶回教室参加周测", nextSceneId: "ch6_weekly_exam", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["目标优先"] },
+      { id: "ch6_warned_crying_student", text: "提醒他如果被其他同学发现，可能会被举报违规", nextSceneId: "ch6_weekly_exam", effects: { empathy: 1, realityJudgment: 1 }, tags: ["关心他人"] },
+      { id: "ch6_helped_crying_student", text: "走到他身后拍了拍他的肩膀：“同学，需要帮忙吗？”", nextSceneId: "ch6_crying_student_response", effects: { empathy: 2, selfProtection: -1 }, tags: ["主动帮助"] },
+    ],
+  },
+
+  ch6_crying_student_response: {
+    id: "ch6_crying_student_response",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/厕所奇遇.png",
+    cgMode: true,
+    speaker: "男生",
+    text: "你、你别告诉老师。\n\n他慌乱地抹了把脸，像是终于意识到这里也并不安全。\n\n“可我真的不想回去。”\n\n我看了一眼自己仍在渗血的裤腿，只能压低声音提醒他去洗把脸，别让人看出异常。男生沉默地点点头，低声道了句谢，随后低头离开。",
+    nextSceneId: "ch6_weekly_exam",
+  },
+
+  ch6_weekly_exam: {
+    id: "ch6_weekly_exam",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我赶回教室不久，周测试卷便发了下来。\n\n我凭残存记忆完成了大约七成题目，其余只能靠猜。\n\n收卷时，我才意识到腿上的伤口仍在流血，裤腿已经被血液染深。周围同学却对此视而不见。\n\n这么晚医务室也不会开了，只能回家处理伤口。",
+    nextSceneId: "ch6_after_school_walk",
+  },
+
+  ch6_after_school_walk: {
+    id: "ch6_after_school_walk",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    text: "晚自习结束后，刘宇很自然地拉过我和周骐瑞，我们跟三兄弟一样勾肩搭背地走着，虽然是刘宇单方面所为。\n\n他走得有些快，我扯到了刚刚结痂的伤口，疼得倒吸一口凉气。\n\n刘宇和周骐瑞看向我，却没有发现任何异常。\n\n“我的右腿受伤了……你们看不到吗？伤得很重。”\n\n周骐瑞小心撩起我的裤腿，随后摇头：“没有任何伤口。”\n\n刘宇的声音严肃得不太正常：“你怎么受伤的？”",
+    nextSceneId: "ch6_injury_explanation_choice",
+  },
+
+  ch6_injury_explanation_choice: {
+    id: "ch6_injury_explanation_choice",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    text: "我警觉地瞥了刘宇一眼。",
+    choices: [
+      { id: "ch6_concealed_teacher_monster", text: "……", nextSceneId: "ch6_liuyu_root_rule_test", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["谨慎"] },
+      { id: "ch6_partial_injury_truth", text: "我在办公室的时候，看到老师……", nextSceneId: "ch6_root_rule_atmosphere", effects: { trust: 1, selfProtection: 1 }, tags: ["有限坦诚"] },
+      { id: "ch6_described_teacher_monster", text: "被怪物抓的……", nextSceneId: "ch6_root_rule_atmosphere", effects: { truthDesire: 1, selfProtection: -1 }, tags: ["坦白", "鲁莽"] },
+    ],
+  },
+
+  ch6_liuyu_root_rule_test: {
+    id: "ch6_liuyu_root_rule_test",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "刘宇",
+    text: "怎么突然不说话了？\n\n他的声音压得很低，却像故意把问题推回给我。\n\n我下意识开口：“我在办公室的时候，被老师……”\n\n话说到一半，周围几个学生的脚步忽然慢了下来。周骐瑞的目光也变得僵硬。\n\n我猛地闭嘴，意识到伤口不可见的问题也许不在伤口本身，而在造成伤口的那段事实。",
+    nextSceneId: "ch6_root_rule_experiment_choice",
+  },
+
+  ch6_root_rule_atmosphere: {
+    id: "ch6_root_rule_atmosphere",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/转头.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我几乎脱口而出，然后突然意识到了什么，连忙住口。\n\n为什么周围突然这么安静？现在可是在放学后的室外。\n\n当我再次抬起头，对上了周骐瑞阴翳的脸。越过他的肩膀，前方所有同学都转过一个诡异的弧度，冷漠地看着我。\n\n我很可能触碰了某条不能公开的学校规则。",
+    nextSceneId: "ch6_root_rule_experiment_choice",
+  },
+
+  ch6_root_rule_experiment_choice: {
+    id: "ch6_root_rule_experiment_choice",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/转头.png",
+    cgMode: true,
+    speaker: "主角",
+    text: "我现在还来不及思考这么多，当务之急是离开学校。\n\n还有，为什么“违规提醒”没有发动？\n\n既然如此，我就大胆再试探一下。",
+    nextSceneId: "ch6_root_rule_trigger",
+  },
+
+  ch6_root_rule_trigger: {
+    id: "ch6_root_rule_trigger",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/转头.png",
+    cgMode: true,
+    speaker: "主角",
+    text: "我刻意提高音量，尽量让远处的人听见。\n\n“我说——哪怕我逃了晚自习，老师也不能把我怎么样。”\n\n系统提示：由于您的天赋效果，该话语的份量正在上升。\n\n四周的氛围如同地震般猛烈震动。越来越多的呢喃声聚集。\n\n系统提示：由于您违反副本根本性规则，且被动技能处于使用状态，您即刻遭到全校追杀。",
+    nextSceneId: "ch6_capture_ritual",
+  },
+
+  ch6_capture_ritual: {
+    id: "ch6_capture_ritual",
+    chapter: "第6章 · 追杀与逃生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "离我最近的刘宇和周骐瑞面无表情地将我撂倒，然后几个学生上来死死扣住我的四肢。\n\n其他学生以我为中心围成圆圈。姗姗来迟的老师们整齐排列在圈的内层，全都已经怪物化。\n\n他们双手合十，虔诚祈祷。\n\n系统提示：叛逆值已达到主动技能初始化条件。开始初始化。\n\n10%。",
+    nextSceneId: "ch6_ritual_wishes",
+  },
+
+  ch6_ritual_wishes: {
+    id: "ch6_ritual_wishes",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/天空.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我的咳嗽声与脑内警报盖过师生的声音。\n\n我索性屏住呼吸，配合颈部不断收紧的力量，平静地望向灰蒙蒙的夜空。\n\n这些愿望本身没有错。我知道的。",
+    nextSceneId: "ch6_ritual_desire_snowball",
+  },
+
+  ch6_ritual_desire_snowball: {
+    id: "ch6_ritual_desire_snowball",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/天空.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "阴风掠过，大量试卷和总结报告从天而降。内容模糊不清，唯独页眉处的数字大得骇人。\n\n它们落到我的身上，散布到我的周围，挡住我的眼睛。",
+    nextSceneId: "ch6_ritual_backlash",
+  },
+
+  ch6_ritual_backlash: {
+    id: "ch6_ritual_backlash",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/仪式.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "接着，欢呼声逐渐消失，抱怨声夹杂着呜咽声如浪涛般一阵盖过一阵。",
+    nextSceneId: "ch6_numbers_attack",
+  },
+
+  ch6_numbers_attack: {
+    id: "ch6_numbers_attack",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/祭祀/仪式.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "几名学生捡起地上的试卷，粗暴地将它们揉成团，塞进我的嘴里。\n\n剩余纸张上的猩红数字缓慢脱离页面。每一道笔画的首尾都尖锐得像刀尖，在夜色中对准我的四肢。\n\n系统……再快一点。\n\n系统提示：60%。",
+    nextSceneId: "ch7_rule_skill_initialize",
+  },
+
+  ch7_rule_skill_initialize: {
+    id: "ch7_rule_skill_initialize",
+    chapter: "第7章 · 暂缺",
+    background: "/assets/CG/祭祀/仪式.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "第七章剧情暂由后续版本补完。\n\n学校区域在混乱后进入修复期，而家庭中的镜面异常仍在继续。",
+    nextSceneId: "ch8_mirror_figure_disappears",
+  },
+
+  ch8_mirror_figure_disappears: {
+    id: "ch8_mirror_figure_disappears",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/镜子.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "镜中空间里的血腥味与人影同时消失。\n\n我立刻转头寻找，可受限于镜面的大小，只能看见极其有限的角度。\n\n它去哪了？\n\n一张血淋淋的鬼脸骤然贴到眼前，咧开的腥臭巨口几乎贴上我的脸。\n\n我吓得一屁股摔到地上，惊魂未定地看着那面镜子，却只能看到自己惨白的脸。",
+    nextSceneId: "ch8_bathroom_knocking",
+  },
+
+  ch8_bathroom_knocking: {
+    id: "ch8_bathroom_knocking",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/bathroom/卫生间.png",
+    speaker: "旁白",
+    text: "砰砰砰——\n\n毛玻璃门上映出一个人影。从身高与头发判断，应该是母亲。\n\n违规提醒没有发动，现在应该还没到凌晨一点。母亲敲门，很可能与镜子里的东西有关。\n\n门外的人没有叫我的名字，只是一遍遍地敲门。这很反常。",
+    nextSceneId: "ch8_door_response_choice",
+  },
+
+  ch8_door_response_choice: {
+    id: "ch8_door_response_choice",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/bathroom/卫生间.png",
+    speaker: "旁白",
+    text: "我必须确认门外到底是什么。",
+    choices: [
+      { id: "ch8_asked_door_identity", text: "我隔着门喊了一嗓子：“谁啊？”", nextSceneId: "ch8_door_check_result", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["谨慎验证"] },
+      { id: "ch8_checked_door_gap", text: "我就地趴下，从门缝中看去", nextSceneId: "ch8_door_check_result", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["细节观察"] },
+      { id: "ch8_checked_mirror_again", text: "我把头重新伸进镜子中，查看那只鬼是否还在镜中", nextSceneId: "ch8_door_check_result", effects: { truthDesire: 2, selfProtection: -1 }, tags: ["冒险调查"] },
+      { id: "ch8_opened_door_directly", text: "凌晨一点我必须躺在床上，如今没多少时间了，我只能硬刚了", nextSceneId: "ch8_mother_ghost_enters", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["果断行动"] },
+    ],
+  },
+
+  ch8_door_check_result: {
+    id: "ch8_door_check_result",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/bathroom/卫生间.png",
+    speaker: "旁白",
+    text: "门外没有回答。\n\n若从门缝看去，那双米色拖鞋确实属于母亲；若回看镜中，漆黑的空间又像被什么东西堵住了风口。\n\n可眼下我必须回房间睡觉，一点母亲会来房间检查。管她是不是母亲，违反规则才是致命的。\n\n我深吸一口气，打开了门。",
+    nextSceneId: "ch8_mother_ghost_enters",
+  },
+
+  ch8_mother_ghost_enters: {
+    id: "ch8_mother_ghost_enters",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/人亡.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "刚才镜中的鬼脸，又和我对视了。\n\n这只鬼的装束完全和母亲一样。\n\n鬼踏入厕所的瞬间，我的头仿佛炸开一般疼痛。恍惚间，白色调的厕所被血色渲染，墙壁、镜子、盥洗池上满是飞溅的血迹。\n\n地板上一滩血液还在缓慢流动，未被污染的区域是一个躺倒在地的人形轮廓。\n\n这里死人了。\n\n鬼影痛苦扭曲着钻回镜中。系统提示：恭喜您找到“镜中真相碎片1”。副本探索进度达到15%。",
+    nextSceneId: "ch8_return_to_bed",
+  },
+
+  ch8_return_to_bed: {
+    id: "ch8_return_to_bed",
+    chapter: "第8章 · 天台和解",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我思考着，回到房间，关灯躺上床。\n\n凌晨一点，母亲像前几天一样打开房门。她确认我已经睡觉后，安心地合上门。\n\n那时，我已有预感，如果我再不做些什么改变现状，母亲就会变成那只鬼。",
+    nextSceneId: "ch8_inner_voice_returns",
+  },
+
+  ch8_inner_voice_returns: {
+    id: "ch8_inner_voice_returns",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/意识/与“我”对话.png",
+    cgMode: true,
+    speaker: "“我”",
+    text: "父亲失业了，母亲比以前更加病态，整个家都覆上一层阴霾。我要窒息了。\n\n系统提示：技能“违规提醒”正在发动。\n\n“我会乖乖听她的话。她会后悔的。”\n\n我叹了口气：“不止她会后悔，你也会后悔。”\n\n“我”冷冷回答：“所有人都会后悔的，我已经不在乎了。”\n\n我真是被他气笑了。",
+    nextSceneId: "ch8_inner_voice_first_choice",
+  },
+
+  ch8_inner_voice_first_choice: {
+    id: "ch8_inner_voice_first_choice",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/意识/与“我”对话.png",
+    cgMode: true,
+    speaker: "主角",
+    text: "该怎么回应这份绝望？",
+    choices: [
+      { id: "ch8_challenged_inner_voice", text: "你自己尝试过改变自己、改变现状吗？被自己妄想的绝望困住，这是比懦弱更蠢的做法", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["直接挑战"] },
+      { id: "ch8_guided_small_choice", text: "我知道这么做很难，但是，你真的甘愿一辈子腐烂发臭吗？", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { empathy: 1, realityJudgment: 1 }, tags: ["共情引导"] },
+      { id: "ch8_shared_fear_with_self", text: "你以为只有你一个人承受着这样的绝望吗？但为什么有的人能创造机遇？", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { truthDesire: 1, empathy: 1 }, tags: ["自我暴露"] },
+      { id: "ch8_used_school_change_as_proof", text: "这就是我和你的差距。我已经改变了一条副本的根本规则", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { authorityResistance: 2, trust: -1 }, tags: ["行动证明"] },
+    ],
+  },
+
+  ch8_inner_voice_dynamic_response: {
+    id: "ch8_inner_voice_dynamic_response",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/意识/与“我”对话.png",
+    cgMode: true,
+    speaker: "“我”",
+    text: "你说得头头是道，但你自己做得到吗？你有什么资格指责我？\n\n窒息感仍在持续，黑暗中的心跳声被无限放大。\n\n我想继续反驳，却忽然意识到，语言已经没有意义。他不相信“改变”两个字，除非我真的做给他看。\n\n那就先做一件小事，证明我不是只会站着说话。",
+    nextSceneId: "ch8_leave_for_rooftop",
+  },
+
+  ch8_leave_for_rooftop: {
+    id: "ch8_leave_for_rooftop",
+    chapter: "第8章 · 天台和解",
+    background: "",
+    cgMode: true,
+    speaker: "主角",
+    text: "想让我证明给你看，也要你先给我一点行动空间。如果我死在你手里，你还能看到结果吗？\n\n“想在我手里活下来，你就得给我带来快乐。”\n\n行。那你现在可要睁大眼睛好好看着。\n\n我忍住窒息感，偷偷溜出房门，通过电梯到达顶楼，从逃生通道走到天台。",
+    nextSceneId: "ch8_rooftop_arrival",
+  },
+
+  ch8_rooftop_arrival: {
+    id: "ch8_rooftop_arrival",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/rooftop/天台.png",
+    speaker: "旁白",
+    text: "深夜，天色如墨，为稀疏的云层绘上一层淡淡的白。\n\n这栋楼有四十层，从这里望去几乎能看到这座城市的全貌。哪怕是深夜，城市似乎仍没有睡着。\n\n我沉默着俯瞰了城市很久。\n\n“你没来过这里。”\n\n“我是没来过。来这地方一来不能学习，二来上上下下很浪费时间，我有什么必要来这里？”",
+    nextSceneId: "ch8_rooftop_observation_choice",
+  },
+
+  ch8_rooftop_observation_choice: {
+    id: "ch8_rooftop_observation_choice",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/rooftop/天台.png",
+    speaker: "主角",
+    text: "我要让他看见什么？",
+    choices: [
+      { id: "ch8_showed_working_city", text: "看那边。凌晨一点，依旧有卡车送货，立交桥上还有救护车在跑。", nextSceneId: "ch8_rooftop_perspective", effects: { empathy: 1, realityJudgment: 1 }, tags: ["扩展视角"] },
+      { id: "ch8_showed_sensory_city", text: "高楼层顶会留灯，街道路灯也不会熄灭，是为了让人看清脚下的路。", nextSceneId: "ch8_rooftop_perspective", effects: { joyPerception: 2, empathy: 1 }, tags: ["快乐感知"] },
+      { id: "ch8_admitted_uncertainty", text: "也许你确实不会感到快乐，那我也愿赌服输，只能死在你手里。", nextSceneId: "ch8_rooftop_perspective", effects: { empathy: 1, trust: 1 }, tags: ["坦诚陪伴"] },
+      { id: "ch8_framed_rooftop_as_choice", text: "现在你正站在这个你曾经从来不会踏入的地方，这其实就是一种改变。", nextSceneId: "ch8_rooftop_perspective", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["主体性"] },
+    ],
+  },
+
+  ch8_rooftop_perspective: {
+    id: "ch8_rooftop_perspective",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/城市夜景.png",
+    cgMode: true,
+    speaker: "主角",
+    text: "人们为不同的目的而活着，命运在某些时候奇妙地交汇，又在下一站分开。\n\n单一、片面的标准把你困住了，这会让你痛苦。但你永远有权利决定自己想成为什么样的人。\n\n你把圈凿出一个孔，就有路了。\n\n不是推翻整个世界。就你个人而言，只要打破那些束缚住思维的条条框框，就已经能看到圈外的路。\n\n当然，你仍身在圈内。但至少你拥有了培养取悦自己的能力的机会。",
+    nextSceneId: "ch8_rooftop_method_choice",
+  },
+
+  ch8_rooftop_method_choice: {
+    id: "ch8_rooftop_method_choice",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/rooftop/天台.png",
+    speaker: "“我”",
+    text: "你兜圈子兜了这么久，到底想做什么？你现在唯一该做的，就是让我感受到快乐。\n\n我咳了几声：“别急……我做这么多不就是为了让你感受到快乐吗？来，我教你。”\n\n什么都别想。把注意力集中到感官上，用心感受现在。\n\n风声、鸣笛声、车辆驶过的声音，冬日独有的烟火气，还有远处灯火带来的错觉。\n\n多管闲事也是我的爱好。如果我眼里只有自己，那生活就会很无趣。\n\n但这背后的根源到底是什么？",
+    nextSceneId: "ch8_inner_truth_choice",
+  },
+
+  ch8_inner_truth_choice: {
+    id: "ch8_inner_truth_choice",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/rooftop/天台.png",
+    speaker: "“我”",
+    text: "所以，造成这一切的根源到底是什么？\n\n我在心里默念那个思考已久的答案，却意识到，有些东西说出口就成了一种教条，甚至是一种路径依赖。",
+    choices: [
+      { id: "ch8_refused_standard_answer", text: "……告诉你就没有意义了", nextSceneId: "ch8_inner_voice_final_response", effects: { empathy: 1, selfProtection: 1 }, tags: ["尊重主体性"] },
+      { id: "ch8_admitted_no_complete_answer", text: "这个答案不一定完整，但对我来说至少目前是正确的——错位", nextSceneId: "ch8_inner_voice_final_response", effects: { truthDesire: 1, realityJudgment: 1 }, tags: ["认识局限"] },
+      { id: "ch8_explained_collective_pressure", text: "每个人的答案都不一样，而你的答案需要你自己寻找，我无权干涉", nextSceneId: "ch8_inner_voice_final_response", effects: { realityJudgment: 1, empathy: 1 }, tags: ["主体寻找"] },
+      { id: "ch8_asked_present_feeling", text: "答案不重要……倒是你，现在快乐一点了吗？", nextSceneId: "ch8_inner_voice_final_response", effects: { joyPerception: 2 }, tags: ["体验验证"] },
+    ],
+  },
+
+  ch8_inner_voice_final_response: {
+    id: "ch8_inner_voice_final_response",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/城市夜景.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "风从栏杆缝隙里穿过，城市灯光像散落在夜色里的碎屑。\n\n“我”沉默了很久。\n\n它第一次感觉到，自己不是任务目标，不是需要被矫正的失败品，而是一个被允许自己思考答案的独立个体。\n\n这份尊重不是功利哄劝，也不是把某个标准答案塞进它嘴里。哪怕“错位”这个答案指向物质供给与精神需求之间的裂缝，它也只是主角目前的答案，不是必须被接受的真理。\n\n窒息感没有完全消失，却明显松动了。\n\n它终于忍不住问：为什么？",
+    nextSceneId: "ch8_rooftop_resolution",
+  },
+
+  ch8_rooftop_resolution: {
+    id: "ch8_rooftop_resolution",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/城市夜景.png",
+    cgMode: true,
+    speaker: "“我”",
+    text: "为什么？这对你没有一点好处。你为什么要和我说这么多？\n\n我放松身体，将手臂搭在栏杆上。冷风肆意拨乱我的头发，我眼中却无比清明。\n\n“你就当我，多管闲事吧。”\n\n“神金。”\n\n它语气仍然嫌弃，心情却似乎好了不少。\n\n“再睁眼看看这个令人厌恶的世界。其实也很奇妙，不是吗？”\n\n源于人类本性中纯粹的欲望，纯粹的好奇，于是变成了纯粹的快乐。\n\n脑内警报声停止，“我”的存在也暂时沉寂。",
+    nextSceneId: "ch8_return_home",
+  },
+
+  ch8_return_home: {
+    id: "ch8_return_home",
+    chapter: "第8章 · 天台和解",
+    background: "",
+    cgMode: true,
+    speaker: "系统",
+    text: "我蹑手蹑脚回到房间，倒头就睡。\n\n恭喜您找到“被遗弃的呐喊碎片2”。\n\n副本探索进度达到20%。\n\n家庭区域叛逆值达到35%。\n\n混沌磁场范围扩大。由于天赋加持效果，您的磁场影响力增强。",
+    nextSceneId: "ch8_demo_personality_review",
+  },
+
+  ch8_demo_personality_review: {
+    id: "ch8_demo_personality_review",
+    chapter: "第8章 · 天台和解",
+    background: "",
+    cgMode: true,
+    speaker: "系统",
+    text: "Demo阶段人格回响：当前结果只是阶段观察，并非最终人格判定。\n\n你展现出“凿孔者”与“守灯者”的混合倾向：既会寻找规则缝隙，也愿意在自身困难时照亮另一个自己。\n\n优势与风险并存。你能改变一些事，也可能在改变中承担过多重量。\n\n副本尚未结束，未来行为仍会改变画像与关系。\n\n观察仍将继续。",
+    nextSceneId: "ch8_unfinished_threads",
+  },
+
+  ch8_unfinished_threads: {
+    id: "ch8_unfinished_threads",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/手机.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "我睡着以后，手机屏幕在黑暗中悄然亮起。\n\n试胆活动群聊中，周骐瑞发来一条新消息：学校重新开放后，不要立刻回来。\n\n刘宇紧接着回复：晚了。他肯定会来。\n\n另一条未读消息来自陌生号码，内容只有三个词：\n\n镜中尸骸。\n湖中遗物。\n书中落叶。\n\n卫生间的镜面泛起微不可见的涟漪。父母卧室中，本该躺着两个人的床上却空空如也。\n\n而“成为好孩子”的规则，仍存在于学校之外的每一个区域。",
+    nextSceneId: "ch8_demo_ending",
+  },
+
+  ch8_demo_ending: {
+    id: "ch8_demo_ending",
+    chapter: "第8章 · Demo结束",
+    background: "",
+    cgMode: true,
+    speaker: "系统",
+    text: "《快乐小孩》Demo剧情已完成。\n\n当前副本探索进度：20%。\n\n这不是副本的终点。\n\n你的选择已经改变了角色对你的看法，也改变了叶平生面对规则的方式。\n\n在后续剧情中，未完成的交易、尚未开始的试胆活动、重新修复的学校与家庭中的真相，将继续回应你留下的每一道痕迹。",
+    nextSceneId: "title_screen",
   },
 
 };

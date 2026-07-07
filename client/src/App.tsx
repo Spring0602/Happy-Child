@@ -23,6 +23,16 @@ import "./styles/global.css";
 
 type GamePhase = "menu" | "playing";
 
+type FloatingTextItem = {
+  id: string;
+  text: string;
+  x: string;
+  y: string;
+  fontSize?: number;
+  width?: string;
+  variant?: "normal" | "climax" | "gold" | "backlash";
+};
+
 function normalizeLoadedState(loaded: GameState): {
   state: GameState;
   mapId: string;
@@ -77,8 +87,10 @@ export default function App() {
   const [showBacklog, setShowBacklog] = useState(false);
   const [showPortraitPanel, setShowPortraitPanel] = useState(false);
   const [showNotebookToast, setShowNotebookToast] = useState(false);
+  const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
   const [dialogHistory, setDialogHistory] = useState<DialogLogEntry[]>([]);
   const prevSceneIdRef = useRef<string>("");
+  const corridorDeathTimerRef = useRef<number | null>(null);
 
   // 当前对话场景
   const dialogSceneId = state.currentSceneId && scenes[state.currentSceneId]
@@ -236,6 +248,50 @@ export default function App() {
       dispatch({ type: "SET_FLAG", flag: "flag_clear" });
     }
 
+    const choiceFlagIds = new Set([
+      "ch6_class3_force_through",
+      "ch6_class3_call_zhoujunxiu",
+      "ch6_class3_claim_teacher",
+      "ch6_class3_counter_pull",
+      "ch6_class3_knife_warning",
+      "ch6_class3_cut_student",
+      "ch6_followed_liuyu_map",
+      "ch6_verified_escape_route",
+      "ch6_stalled_teacher",
+      "ch6_prepared_to_fight_teacher",
+      "ch6_vent_commit",
+      "ch6_blocked_teacher",
+      "ch6_distracted_teacher",
+      "ch6_ignored_crying_student",
+      "ch6_warned_crying_student",
+      "ch6_helped_crying_student",
+      "ch6_concealed_teacher_monster",
+      "ch6_partial_injury_truth",
+      "ch6_described_teacher_monster",
+      "ch8_asked_door_identity",
+      "ch8_checked_door_gap",
+      "ch8_checked_mirror_again",
+      "ch8_opened_door_directly",
+      "ch8_challenged_inner_voice",
+      "ch8_guided_small_choice",
+      "ch8_shared_fear_with_self",
+      "ch8_used_school_change_as_proof",
+      "ch8_showed_working_city",
+      "ch8_showed_sensory_city",
+      "ch8_admitted_uncertainty",
+      "ch8_framed_rooftop_as_choice",
+      "ch8_refused_standard_answer",
+      "ch8_admitted_no_complete_answer",
+      "ch8_explained_collective_pressure",
+      "ch8_asked_present_feeling",
+    ]);
+    if (choiceFlagIds.has(choice.id)) {
+      dispatch({ type: "SET_FLAG", flag: choice.id });
+    }
+    if (choice.id === "ch6_class3_cut_student") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_harmed_class3_student" });
+    }
+
     // AI分析静默运行
     if (choice.needAIAnalysis) {
       try {
@@ -311,6 +367,18 @@ export default function App() {
         if (currentScene.onCgEnd === "ch4_free_classroom_lunch") {
           dispatch({ type: "DIALOG_END" });
           gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          return;
+        }
+        if (currentScene.onCgEnd === "ch5_free_gallery" || currentScene.onCgEnd === "ch5_free_class3") {
+          dispatch({ type: "DIALOG_END" });
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          return;
+        }
+        if (currentScene.onCgEnd === "ch6_free_corridor_return") {
+          dispatch({ type: "SET_FLAG", flag: "ch6_corridor_returning" });
+          dispatch({ type: "DIALOG_END" });
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          startCorridorDeathTimer();
           return;
         }
       }
@@ -609,6 +677,137 @@ export default function App() {
       return;
     }
 
+    if (nextSceneId === "ch5_wang_gallery_enter") {
+      enterWangGalleryScene("spawn_wang_gallery_default", nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch5_return_to_office") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "teleport_to_spawn", payload: { spawnId: "spawn_spawn_102" } });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch5_enter_class3") {
+      enterClass3Scene("spawn_spawn_279", nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch5_class3_exposure") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch6_corridor_return") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_escaped_class3" });
+      enterMapScene("corridor", "spawn_spawn_38", nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch6_liuyu_catches_late") {
+      clearCorridorDeathTimer();
+      enterClassroomScene("spawn_spawn_156", nextSceneId, () => {
+        fillClassroomSeats(["spawn_spawn_127", "spawn_spawn_132", "spawn_spawn_145", "spawn_spawn_156", "spawn_spawn_157"]);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_157", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
+      });
+      return;
+    }
+
+    if (nextSceneId === "ch6_teacher_office_enter") {
+      enterTeacherOfficeScene(nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch6_office_escape_choice") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch6_toilet_encounter") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_teacher_office_escaped" });
+      dispatch({ type: "SET_FLAG", flag: "ch6_rule_wound" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch6_after_school_walk") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_weekly_exam_completed" });
+      enterGateNightScene(nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch6_capture_ritual") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_school_root_rule_triggered" });
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (dialogScene?.id === "ch6_ritual_wishes" && nextSceneId === "ch6_ritual_desire_snowball") {
+      runFloatingTextSequence("wishes", nextSceneId);
+      return;
+    }
+
+    if (dialogScene?.id === "ch6_ritual_desire_snowball" && nextSceneId === "ch6_ritual_backlash") {
+      runFloatingTextSequence("snowball", nextSceneId);
+      return;
+    }
+
+    if (dialogScene?.id === "ch6_ritual_backlash" && nextSceneId === "ch6_numbers_attack") {
+      runFloatingTextSequence("backlash", nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch7_rule_skill_initialize") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_active_skill_initializing" });
+      dispatch({ type: "SET_FLAG", flag: "ch6_school_rebellion_60" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch8_bathroom_knocking") {
+      enterMapScene("bathroom", "spawn_spawn_23", nextSceneId);
+      return;
+    }
+
+    if (dialogScene?.id === "ch8_mother_ghost_enters" && nextSceneId === "ch8_return_to_bed") {
+      dispatch({ type: "SET_FLAG", flag: "ch8_mirror_truth_fragment_1" });
+      dispatch({ type: "SET_FLAG", flag: "ch8_mother_ghost_suspected" });
+      dispatch({ type: "SET_FLAG", flag: "ch8_home_mirrors_connected_suspected" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch8_rooftop_arrival") {
+      dispatch({ type: "SET_FLAG", flag: "ch8_left_room_during_check_hours" });
+      enterMapScene("rooftop", "spawn_rooftop_default", nextSceneId);
+      return;
+    }
+
+    if (dialogScene?.id === "ch8_rooftop_resolution" && nextSceneId === "ch8_return_home") {
+      dispatch({ type: "SET_FLAG", flag: "ch8_inner_voice_respected" });
+      dispatch({ type: "SET_FLAG", flag: "ch8_rooftop_shared_joy" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (dialogScene?.id === "ch8_return_home" && nextSceneId === "ch8_demo_personality_review") {
+      dispatch({ type: "SET_FLAG", flag: "ch8_abandoned_cry_fragment_2" });
+      dispatch({ type: "SET_FLAG", flag: "ch8_demo_story_completed" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
     // ── 7.1 校园小卖部：告别挥手 → 播放 stand_front 动画 ──
     if (dialogScene?.id === "ch1_shop_school_farewell") {
       gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
@@ -711,6 +910,29 @@ export default function App() {
           return;
         }
       }
+    }
+
+    // ── 第5章：画廊/3班探索阶段 flag ──
+    const currentSceneId = currentScene?.id ?? "";
+    if (currentSceneId === "ch5_gallery_soft") {
+      dispatch({ type: "SET_FLAG", flag: "ch5_gallery_soft_seen" });
+      if (state.flags["ch5_gallery_raw_seen"]) dispatch({ type: "SET_FLAG", flag: "ch5_gallery_paintings_seen" });
+    }
+    if (currentSceneId === "ch5_gallery_raw") {
+      dispatch({ type: "SET_FLAG", flag: "ch5_gallery_raw_seen" });
+      if (state.flags["ch5_gallery_soft_seen"]) dispatch({ type: "SET_FLAG", flag: "ch5_gallery_paintings_seen" });
+    }
+    if (currentSceneId === "ch5_gallery_inference") {
+      dispatch({ type: "SET_FLAG", flag: "ch5_social_responsibility_realized" });
+    }
+    if (currentSceneId === "ch5_gallery_materials_warning") {
+      dispatch({ type: "SET_FLAG", flag: "ch5_gallery_warning_triggered" });
+    }
+    if (currentSceneId === "ch5_class3_students") {
+      dispatch({ type: "SET_FLAG", flag: "ch5_class3_students_checked" });
+    }
+    if (currentSceneId === "ch5_class3_rules") {
+      dispatch({ type: "SET_FLAG", flag: "ch5_class3_rules_found" });
     }
 
     // ── 7.1 校园小卖部：进入后解放玩家 ──
@@ -920,6 +1142,83 @@ export default function App() {
       }
     }
 
+    // ── 第6章：20秒内奔回本班 ──
+    if (state.currentMapId === "corridor" && state.flags["ch6_corridor_returning"]) {
+      if (actualSceneId === "trigger_36") {
+        clearCorridorDeathTimer();
+        dispatch({ type: "SET_FLAG", flag: "ch6_reached_classroom_in_time" });
+        enterClassroomScene("spawn_spawn_156", "ch6_liuyu_catches_late", () => {
+          fillClassroomSeats(["spawn_spawn_127", "spawn_spawn_132", "spawn_spawn_145", "spawn_spawn_156", "spawn_spawn_157"]);
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_157", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
+        });
+        return;
+      }
+      if (["trigger_53", "trigger_51", "trigger_50", "trigger_34", "trigger_35", "trigger_37"].includes(actualSceneId)) {
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_wrong_room" });
+        return;
+      }
+    }
+
+    // ── 第5章：王沁林画廊探索触发器 ──
+    if (state.currentMapId === "wang_gallery") {
+      const softPaintingTriggers = new Set(["trigger_88", "trigger_90", "trigger_92", "trigger_94"]);
+      const rawPaintingTriggers = new Set(["trigger_89", "trigger_91", "trigger_93", "trigger_95"]);
+      const materialTriggers = new Set(["trigger_96", "trigger_97", "trigger_99", "trigger_100", "trigger_101", "trigger_102", "trigger_103", "trigger_104"]);
+
+      if (softPaintingTriggers.has(actualSceneId)) {
+        dispatch({ type: "DIALOG_START", sceneId: "ch5_gallery_soft" });
+        return;
+      }
+      if (rawPaintingTriggers.has(actualSceneId)) {
+        dispatch({ type: "DIALOG_START", sceneId: "ch5_gallery_raw" });
+        return;
+      }
+      if (actualSceneId === "trigger_end") {
+        const targetSceneId = !state.flags["ch5_gallery_paintings_seen"]
+          ? "ch5_gallery_infer_need_paintings"
+          : state.flags["ch5_social_responsibility_realized"]
+            ? "ch5_gallery_materials_warning"
+            : "ch5_gallery_inference";
+        dispatch({ type: "DIALOG_START", sceneId: targetSceneId });
+        return;
+      }
+      if (materialTriggers.has(actualSceneId)) {
+        dispatch({
+          type: "DIALOG_START",
+          sceneId: state.flags["ch5_social_responsibility_realized"] ? "ch5_gallery_materials_warning" : "ch5_gallery_materials_wait",
+        });
+        return;
+      }
+      if (actualSceneId === "trigger_48") {
+        dispatch({ type: "DIALOG_START", sceneId: "ch5_gallery_infer_need_paintings" });
+        return;
+      }
+    }
+
+    // ── 第5章：3班探索触发器 ──
+    if (state.currentMapId === "classroom_3") {
+      if (["trigger_283", "trigger_284", "trigger_285"].includes(actualSceneId)) {
+        dispatch({ type: "DIALOG_START", sceneId: "ch5_class3_students" });
+        return;
+      }
+      if (actualSceneId === "trigger_251") {
+        dispatch({ type: "DIALOG_START", sceneId: "ch5_class3_slogan" });
+        return;
+      }
+      if (actualSceneId === "trigger_245") {
+        dispatch({ type: "DIALOG_START", sceneId: "ch5_class3_leave_blocked" });
+        return;
+      }
+      if (actualSceneId === "trigger_250") {
+        dispatch({
+          type: "DIALOG_START",
+          sceneId: state.flags["ch5_class3_students_checked"] ? "ch5_class3_rules" : "ch5_class3_rules_wait",
+        });
+        return;
+      }
+    }
+
     const scene = scenes[actualSceneId];
     if (scene?.onCgEnd) {
       if (scene.onCgEnd === "enter_balcony") {
@@ -945,7 +1244,113 @@ export default function App() {
     ? `[${dialogScene.speaker || "旁白"}] ${dialogScene.text.slice(0, 20)}`
     : "";
 
-  const fillClassroomSeats = useCallback((exclude: string[]) => {
+  const wait = (ms: number) => new Promise(resolve => window.setTimeout(resolve, ms));
+
+  const clearCorridorDeathTimer = useCallback(() => {
+    if (corridorDeathTimerRef.current !== null) {
+      window.clearTimeout(corridorDeathTimerRef.current);
+      corridorDeathTimerRef.current = null;
+    }
+  }, []);
+
+  const startCorridorDeathTimer = useCallback(() => {
+    clearCorridorDeathTimer();
+    corridorDeathTimerRef.current = window.setTimeout(() => {
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_timeout_death" });
+      corridorDeathTimerRef.current = null;
+    }, 20000);
+  }, [clearCorridorDeathTimer]);
+
+  const enterMapScene = useCallback((mapId: string, spawnId: string, sceneId: string) => {
+    dispatch({ type: "CHANGE_MAP", mapId, spawnId, position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId, spawnId });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, []);
+
+  const addFloatingText = useCallback((item: Omit<FloatingTextItem, "id">) => {
+    const id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    setFloatingTexts(prev => [...prev, { ...item, id }]);
+    return id;
+  }, []);
+
+  const removeFloatingText = useCallback((id: string) => {
+    setFloatingTexts(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  const runFloatingTextSequence = useCallback(async (sequence: "wishes" | "snowball" | "backlash", nextSceneId: string) => {
+    const show = async (item: Omit<FloatingTextItem, "id">, delay: number) => {
+      addFloatingText(item);
+      await wait(delay);
+    };
+
+    if (sequence === "wishes") {
+      setFloatingTexts([]);
+      const wishes = [
+        ["保佑我考上清华……", "8%", "14%", 24, undefined, 2200],
+        ["保佑我这次竞赛拿省一……", "58%", "18%", 24, undefined, 2200],
+        ["保佑我上985……", "12%", "38%", 24, undefined, 2200],
+        ["保佑我上211……", "62%", "42%", 24, undefined, 2200],
+        ["保佑学校高考均分再创新高……", "10%", "62%", 24, undefined, 2800],
+        ["保佑我今年升职加薪……", "58%", "64%", 24, undefined, 2200],
+        ["保佑我入选优秀教师……", "35%", "28%", 24, undefined, 2200],
+        ["保佑我年终KPI达到平均以上……", "34%", "74%", 24, undefined, 2800],
+      ] as const;
+      for (const [text, x, y, fontSize, width, delay] of wishes) {
+        await show({ text, x, y, fontSize, width, variant: "normal" }, delay);
+      }
+      for (const [text, fontSize, delay] of [["保佑我功成名就……", 42, 2400], ["保佑我功成名就。", 56, 2400], ["保佑我功成名就！", 76, 2800]] as const) {
+        const id = addFloatingText({ text, x: "50%", y: "50%", fontSize, variant: "climax" });
+        await wait(delay);
+        removeFloatingText(id);
+      }
+      setFloatingTexts([]);
+      await wait(500);
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (sequence === "snowball") {
+      setFloatingTexts([]);
+      const texts = [
+        ["神啊！您显灵了！", "10%", "12%", 28, undefined, 2000],
+        ["哈哈！我考上了，我考上了！", "58%", "16%", 28, undefined, 2400],
+        ["喜报！XX中学高考成绩节节高！", "34%", "28%", 26, undefined, 2600],
+        ["不够，还不够，211还不够。我还不够努力，我还不够优秀，他们几个都能考上985，我还可以考得更好，我要复读！", "6%", "42%", 24, "40%", 4800],
+        ["不够，还不够。就业市场如此多变，连这些清华北大毕业的还有这么多人失业，为了拿到一份体面的工作，我要考研！……考公考编！他们都说，能上岸的！", "54%", "40%", 24, "40%", 5600],
+        ["不够，还不够。学生还不够拼命，我们也不够拼命……也许应该将分层教学实施得更精细，分三个级部，每个级部分两个尖子班……对，两个尖子班，他们不能没有竞争。", "7%", "68%", 24, "43%", 5800],
+        ["不够，还不够。这届理科学生一个高二强基保送清华，一个高考考入清华，我看市里最好的高中有三个进了清华；文科只有一个考入北大，但也侥幸……是不是应该把中考录取分数线再提高一点？", "53%", "66%", 24, "42%", 6200],
+      ] as const;
+      for (const [text, x, y, fontSize, width, delay] of texts) {
+        await show({ text, x, y, fontSize, width, variant: "gold" }, delay);
+      }
+      setFloatingTexts([]);
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    setFloatingTexts([]);
+    const backlash = [
+      ["满墙的标语和老师日日的鼓励，我知道那多少有些真情实感，但是我为什么这么害怕看到它们？我真的好累，我真的不想再学了，这些东西我真的学不会！可是我也必须‘只要学不死就往死里学’，我不想再复读了，我不想再看到父母那两双失望的眼睛！为什么要逼我？", "5%", "10%", 22, "45%", 7000],
+      ["老师你不是说读完高中就解放了吗？为什么到了大学还要再学这些恶心的东西，我真的受够了！为什么现在还要逼我？", "53%", "12%", 22, "41%", 4800],
+      ["我曾经以为自己是天之骄子。可被所有人碾压以后，我才发现自己什么都不是。放弃吧，这辈子也就这样了。", "8%", "42%", 22, "39%", 4600],
+      ["读完研还是找不到工作……什么上岸？哈哈……", "60%", "40%", 24, "30%", 3400],
+      ["我究竟还要哄骗这些孩子多久？为了让他们高考全力以赴，这种洗脑究竟正确吗？但是，这也是为了他们好啊。", "6%", "68%", 22, "42%", 5000],
+      ["这次体检报告已经有三个危险指标了。为了这份工作，我这么拼命，真的值得吗？", "56%", "62%", 22, "36%", 4200],
+      ["隔壁班的黄老师突发心脏病，在讲台上就……诶，她才40多岁啊。", "34%", "82%", 22, "44%", 4200],
+    ] as const;
+    for (const [text, x, y, fontSize, width, delay] of backlash) {
+      await show({ text, x, y, fontSize, width, variant: "backlash" }, delay);
+    }
+    setFloatingTexts([]);
+    dispatch({ type: "GO_NEXT", nextSceneId });
+  }, [addFloatingText, removeFloatingText]);
+
+  const fillClassroomSeats = useCallback((exclude: string[], includeSpawns: string[] = []) => {
     gameBridge.sendToPhaser({
       type: "STORY_EVENT",
       eventId: "fill_classroom_seats",
@@ -966,6 +1371,7 @@ export default function App() {
           "spawn_spawn_252",
           "spawn_spawn_253",
         ],
+        includeSpawns,
         framesPrefixes: ["npc_female1_frames", "npc_male_frames"],
       },
     });
@@ -1025,6 +1431,68 @@ export default function App() {
     }, 700);
   }, []);
 
+  const enterWangGalleryScene = useCallback((spawnId: string, sceneId: string) => {
+    dispatch({ type: "CHANGE_MAP", mapId: "wang_gallery", spawnId, position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "wang_gallery", spawnId });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_45", npcKey: "npc_wang_teacher", scale: 0.75, framesPrefix: "wql_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_46", npcKey: "npc_zhoujunxiu", scale: 0.75, framesPrefix: "zjx_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_wang_teacher", direction: "right" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhoujunxiu", direction: "left" } });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, []);
+
+  const enterTeacherOfficeScene = useCallback((sceneId: string) => {
+    dispatch({ type: "CHANGE_MAP", mapId: "teacher_office", spawnId: "spawn_spawn_35", position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "teacher_office", spawnId: "spawn_spawn_35" });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_36", npcKey: "npc_teacher", scale: 0.75, framesPrefix: "teacher_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_37", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_teacher", direction: "front" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "back" } });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, []);
+
+  const enterGateNightScene = useCallback((sceneId: string) => {
+    dispatch({ type: "CHANGE_MAP", mapId: "gate_night", spawnId: "spawn_spawn_176", position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "gate_night", spawnId: "spawn_spawn_176" });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_174", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_175", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "back" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "back" } });
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, []);
+
+  const setupClass3 = useCallback(() => {
+    fillClassroomSeats(
+      ["spawn_spawn_279", "spawn_spawn_126"],
+      ["spawn_spawn_251", "spawn_spawn_256", "spawn_spawn_261", "spawn_spawn_266", "spawn_spawn_271", "spawn_spawn_277", "spawn_spawn_282"],
+    );
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_126", npcKey: "npc_zhoujunxiu", scale: 0.75, framesPrefix: "zjx_frames" } });
+    gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhoujunxiu", direction: "up" } });
+  }, [fillClassroomSeats]);
+
+  const enterClass3Scene = useCallback((spawnId: string, sceneId: string) => {
+    dispatch({ type: "CHANGE_MAP", mapId: "classroom_3", spawnId, position: { x: 0, y: 0 } });
+    gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "classroom_3", spawnId });
+    dispatch({ type: "DIALOG_END" });
+    setTimeout(() => {
+      setupClass3();
+      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+      dispatch({ type: "DIALOG_START", sceneId });
+    }, 700);
+  }, [setupClass3]);
+
   // ── 开始菜单阶段 ──
   if (gamePhase === "menu") {
     return (
@@ -1065,6 +1533,26 @@ export default function App() {
 
       {/* ── React 闪屏层 ── */}
       {reactFlash && <div className={`react-flash-overlay ${reactFlash}`} />}
+
+      {/* ── 屏幕文字演出层 ── */}
+      {floatingTexts.length > 0 && (
+        <div className="floating-text-layer">
+          {floatingTexts.map(item => (
+            <div
+              key={item.id}
+              className={`floating-text ${item.variant ?? "normal"}`}
+              style={{
+                left: item.x,
+                top: item.y,
+                fontSize: item.fontSize ? `${item.fontSize}px` : undefined,
+                width: item.width,
+              }}
+            >
+              {item.text}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* ── 对话叠层 ── */}
       {dialogScene && dialogScene.cgMode && (

@@ -3636,11 +3636,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -3661,11 +3656,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3686,11 +3676,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3711,11 +3696,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3736,11 +3716,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3761,11 +3736,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3786,11 +3756,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3811,11 +3776,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3836,11 +3796,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -3861,11 +3816,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -3886,11 +3836,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -3911,11 +3856,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -3936,11 +3876,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -3961,11 +3896,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -3986,11 +3916,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -4011,11 +3936,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -4036,11 +3956,26 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            }
+          ]
+        },
+        {
+          "id": 117,
+          "name": "trigger_end",
+          "x": 946,
+          "y": 638,
+          "width": 128.27985915981355,
+          "height": 64.13992957990672,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
             },
             {
-              "name": "hintText",
+              "name": "sceneId",
               "type": "string",
-              "value": "??"
+              "value": ""
             }
           ]
         }
@@ -4083,6 +4018,14 @@
           "y": 373,
           "width": 32,
           "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_102",
+          "x": 562,
+          "y": 473,
+          "width": 32,
+          "height": 32
         }
       ]
     },
@@ -4102,7 +4045,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 254,
+  "nextobjectid": 255,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

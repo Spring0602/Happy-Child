@@ -22,6 +22,8 @@
 
 ### [CG]3班暴露
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\3班\突脸.png
+效果：淡入
 [旁白]那双瞪得浑圆的眼睛死死盯着我，眼球仿佛随时会从眼眶中掉落。
 [NPC:陌生同学]你——是——谁——？
 [旁白]喑哑的嗓音贴着耳膜响起，完全不像人类，更像是恶魔的低语。
@@ -73,11 +75,10 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 → NPC观念更新: 周隽秀
 → 对话结束后：跳转 ch6_class3_door_locked
 
-### [地图]被锁住的教室门
+### [CG]被锁住的教室门
 
-地图：classroom_3
-出生点：spawn_classroom_3_door
-冻结玩家：是
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\3班\逃生.png
+效果：淡入
 [旁白]我拨开一只只伸来的手，终于挤到教室门口。\n\n抓住门把手的瞬间，我往下一摁，却发现门根本打不开。
 [NPC:陌生同学]你是谁……你是谁……你是谁……
 [旁白]重复的呢喃像蚊虫贴着耳边飞舞，令人焦躁发狂。
@@ -94,7 +95,7 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 [主角说]该死！你TM给我放手啊！
 → 跳转：ch6_class3_survival_choice
 
-### [地图]坚持到铃响
+### [CG]坚持到铃响
 
 → 选项：突然松开门把手，借后方拉力撞倒人群
     AI标签：临场反击, 果断, 环境利用
@@ -112,6 +113,9 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
     跳转：ch6_class3_standoff
 
 ### [CG]铃响前的对峙
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\3班\人群.png
+效果：淡入
 
 条件：ch6_class3_counter_pull
 [旁白]我突然松开门把手。后方拉扯的力量让我狠狠摔进人群，数名学生失去重心倒在地上，抓住脚踝的手也随之松开。
@@ -144,18 +148,45 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 ### [地图]奔回本班
 
 地图：corridor
-出生点：spawn_corridor_class3
-倒计时提醒：从10开始倒计时，若到0仍未交互trigger_return_classroom，则跳转：ch6_corridor_timeout_death
+出生点：spawn_spawn_38
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
 冻结玩家：否
 [NPC:系统]技能“违规提醒”发动中。
+[NPC:系统]注意：该技能只能保护您20秒！
+倒计时提醒：从20开始倒计时，若到0仍未交互trigger_36，则跳转：ch6_corridor_timeout_death
 [旁白]熟悉的窒息感再次袭来，迫使我放慢速度。
 [主角]（该死，现在这技能还帮倒忙了。）
 
-@trigger_return_classroom
+@trigger_36
   提示文字：E进入教室
   触发：[对话]
     [旁白]我用尽最后一口气赶到教室门口，猛地推开门。
     → 跳转：ch6_liuyu_catches_late
+
+@trigger_53
+  提示文字：E高三（2）班
+  触发：[对话]
+    [旁白]不是这里。
+
+@trigger_51
+  提示文字：E上楼
+  触发：[对话]
+    [旁白]（1）班在楼梯口附近。
+
+@trigger_50
+  提示文字：E离开教学楼
+  触发：[对话]
+    [旁白]（1）班在楼梯口附近。
+
+@trigger_34
+  提示文字：E女厕所
+  触发：[对话]
+    [旁白]方向反了哥们。
+
+@trigger_35
+  提示文字：E男厕所
+  触发：[对话]
+    [旁白]方向反了哥们。
 
 ### [CG]回班失败·窒息死亡
 
@@ -174,10 +205,13 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 ### [地图]刘宇判定迟到
 
 地图：classroom
-出生点：spawn_classroom_door
+出生点：spawn_spawn_156
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_left 
 冻结玩家：是
 NPC：
-  - id: npc_liuyu, 名称: 刘宇, 精灵: ly_frames, 位置: spawn_teacher_front, 朝向: 主角
+  - id: npc_liuyu, 名称: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_front, 位置: spawn_spawn_157
+  - id: npc_zhouqirui, 名称: 周骐瑞, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\zqr_frames\zqr_frames_sit_back, 位置: spawn_spawn_117
+  - 除spawn_spawn_127、spawn_spawn_132、spawn_spawn_145外，其他座位上的出生点随机播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames\npc_female1_frames_sit_back和G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames\npc_male _frames_sit_back
 
 [旁白]我猛地推开门，就看见刘宇正坐在讲台上，漠然的视线轻飘飘地与我的交汇在一起。其他同学都木然地低着头学习，丝毫没有注意这边发生了什么。
 [NPC:刘宇]你迟到了，叶平生。
@@ -189,7 +223,7 @@ NPC：
 
 ### [CG]去往教师办公室
 场景ID：ch6_to_teacher_office
-图片：
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\美术教室\楼梯.png
 效果：淡入
 [旁白]我感受着手腕上逐渐收紧的力道，竟然莫名地觉得安心。\n\n他塞给我一个纸团，小声嘱咐道，
 → 跳转：ch6_liuyu_route_note
@@ -214,7 +248,6 @@ AI提示：根据刘宇对主角的印象及第五章谈判方式，生成他秘
 → 对话结束后：跳转 ch6_liuyu_route_note
 
 ### [CG]逃生路线
-图片：
 [主角说]好，谢谢你了。
 [旁白]我展开刘宇塞来的纸团。这是一张学校内部地形图，一条红线从教师办公室延伸至一楼厕所，关键位置标着简短批注。
 [旁白]来到办公室门前，刘宇敲了敲门，听到老师的许可声后推开了门。
@@ -223,25 +256,35 @@ AI提示：根据刘宇对主角的印象及第五章谈判方式，生成他秘
 ### [地图]进入教师办公室
 
 地图：teacher_office
-出生点：spawn_teacher_office_default
+出生点：spawn_spawn_35
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_back
 冻结玩家：是
 NPC：
-  - id: npc_teacher, 名称: 班主任, 精灵: teacher_frames, 位置: spawn_teacher_desk, 朝向: 下
+  - id: npc_teacher, 名称: 班主任, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\teacher_frames\teacher_frames_sit_front, 位置: spawn_spawn_36
+  - id: npc_liuyu, 名称: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_back, 位置: spawn_spawn_37
 
 [NPC:刘宇]老师，迟到的人我带来了。
 [NPC:班主任]好，你先回去吧。
-[旁白]刘宇与我交换了一个眼神，就转身离开。\n\n老师还在批改作业，我们谁也没有开口，办公室内寂静得诡异，惹得一阵强烈的不祥预感顺着我的脊椎一路攀援直冲天灵盖。\n\n我不禁打了个寒颤，未知的恐惧仍在一点点随着时间积累——因为我压根听不见她批改作业时本该发出的“沙沙”声。
+[旁白]刘宇与我交换了一个眼神，就转身离开。
+NPC动作：
+    - npc_liuyu: walk_right -> spawn_spawn_37 -> walk_down ->spawn_spawn_39 -> walk_left -> spawn_spawn_38 -> walk_down -> spawn_spawn_40 ->消失
+[旁白]老师还在批改作业，我们谁也没有开口，办公室内寂静得诡异，惹得一阵强烈的不祥预感顺着我的脊椎一路攀援直冲天灵盖。\n\n我不禁打了个寒颤，未知的恐惧仍在一点点随着时间积累——因为我压根听不见她批改作业时本该发出的“沙沙”声。
 [旁白]不知过了多久，她终于停下笔，抬头看向我。
 [NPC:班主任]不听话的孩子，就应该受到应有的惩罚。
 → 效果: fade_out
-[旁白]她的声音逐渐失去人类质感。周围环境迅速昏暗，连办公室的布局都变得难以辨认。
+[旁白]她的声音逐渐失去人类质感。周围环境迅速变得昏暗，连办公室的布局都变得难以辨认。
 → 跳转：ch6_office_escape_choice
 
 ### [地图]寻找办公室出口
 
 地图：teacher_office
-出生点：spawn_teacher_office_default
+效果：flash_red   
+出生点：spawn_spawn_35
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_back
 冻结玩家：是
+NPC：
+  - id: npc_teacher, 名称: 班主任, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\teacher_monster_frames\teacher_monster_frames_sit_front, 位置: spawn_spawn_36
+
 [旁白]老师的皮肤惨白如纸，甚至透着骇人的青灰色。而牙齿变得尖锐，嘴角咧到了耳根；指甲变得锋利，目露凶光。
 [旁白]我咬紧后槽牙，目光迅速扫过整个办公室。门、窗户、通风管道……
 [主角]（门应该是打不开的，但刘宇提到每个办公室都有一个足够大的通风管道，可供人通过。）
@@ -270,6 +313,8 @@ NPC：
 
 ### [CG]破坏通风管道
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\逼近.png
+效果：fade_in
 条件：ch6_verified_escape_route
 [旁白]我没有立刻冲向通风管道，而是先去拧办公室门把手。\n\n门锁纹丝不动。
 [主角]（果然打不开。那窗户呢？）
@@ -322,7 +367,7 @@ NPC：
     跳转：ch6_vent_escape
 
 ### [CG]通风管道逃生
-
+图片：无
 条件：ch6_vent_commit
 [旁白]利爪破空的声音从身后袭来，我立刻闪躲，但还是在最后一刻被划伤了小腿。
 
@@ -344,7 +389,7 @@ NPC：
 
 ### [CG]一楼厕所
 
-图片：
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\厕所奇遇.png
 效果：淡入
 [旁白]厕所里传来压抑的哭声。好像是有同学压力太大了，晚自习偷跑来这里发泄情绪，甚至不惜违反规则。
 [主角]（真勇。不过我也没资格吐槽他，我这是五十步笑百步。）
@@ -398,6 +443,9 @@ AI提示：根据玩家此前人格画像与本次选择“主动帮助”，生
 
 ### [CG]带伤参加周测
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\教室\教室夜晚.png
+效果：fade_in
+
 [旁白]我赶回教室不久，周测试卷便发了下来。\n\n真是一秒钟都不让我喘息啊。
 [旁白]我凭残存记忆完成了大约七成题目，其余只能靠猜。短短一个小时根本不足以写完全部试题。
 [旁白]收卷时，我才意识到腿上的伤口仍在流血，裤腿已经被血液染深。
@@ -412,15 +460,24 @@ AI提示：根据玩家此前人格画像与本次选择“主动帮助”，生
 ### [地图]放学后的同行
 
 地图：gate_night
-出生点：spawn_gate_default
+出生点：spawn_spawn_176
+玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_back
 冻结玩家：是
 NPC：
-  - id: npc_liuyu, 名称: 刘宇, 精灵: ly_frames, 位置: spawn_liuyu_gate, 朝向: 主角
-  - id: npc_zqr, 名称: 周骐瑞, 精灵: zqr_frames, 位置: spawn_zqr_gate, 朝向: 主角
+  - id: npc_liuyu, 名称: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_back, 位置: spawn_spawn_174
+  - id: npc_zqr, 名称: 周骐瑞, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\zqr_frames\zqr_frames_stand_back, 位置: spawn_spawn_175
+  - 其他非spawn_spawn_174、spawn_spawn_175、spawn_spawn_176、spawn_spawn_171、spawn_spawn_172、spawn_spawn_173的出生点适量（无需全部）随机填充G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames和G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames中的stand动作，朝向随意
+动作：
+    - 主角：spawn_spawn_176 -> walk_up -> spawn_spawn_173
+    - 刘宇：spawn_spawn_174 -> walk_up -> spawn_spawn_171
+    - 周骐瑞：spawn_spawn_175 -> walk_up -> spawn_spawn_172
 
 [旁白]晚自习结束后，刘宇很自然地拉过我和周骐瑞，我们跟三兄弟一样勾肩搭背地走着，虽然是刘宇单方面所为。
 [主角说]嘶——
 [旁白]他走得有些快了，我扯到了刚刚结痂的伤口，疼得倒吸一口凉气。
+NPC动作：
+    - 刘宇：转身
+    - 周骐瑞：转身
 [NPC:刘宇]怎么了你？
 [旁白]刘宇担心地看着我，连周骐瑞也看了过来。\n\n他的目光在我身上扫了一圈，最后并没有发现什么异常。
 [主角说]我的右腿受伤了……你们看不到吗？伤得很重。
@@ -484,6 +541,8 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 
 ### [CG]周围突然安静
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\转头.png
+效果：fade_in
 [旁白]我几乎脱口而出，然后突然意识到了什么，连忙住口。\n\n为什么周围突然这么安静？现在可是在放学后的室外。
 [旁白]当我再次抬起头的时候，对上了周骐瑞阴翳的脸。越过他的肩膀，我还看到前方所有的同学头都转过一个诡异的弧度，冷漠地看着我，这些人的眼睛有些无神有些尚有光彩，但他们看我的眼神绝对说不上友善。
 [旁白]我惊诧地看向刘宇，却发现他的表情和周骐瑞别无二致。\n\n我瞬间如坠冰窟。
@@ -494,9 +553,6 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 → 跳转：ch6_root_rule_experiment_choice
 
 ### [CG]根本规则触发
-图片：
-效果：淡入
-
 [旁白]我刻意提高了音量，尽量让远处的人听见。
 [主角说]我说——哪怕我逃了晚自习，老师也不能把我怎么样。
 [NPC:系统]由于您的天赋效果，该话语的份量正在上升。
@@ -519,7 +575,7 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 ## 四、功成名就
 
 ### [CG]全校追杀
-
+图片：无
 [旁白]离我最近的刘宇和周骐瑞面无表情地讲我撂倒，然后几个学生上来死死扣住我的四肢。
 [旁白]其他学生以我为中心围成圆圈。姗姗来迟的老师们则整齐地排列在圈的内层，我余光瞥到他们全都已经怪物化，但没有一个扑上来撕咬我。
 [旁白]仿佛在为一场杀戮做必要的仪式，或者说是一种请神仪式，而我就是仪式中献给神明的祭品。
@@ -530,7 +586,7 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 → 跳转：ch6_ritual_wishes
 
 ### [CG]愿望汇流
-图片：
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\天空.png
 效果：淡入
 [旁白]我的咳嗽声与脑内警报盖过师生的声音。\n\n我索性屏住呼吸，配合颈部不断收紧的力量，平静地、径直地望向灰蒙蒙的夜空。
 [旁白]云层遮蔽月亮和星辰，什么都看不到。
@@ -575,6 +631,7 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 
 ### [CG]欲望滚雪球
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\天空.png
 → 效果: papers_fall
 [旁白]阴风掠过，大量试卷和总结报告从天而降。内容模糊不清，唯独页眉处的数字大得骇人。它们落到我的身上，散布到我的周围，挡住我的眼睛。
 
@@ -602,6 +659,8 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 
 ### [CG]愿望反噬
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\仪式.png
+效果：fade_in
 [旁白]接着，欢呼声逐渐消失，抱怨声夹杂着呜咽声如浪涛般一阵盖过一阵。
 
 屏幕文字演出：愿望反噬
@@ -629,6 +688,7 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 
 ### [CG]数字落下
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\仪式.png
 [旁白]几名学生捡起地上的试卷，粗暴地将它们揉成团，塞进我的嘴里。
 [旁白]剩余纸张上的猩红数字缓慢脱离页面。每一道笔画的首尾都尖锐得像刀尖，在夜色中对准我的四肢。
 [主角]（系统……再快一点。）

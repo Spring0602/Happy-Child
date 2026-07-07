@@ -874,6 +874,7 @@ export class MapScene extends Phaser.Scene {
         const start = (payload?.start as number) ?? 115;
         const end = (payload?.end as number) ?? 155;
         const exclude = new Set<string>((payload?.exclude as string[]) || []);
+        const includeSpawns = new Set<string>((payload?.includeSpawns as string[]) || []);
         const framePrefixes = ((payload?.framesPrefixes as string[]) || ["npc_female1_frames", "npc_male_frames"]);
         const spawnLayer = this.map.getObjectLayer("player_spawn");
         if (!spawnLayer) break;
@@ -889,7 +890,8 @@ export class MapScene extends Phaser.Scene {
           const match = /^spawn_spawn_(\d+)$/.exec(spawnName);
           if (!match) continue;
           const index = Number(match[1]);
-          if (index < start || index > end || exclude.has(spawnName)) continue;
+          const included = includeSpawns.has(spawnName);
+          if ((!included && (index < start || index > end)) || (exclude.has(spawnName) && !included)) continue;
 
           const npcKey = `classroom_seat_${spawnName}`;
           const existing = npcList.get(npcKey);

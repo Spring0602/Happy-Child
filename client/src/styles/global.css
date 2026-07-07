@@ -636,6 +636,68 @@ body {
 }
 
 /* ══════════════════════════════════════════════
+   屏幕文字演出层（群声/仪式愿望）
+   ══════════════════════════════════════════════ */
+.floating-text-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+}
+
+.floating-text {
+  position: absolute;
+  max-width: 46vw;
+  color: #ffffff;
+  line-height: 1.45;
+  white-space: normal;
+  text-shadow: 0 0 10px rgba(210, 230, 255, 0.75), 0 2px 8px rgba(0, 0, 0, 0.8);
+  animation: floatingTextIn 0.4s ease-out both;
+}
+
+.floating-text.climax {
+  transform: translate(-50%, -50%);
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  color: #fff4f4;
+  background: linear-gradient(180deg, #ffffff 0%, #ff3f3f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 18px rgba(255, 40, 40, 0.95), 0 0 42px rgba(255, 255, 255, 0.55);
+  animation: floatingTextCenterIn 0.25s ease-out both, ritualShake 0.12s infinite;
+}
+
+.floating-text.gold {
+  color: #fff5c4;
+  text-shadow: 0 0 14px rgba(255, 218, 84, 0.9), 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+.floating-text.backlash {
+  color: rgba(230, 235, 240, 0.9);
+  filter: blur(0.2px);
+  text-shadow: 0 0 8px rgba(180, 190, 210, 0.55), 0 2px 8px rgba(0, 0, 0, 0.9);
+  animation: floatingTextIn 0.35s ease-out both, ritualShake 0.2s infinite;
+}
+
+@keyframes floatingTextIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatingTextCenterIn {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes ritualShake {
+  0%, 100% { margin-left: 0; }
+  25% { margin-left: -1px; }
+  75% { margin-left: 1px; }
+}
+
+/* ══════════════════════════════════════════════
    开始菜单（封面 + 四按钮）
    ══════════════════════════════════════════════ */
 .start-menu {
@@ -1233,4 +1295,3 @@ body {
   80%  { opacity: 1; transform: translateX(-50%) translateY(0); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
 }
-
