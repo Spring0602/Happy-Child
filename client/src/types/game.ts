@@ -18,6 +18,27 @@ export interface Choice {
   needAIAnalysis?: boolean;
 }
 
+export interface PhoneChatMessage {
+  id?: string;
+  sender: string;
+  text: string;
+  avatar?: string;
+  align?: "left" | "right" | "center";
+  delayMs?: number;
+  typingMs?: number;
+  system?: boolean;
+}
+
+export interface PhoneChat {
+  title: string;
+  subtitle?: string;
+  messages: PhoneChatMessage[];
+  /** 手机界面位置，默认居中偏上，避免压到底部对话框 */
+  position?: "center" | "left" | "right";
+  /** 播放完成前是否阻止进入下一场景，默认 true */
+  blockNextUntilComplete?: boolean;
+}
+
 export interface Scene {
   id: string;
   chapter: string;
@@ -32,6 +53,8 @@ export interface Scene {
   cgMode?: boolean;
   /** CG 模式下触发后置效果：nextSceneId 的场景加载完成后执行 */
   onCgEnd?: "enter_dormitory" | "enter_balcony" | "enter_dormitory_playable" | string;
+  /** 手机群聊演出层：用于模拟真实手机消息逐条弹出 */
+  phoneChat?: PhoneChat;
 }
 
 export interface CharacterCard {

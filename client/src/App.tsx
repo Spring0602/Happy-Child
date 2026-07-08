@@ -15,6 +15,7 @@ import { StartMenu } from "./components/StartMenu";
 import { GameMenu } from "./components/GameMenu";
 import { Backlog, type DialogLogEntry } from "./components/Backlog";
 import { PersonalityPortrait } from "./components/PersonalityPortrait";
+import { PhoneChatOverlay } from "./components/PhoneChatOverlay";
 import { gameBridge } from "./game/bridge/GameBridge";
 import { MapRegistry } from "./game/config/mapRegistry";
 import { analyzeChoice, generateNpcDialogue, judgeEnding } from "./services/aiClient";
@@ -88,6 +89,7 @@ export default function App() {
   const [showPortraitPanel, setShowPortraitPanel] = useState(false);
   const [showNotebookToast, setShowNotebookToast] = useState(false);
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
+  const [completedPhoneChats, setCompletedPhoneChats] = useState<Record<string, boolean>>({});
   const [dialogHistory, setDialogHistory] = useState<DialogLogEntry[]>([]);
   const prevSceneIdRef = useRef<string>("");
   const corridorDeathTimerRef = useRef<number | null>(null);
@@ -230,6 +232,14 @@ export default function App() {
   }
 
   async function handleChoose(choice: Choice) {
+    if (
+      dialogScene?.phoneChat &&
+      dialogScene.phoneChat.blockNextUntilComplete !== false &&
+      !completedPhoneChats[dialogScene.id]
+    ) {
+      return;
+    }
+
     const nextState = gameReducer(state, { type: "CHOOSE", choice });
     dispatch({ type: "CHOOSE", choice });
 
@@ -392,6 +402,14 @@ export default function App() {
       }
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
+
+    if (
+      dialogScene?.phoneChat &&
+      dialogScene.phoneChat.blockNextUntilComplete !== false &&
+      !completedPhoneChats[dialogScene.id]
+    ) {
       return;
     }
 
@@ -1552,6 +1570,16 @@ export default function App() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* ── 手机群聊演出层 ── */}
+      {dialogScene?.phoneChat && (
+        <PhoneChatOverlay
+          key={dialogScene.id}
+          sceneId={dialogScene.id}
+          chat={dialogScene.phoneChat}
+          onComplete={() => setCompletedPhoneChats(prev => ({ ...prev, [dialogScene.id]: true }))}
+        />
       )}
 
       {/* ── 对话叠层 ── */}
