@@ -762,6 +762,26 @@
               "value": ""
             }
           ]
+        },
+        {
+          "id": 109,
+          "name": "trigger_37",
+          "x": 730,
+          "y": 901,
+          "width": 201.60765316732056,
+          "height": 95.6343995793701,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            }
+          ]
         }
       ]
     },
@@ -794,6 +814,22 @@
           "y": 674,
           "width": 32,
           "height": 32
+        },
+        {
+          "id": 203,
+          "name": "spawn_spawn_35",
+          "x": 787,
+          "y": 625,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_36",
+          "x": 1040,
+          "y": 620,
+          "width": 32,
+          "height": 32
         }
       ]
     },
@@ -813,7 +849,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 253,
+  "nextobjectid": 255,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",
