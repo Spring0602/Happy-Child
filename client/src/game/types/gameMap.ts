@@ -34,7 +34,7 @@ export type PhaserToReactEvent =
 
 /** GameBridge: React → Phaser 指令 */
 export type ReactToPhaserCommand =
-  | { type: "CHANGE_MAP"; mapId: string; spawnId: string }
+  | { type: "CHANGE_MAP"; mapId: string; spawnId: string; playerState?: string }
   | { type: "FREEZE_PLAYER" }
   | { type: "UNFREEZE_PLAYER" }
   | { type: "STORY_EVENT"; eventId: string; payload?: Record<string, unknown> };

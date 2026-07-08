@@ -479,12 +479,19 @@ body {
 /* CG 立绘区域 — 左下角，底部贴合屏幕底部 */
 .cg-portrait-area {
   position: absolute;
-  left: 2%;
   bottom: 0;
   z-index: 2;
   pointer-events: none;
   display: flex;
   align-items: flex-end;
+}
+
+.cg-portrait-area.left {
+  left: 2%;
+}
+
+.cg-portrait-area.right {
+  right: 2%;
 }
 
 .cg-portrait {

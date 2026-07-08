@@ -26,6 +26,10 @@ export class PlayerController {
   update(_delta: number) {
     // 坐下时：检测方向键 → 站起来
     if (this.isSitting) {
+      if (this.frozen) {
+        this.body.setVelocity(0, 0);
+        return;
+      }
       if (
         Phaser.Input.Keyboard.JustDown(this.wasd.W) ||
         Phaser.Input.Keyboard.JustDown(this.wasd.A) ||
@@ -178,6 +182,14 @@ export class PlayerController {
     } else {
       this.playIdleAnimation(dir);
     }
+  }
+
+  /** 剧情强制站立并朝向指定方向，不触发椅子站起回调 */
+  standFacing(dir: Direction) {
+    this.isSitting = false;
+    this.lastDirection = dir;
+    this.body.setVelocity(0, 0);
+    this.playIdleAnimation(dir);
   }
 
   freeze() {

@@ -25,6 +25,7 @@ export const initialGameState: GameState = {
   joyProof: 0,
   aiTraces: [],
   currentMapId: "dormitory",
+  currentSpawnId: "spawn_sit_desk",
   playerPosition: { x: 0, y: 0 },
   flags: {},
   interactedItems: [],
@@ -81,6 +82,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         currentMapId: action.mapId,
+        currentSpawnId: action.spawnId,
         playerPosition: action.position,
       };
 

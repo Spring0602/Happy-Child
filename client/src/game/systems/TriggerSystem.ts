@@ -22,6 +22,7 @@ export class TriggerSystem {
   private scene: Phaser.Scene;
   private player: Phaser.GameObjects.Sprite;
   private triggers: Trigger[] = [];
+  private enabled = true;
 
   constructor(scene: Phaser.Scene, player: Phaser.GameObjects.Sprite) {
     this.scene = scene;
@@ -32,12 +33,18 @@ export class TriggerSystem {
     this.triggers.push({ zone, config, triggered: false });
   }
 
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
+
   /** 重置所有触发器（地图切换时调用） */
   reset() {
     this.triggers = [];
   }
 
   update() {
+    if (!this.enabled) return;
+
     for (const trigger of this.triggers) {
       // 一次性触发：已触发则跳过
       if (trigger.config.once && trigger.triggered) continue;

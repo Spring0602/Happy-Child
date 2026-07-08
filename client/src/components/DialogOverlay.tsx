@@ -16,10 +16,12 @@ const PROTAGONIST_NAMES = ["叶平生"];
 const PORTRAIT_MAP: Record<string, string> = {
   "叶平生": "/assets/portraits/yps_defult.png",
   "刘宇": "/assets/portraits/ly_smile.png",
+  "周骐瑞": "/assets/portraits/zqr_defult.png",
+  "周隽秀": "/assets/portraits/zjx_defult.png",
 };
 
-/** 旁白/系统类（不显示立绘） */
-const NARRATOR_NAMES = ["旁白", "系统", "系统邮件", "规则"];
+/** 旁白类（不显示立绘、不显示说话者名） */
+const NARRATOR_NAMES = ["旁白", "系统邮件", "规则"];
 
 function getSpeakerLabel(speaker: string | undefined): string | null {
   if (!speaker || NARRATOR_NAMES.includes(speaker)) return null;
@@ -37,23 +39,68 @@ function getSpeakerInfo(speaker: string | undefined) {
   return { side: "right" as const, portrait: PORTRAIT_MAP[speaker] ?? null, label: speaker };
 }
 
-/** 按 \\n\\n 拆分文本段落（至少保留一整段） */
-function splitParagraphs(text: string): string[] {
-  const parts = text.split(/\n\n/).filter(p => p.trim());
-  return parts.length > 0 ? parts : [text];
+type DialogSegment = {
+  speaker?: string;
+  text: string;
+};
+
+function splitSegmentText(text: string): string[] {
+  const parts = text.split(/\n\s*\n/).map(part => part.trim()).filter(Boolean);
+  return parts.length > 0 ? parts : [text.trim()].filter(Boolean);
+}
+
+function normalizeRoleCode(roleCode: string | undefined, fallbackSpeaker: string | undefined): string | undefined {
+  if (!roleCode) return fallbackSpeaker;
+  if (roleCode === "旁白") return "旁白";
+  if (roleCode === "主角" || roleCode === "主角说") return "叶平生";
+  if (roleCode.startsWith("NPC:")) return roleCode.slice("NPC:".length).trim();
+  return fallbackSpeaker;
+}
+
+/** 按剧本角色码拆分文本，兼容一个 scene 内多角色混排 */
+function splitDialogSegments(text: string, fallbackSpeaker: string | undefined): DialogSegment[] {
+  const normalizedText = text.replace(/\\n/g, "\n");
+  const rolePattern = /\[(旁白|主角说|主角|NPC:[^\]]+)\]\s*/g;
+  const matches = [...normalizedText.matchAll(rolePattern)];
+
+  if (matches.length === 0) {
+    const parts = splitSegmentText(normalizedText);
+    return (parts.length > 0 ? parts : [normalizedText.trim()]).map(part => ({
+      speaker: fallbackSpeaker,
+      text: part,
+    }));
+  }
+
+  const segments: DialogSegment[] = [];
+  if (matches[0].index && matches[0].index > 0) {
+    const prefix = normalizedText.slice(0, matches[0].index).trim();
+    splitSegmentText(prefix).forEach(part => segments.push({ speaker: fallbackSpeaker, text: part }));
+  }
+
+  matches.forEach((match, index) => {
+    const contentStart = (match.index ?? 0) + match[0].length;
+    const contentEnd = index + 1 < matches.length ? matches[index + 1].index ?? normalizedText.length : normalizedText.length;
+    const content = normalizedText.slice(contentStart, contentEnd).trim();
+    if (!content) return;
+    const speaker = normalizeRoleCode(match[1], fallbackSpeaker);
+    splitSegmentText(content).forEach(part => segments.push({ speaker, text: part }));
+  });
+
+  return segments.length > 0 ? segments : [{ speaker: fallbackSpeaker, text: normalizedText }];
 }
 
 export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: Props) {
-  const { side, portrait, label } = getSpeakerInfo(scene.speaker);
   const hasChoices = scene.choices && scene.choices.length > 0;
   const hasAIEvent = !!scene.aiEvent;
   const chainEnded = !hasChoices && !hasAIEvent && !scene.nextSceneId;
-  const isNarrator = !scene.speaker || NARRATOR_NAMES.includes(scene.speaker);
 
-  // 稳定化 paragraphs 数组引用
-  const paragraphs = useMemo(() => splitParagraphs(scene.text), [scene.text]);
+  // 稳定化段落数组引用
+  const paragraphs = useMemo(() => splitDialogSegments(scene.text, scene.speaker), [scene.text, scene.speaker]);
   const [currentParagraph, setCurrentParagraph] = useState(0);
   const totalParagraphs = paragraphs.length;
+  const currentSegment = paragraphs[currentParagraph] ?? { speaker: scene.speaker, text: "" };
+  const { side, portrait, label } = getSpeakerInfo(currentSegment.speaker);
+  const isNarrator = !currentSegment.speaker || NARRATOR_NAMES.includes(currentSegment.speaker);
 
   // ⚠️ scene 切换时重置段落（修复选项后对话框空白的 bug）
   useEffect(() => {
@@ -65,10 +112,11 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
   const [typingDone, setTypingDone] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lenRef = useRef(0);
+  const showChoices = !!hasChoices && typingDone && currentParagraph >= totalParagraphs - 1;
 
   // 段落切换时重置打字机
   useEffect(() => {
-    const text = paragraphs[currentParagraph] ?? "";
+    const text = paragraphs[currentParagraph]?.text ?? "";
     const len = text.length;
     lenRef.current = len;
     setDisplayedChars(0);
@@ -99,11 +147,11 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
   }, [currentParagraph, paragraphs]);
 
   // 当前段落的完整文本
-  const fullText = paragraphs[currentParagraph] || "";
+  const fullText = currentSegment.text || "";
 
   // 空格键
   const handleSpace = useCallback(() => {
-    if (hasChoices) return;
+    if (showChoices) return;
     if (!typingDone) {
       if (timerRef.current) clearInterval(timerRef.current);
       setDisplayedChars(fullText.length);
@@ -117,7 +165,7 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
     } else if (scene.nextSceneId) {
       onNext(scene.nextSceneId);
     }
-  }, [hasChoices, typingDone, currentParagraph, totalParagraphs, hasAIEvent, chainEnded, scene.nextSceneId, onNext, onAIEvent, onClose, fullText.length]);
+  }, [showChoices, typingDone, currentParagraph, totalParagraphs, hasAIEvent, chainEnded, scene.nextSceneId, onNext, onAIEvent, onClose, fullText.length]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -130,12 +178,12 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
     return () => window.removeEventListener("keydown", onKey);
   }, [handleSpace]);
 
-  const showArrow = typingDone && !hasChoices;
+  const showArrow = typingDone && !showChoices;
 
   return (
     <div className="dialog-overlay">
       {/* 选项栏 — 在对话框上方 */}
-      {hasChoices && (
+      {showChoices && (
         <div className="dialog-choices">
           {scene.choices!.map((choice) => (
             <button

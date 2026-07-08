@@ -8193,24 +8193,24 @@
         {
           "id": 200,
           "name": "spawn_spawn_164",
-          "x": 209,
-          "y": 988,
+          "x": 210,
+          "y": 966,
           "width": 32,
           "height": 32
         },
         {
           "id": 201,
           "name": "spawn_spawn_165",
-          "x": 254,
-          "y": 988,
+          "x": 256,
+          "y": 984,
           "width": 32,
           "height": 32
         },
         {
           "id": 202,
           "name": "spawn_spawn_166",
-          "x": 730,
-          "y": 1056,
+          "x": 728,
+          "y": 1047,
           "width": 32,
           "height": 32
         },
@@ -8345,8 +8345,16 @@
         {
           "id": 219,
           "name": "spawn_spawn_183",
-          "x": 366,
-          "y": 987,
+          "x": 368,
+          "y": 965,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 220,
+          "name": "spawn_spawn_184",
+          "x": 367,
+          "y": 982,
           "width": 32,
           "height": 32
         }
@@ -8368,7 +8376,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 270,
+  "nextobjectid": 271,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

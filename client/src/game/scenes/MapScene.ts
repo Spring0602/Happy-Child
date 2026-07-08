@@ -19,6 +19,17 @@ export class MapScene extends Phaser.Scene {
   /** 全屏黑幕遮罩，防止地图切换时闪现旧底图 */
   private transitionOverlay: Phaser.GameObjects.Rectangle | null = null;
 
+  private setPlayerFrozen(frozen: boolean) {
+    this.playerFrozen = frozen;
+    this.interactionSys?.setEnabled(!frozen);
+    this.triggerSys?.setEnabled(!frozen);
+    if (frozen) {
+      this.playerCtrl?.freeze();
+    } else {
+      this.playerCtrl?.unfreeze();
+    }
+  }
+
   constructor() {
     super({ key: "MapScene" });
   }
@@ -57,7 +68,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 加载一张地图 */
-  private loadMap(mapId: string, spawnId?: string) {
+  private loadMap(mapId: string, spawnId?: string, playerState?: string) {
     const entry = MapRegistry[mapId];
     if (!entry) {
       console.error(`[MapScene] 地图 ${mapId} 未注册`);
@@ -153,7 +164,6 @@ export class MapScene extends Phaser.Scene {
 
       // === 5. 初始化子系统（必须在 processObjectLayers 之前） ===
       this.playerCtrl = new PlayerController(this, this.player);
-      if (this.playerFrozen) this.playerCtrl.freeze();
       this.interactionSys = new InteractionSystem(this, this.player);
       this.interactionSys.setOnSit((chairY, sitInFront) => {
         this.sitPlayerAtChair(chairY, sitInFront);
@@ -171,6 +181,8 @@ export class MapScene extends Phaser.Scene {
         this.playerCtrl?.setDirection("down");
       });
       this.triggerSys = new TriggerSystem(this, this.player);
+      this.setPlayerFrozen(this.playerFrozen);
+      this.applyPlayerState(playerState);
 
       // === 6. 处理对象层（注册碰撞、交互、触发器 — 依赖上面的子系统） ===
       this.collisionGroup = this.physics.add.staticGroup();
@@ -550,16 +562,14 @@ export class MapScene extends Phaser.Scene {
   private listenBridge() {
     gameBridge.onReactCommand("CHANGE_MAP", (cmd) => {
       if (cmd.type === "CHANGE_MAP") {
-        this.transitionToMap(cmd.mapId, cmd.spawnId);
+        this.transitionToMap(cmd.mapId, cmd.spawnId, cmd.playerState);
       }
     });
     gameBridge.onReactCommand("FREEZE_PLAYER", () => {
-      this.playerFrozen = true;
-      this.playerCtrl?.freeze();
+      this.setPlayerFrozen(true);
     });
     gameBridge.onReactCommand("UNFREEZE_PLAYER", () => {
-      this.playerFrozen = false;
-      this.playerCtrl?.unfreeze();
+      this.setPlayerFrozen(false);
     });
     gameBridge.onReactCommand("STORY_EVENT", (cmd) => {
       if (cmd.type !== "STORY_EVENT") return;
@@ -595,6 +605,38 @@ export class MapScene extends Phaser.Scene {
     this.playerCtrl?.sit(finalChairY, sitInFront, mapHeight);
   }
 
+  private parsePlayerState(playerState?: string): { pose: "stand" | "sit"; direction: "left" | "right" | "up" | "down" } | null {
+    if (!playerState) return null;
+    const normalized = playerState
+      .replace(/\\/g, "/")
+      .split("/")
+      .pop()
+      ?.replace(/\.(png|jpg|jpeg|webp)$/i, "")
+      .toLowerCase();
+    if (!normalized) return null;
+
+    const pose = normalized.includes("sit") ? "sit" : "stand";
+    const direction =
+      normalized.includes("left") ? "left" :
+      normalized.includes("right") ? "right" :
+      normalized.includes("back") || normalized.includes("up") ? "up" :
+      "down";
+
+    return { pose, direction };
+  }
+
+  private applyPlayerState(playerState?: string) {
+    const state = this.parsePlayerState(playerState);
+    if (!state || !this.playerCtrl || !this.player) return;
+
+    this.playerCtrl.setDirection(state.direction);
+    if (state.pose === "sit") {
+      const entry = MapRegistry[(this.registry.get("currentMapId") as string) || ""];
+      const mapHeight = entry?.height || this.map.heightInPixels || 600;
+      this.playerCtrl.sit(this.player.y, true, mapHeight);
+    }
+  }
+
   /** 处理剧情事件 */
   private handleStoryEvent(eventId: string, payload?: Record<string, unknown>) {
     console.log(`[MapScene] 📖 剧情事件: ${eventId}`, payload);
@@ -621,6 +663,20 @@ export class MapScene extends Phaser.Scene {
             this.player.y = spawn.y! + (spawn.height ?? 32) / 2;
           }
         }
+        break;
+      }
+      case "camera_focus_spawn": {
+        const spawnId = payload?.spawnId as string;
+        const duration = (payload?.duration as number) || 600;
+        const point = spawnId ? this.getSpawnCenter(spawnId) : null;
+        if (point) {
+          this.cameras.main.stopFollow();
+          this.cameras.main.pan(point.x, point.y, duration, "Sine.easeInOut");
+        }
+        break;
+      }
+      case "camera_follow_player": {
+        this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
         break;
       }
       case "flash_screen": {
@@ -769,9 +825,13 @@ export class MapScene extends Phaser.Scene {
         const framesPrefix = (payload?.framesPrefix as string) || npcKey;
         if (!spawnId || !npcKey) break;
 
-        const initTexture = `${framesPrefix}_stand_front_0`;
+        const dirMap: Record<string, string> = { front: "front", back: "back", left: "left", right: "right", down: "front", up: "back" };
+        const pose = ((payload?.pose as string) || "stand") === "sit" ? "sit" : "stand";
+        const frameDir = dirMap[(payload?.direction as string) || "front"] || "front";
+        const actionDirection = `${pose}_${frameDir}`;
+        const initTexture = `${framesPrefix}_${actionDirection}_0`;
         if (!this.textures.exists(initTexture)) {
-          const texturePath = this.getNpcStandTexturePath(framesPrefix, "front");
+          const texturePath = this.getNpcFrameTexturePath(framesPrefix, actionDirection);
           console.warn(`[MapScene] ⚠ NPC 纹理未预加载，正在即时补载: ${initTexture}`);
           this.load.image(initTexture, texturePath);
           this.load.once(`filecomplete-image-${initTexture}`, () => {
@@ -812,7 +872,7 @@ export class MapScene extends Phaser.Scene {
               | undefined;
             const displayScaleMultiplier = frameManifest?.displayScaleMultiplier ?? 1;
             const scale = ((payload?.scale as number) || 0.75) * displayScaleMultiplier;
-            // 使用帧纹理创建精灵（默认正面站立）
+            // 使用帧纹理创建精灵（默认正面站立，可由 payload 指定初始坐姿/朝向）
             const sprite = this.add.sprite(cx, cy, initTexture).setScale(scale);
             sprite.setDepth(cy / (this.map.heightInPixels || 1000));
             // 碰撞体
@@ -853,7 +913,7 @@ export class MapScene extends Phaser.Scene {
           if (this.textures.exists(frameKey) && entry.sprite.texture.key !== frameKey) {
             entry.sprite.setTexture(frameKey);
           } else if (!this.textures.exists(frameKey)) {
-            const texturePath = this.getNpcStandTexturePath(entry.framesPrefix, frameDir);
+            const texturePath = this.getNpcFrameTexturePath(entry.framesPrefix, `stand_${frameDir}`);
             this.load.image(frameKey, texturePath);
             this.load.once(`filecomplete-image-${frameKey}`, () => {
               if (entry.sprite.active) entry.sprite.setTexture(frameKey);
@@ -870,11 +930,42 @@ export class MapScene extends Phaser.Scene {
         }
         break;
       }
+      case "set_npc_pose": {
+        const npcKey = payload?.npcKey as string;
+        const direction = (payload?.direction as string) || "front";
+        const pose = ((payload?.pose as string) || "stand") === "sit" ? "sit" : "stand";
+        if (!npcKey) break;
+        const npcList = this.registry.get("npcSprites") as Map<string, {
+          sprite: Phaser.GameObjects.Sprite;
+          zone: Phaser.GameObjects.Zone;
+          framesPrefix: string;
+        }> | undefined;
+        const entry = npcList?.get(npcKey);
+        if (!entry) break;
+        const dirMap: Record<string, string> = { front: "front", back: "back", left: "left", right: "right", down: "front", up: "back" };
+        const frameDir = dirMap[direction] || "front";
+        const actionDirection = `${pose}_${frameDir}`;
+        const frameKey = `${entry.framesPrefix}_${actionDirection}_0`;
+        if (this.textures.exists(frameKey)) {
+          entry.sprite.setTexture(frameKey);
+        } else {
+          const texturePath = this.getNpcFrameTexturePath(entry.framesPrefix, actionDirection);
+          this.load.image(frameKey, texturePath);
+          this.load.once(`filecomplete-image-${frameKey}`, () => {
+            if (entry.sprite.active) entry.sprite.setTexture(frameKey);
+          });
+          if (!this.load.isLoading()) {
+            this.load.start();
+          }
+        }
+        break;
+      }
       case "fill_classroom_seats": {
         const start = (payload?.start as number) ?? 115;
         const end = (payload?.end as number) ?? 155;
         const exclude = new Set<string>((payload?.exclude as string[]) || []);
         const includeSpawns = new Set<string>((payload?.includeSpawns as string[]) || []);
+        const includeOnly = !!payload?.includeOnly;
         const framePrefixes = ((payload?.framesPrefixes as string[]) || ["npc_female1_frames", "npc_male_frames"]);
         const spawnLayer = this.map.getObjectLayer("player_spawn");
         if (!spawnLayer) break;
@@ -891,6 +982,7 @@ export class MapScene extends Phaser.Scene {
           if (!match) continue;
           const index = Number(match[1]);
           const included = includeSpawns.has(spawnName);
+          if (includeOnly && !included) continue;
           if ((!included && (index < start || index > end)) || (exclude.has(spawnName) && !included)) continue;
 
           const npcKey = `classroom_seat_${spawnName}`;
@@ -907,7 +999,11 @@ export class MapScene extends Phaser.Scene {
 
           const cx = obj.x! + (obj.width ?? 32) / 2;
           const cy = obj.y! + (obj.height ?? 32) / 2;
-          const sprite = this.add.sprite(cx, cy, textureKey).setScale(0.75);
+          const frameManifest = AssetManifest.frames.find((entry) => entry.key === framesPrefix) as
+            | { displayScaleMultiplier?: number }
+            | undefined;
+          const displayScaleMultiplier = frameManifest?.displayScaleMultiplier ?? 1;
+          const sprite = this.add.sprite(cx, cy, textureKey).setScale(0.75 * displayScaleMultiplier);
           sprite.setDepth(cy / (this.map.heightInPixels || 1000));
           const zone = this.add.zone(cx, cy, 24, 36);
           this.physics.add.existing(zone, true);
@@ -928,21 +1024,29 @@ export class MapScene extends Phaser.Scene {
         }> | undefined;
         const entry = npcList?.get(npcKey);
         if (!entry) break;
-        this.moveSpriteAlongSpawns(entry.sprite, entry.zone, path, (payload?.speed as number) || 120, () => {
+        this.moveSpriteAlongSpawns(entry.sprite, entry.zone, path, (payload?.speed as number) || 120, entry.framesPrefix, () => {
           const direction = payload?.direction as string | undefined;
-          if (direction) this.handleStoryEvent("set_npc_direction", { npcKey, direction });
+          const pose = payload?.pose as string | undefined;
+          if (pose) {
+            this.handleStoryEvent("set_npc_pose", { npcKey, pose, direction });
+          } else if (direction) {
+            this.handleStoryEvent("set_npc_direction", { npcKey, direction });
+          }
         });
         break;
       }
       case "move_player_path": {
         const path = (payload?.path as string[]) || [];
         if (!this.player || path.length === 0) break;
-        this.moveSpriteAlongSpawns(this.player, undefined, path, (payload?.speed as number) || 120, () => {
+        this.moveSpriteAlongSpawns(this.player, undefined, path, (payload?.speed as number) || 120, "yps_frames", () => {
           const direction = payload?.direction as string | undefined;
-          if (direction) this.handleStoryEvent("set_player_anim", { direction });
+          if (direction && payload?.standAfter) {
+            this.playerCtrl?.standFacing(direction as "left" | "right" | "up" | "down");
+          } else if (direction) {
+            this.handleStoryEvent("set_player_anim", { direction });
+          }
           if (payload?.freezeAfter) {
-            this.playerFrozen = true;
-            this.playerCtrl?.freeze();
+            this.setPlayerFrozen(true);
           }
         });
         break;
@@ -953,6 +1057,10 @@ export class MapScene extends Phaser.Scene {
         if (direction && this.playerCtrl) {
           this.playerCtrl.setDirection(direction as "left" | "right" | "up" | "down");
         }
+        break;
+      }
+      case "apply_player_state": {
+        this.applyPlayerState(payload?.playerState as string | undefined);
         break;
       }
       case "eye_open_effect": {
@@ -1027,7 +1135,7 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 地图切换（淡入淡出） — 使用自控黑幕遮罩，杜绝旧底图闪现 */
-  private transitionToMap(mapId: string, spawnId: string) {
+  private transitionToMap(mapId: string, spawnId: string, playerState?: string) {
     console.log(`[MapScene] 🗺️ 开始切换地图: ${mapId} (spawn=${spawnId})`);
 
     // 清理下雨效果
@@ -1063,7 +1171,7 @@ export class MapScene extends Phaser.Scene {
         this.interactionSys?.destroy();
         this.interactionSys = null as unknown as InteractionSystem;
 
-        this.loadMap(mapId, spawnId);
+        this.loadMap(mapId, spawnId, playerState);
 
         // loadMap 会清理旧地图的所有显示对象，因此需要为新地图重新创建黑幕。
         const fadeOverlay = this.add.rectangle(
@@ -1106,6 +1214,7 @@ export class MapScene extends Phaser.Scene {
     zone: Phaser.GameObjects.Zone | undefined,
     path: string[],
     speed: number,
+    framesPrefix?: string,
     onComplete?: () => void
   ) {
     const points = path
@@ -1120,6 +1229,16 @@ export class MapScene extends Phaser.Scene {
       const point = points[index];
       const distance = Phaser.Math.Distance.Between(sprite.x, sprite.y, point.x, point.y);
       const duration = Math.max(80, (distance / speed) * 1000);
+      const deltaX = point.x - sprite.x;
+      const deltaY = point.y - sprite.y;
+      const direction = Math.abs(deltaX) >= Math.abs(deltaY)
+        ? (deltaX >= 0 ? "right" : "left")
+        : (deltaY >= 0 ? "down" : "up");
+      const characterName = framesPrefix?.endsWith("_frames") ? framesPrefix.slice(0, -"_frames".length) : framesPrefix;
+      const runKey = characterName ? `${characterName}_run_${direction}` : "";
+      if (runKey && this.anims.exists(runKey)) {
+        sprite.play(runKey, true);
+      }
       this.tweens.add({
         targets: sprite,
         x: point.x,
@@ -1140,6 +1259,10 @@ export class MapScene extends Phaser.Scene {
           if (index + 1 < points.length) {
             moveTo(index + 1);
           } else {
+            if (characterName) {
+              const idleKey = `${characterName}_idle_${direction}`;
+              if (this.anims.exists(idleKey)) sprite.play(idleKey, true);
+            }
             onComplete?.();
           }
         },
@@ -1150,14 +1273,18 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 从 Tiled properties 数组提取值 */
-  private getNpcStandTexturePath(framesPrefix: string, direction: string): string {
+  private getNpcFrameTexturePath(framesPrefix: string, actionDirection: string): string {
     const character = AssetManifest.frames.find(entry => entry.key === framesPrefix);
-    const actionDirection = `stand_${direction}`;
+    const folderPrefix = character && "folderPrefix" in character ? character.folderPrefix : framesPrefix;
+    const directoryOverrides = character && "directoryOverrides" in character
+      ? character.directoryOverrides
+      : undefined;
     const frameFileOverrides = character && "frameFileOverrides" in character
       ? character.frameFileOverrides
       : undefined;
+    const subDir = directoryOverrides?.[actionDirection as keyof typeof directoryOverrides] || `${folderPrefix}_${actionDirection}`;
     const frameFile = frameFileOverrides?.[actionDirection as keyof typeof frameFileOverrides] || "frame_00.png";
-    return `/assets/sprites/frames/${framesPrefix}/${framesPrefix}_${actionDirection}/${frameFile}`;
+    return `/assets/sprites/frames/${framesPrefix}/${subDir}/${frameFile}`;
   }
 
   /** 从 Tiled properties 数组提取值 */

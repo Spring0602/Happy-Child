@@ -209,7 +209,7 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_left 
 冻结玩家：是
 NPC：
-  - id: npc_liuyu, 名称: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_front, 位置: spawn_spawn_157
+  - id: npc_liuyu, 名称: 刘宇, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\ly_frames\ly_frames_stand_front, 位置: spawn_spawn_258
   - id: npc_zhouqirui, 名称: 周骐瑞, 精灵: G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\zqr_frames\zqr_frames_sit_back, 位置: spawn_spawn_117
   - 除spawn_spawn_127、spawn_spawn_132、spawn_spawn_145外，其他座位上的出生点随机播放G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_female1_frames\npc_female1_frames_sit_back和G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\npc_male_frames\npc_male _frames_sit_back
 

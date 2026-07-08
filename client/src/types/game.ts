@@ -53,6 +53,8 @@ export interface Scene {
   cgMode?: boolean;
   /** CG 模式下触发后置效果：nextSceneId 的场景加载完成后执行 */
   onCgEnd?: "enter_dormitory" | "enter_balcony" | "enter_dormitory_playable" | string;
+  /** 地图场景入场时主角应播放的动作，如 yps_frames_sit_back / stand_left / sit_up */
+  playerState?: string;
   /** 手机群聊演出层：用于模拟真实手机消息逐条弹出 */
   phoneChat?: PhoneChat;
 }
@@ -95,6 +97,7 @@ export interface GameState {
 
   // ====== 探索模式字段 ======
   currentMapId: string;
+  currentSpawnId: string;
   playerPosition: { x: number; y: number };
   flags: Record<string, boolean>;
   interactedItems: string[];

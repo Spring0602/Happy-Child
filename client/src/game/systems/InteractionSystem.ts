@@ -24,6 +24,7 @@ export class InteractionSystem {
   private interactHint: Phaser.GameObjects.Text | null = null;
   private onSitCallback: ((chairY: number, sitInFront: boolean) => void) | null = null;
   private _loggedKeys = false;
+  private enabled = true;
   private readonly onInteractKeyDown = () => {
     this._triggerInteract();
   };
@@ -53,6 +54,13 @@ export class InteractionSystem {
     console.log(`[InteractionSystem] 📍 注册可交互: ${obj.id} (${obj.type}) at (${obj.x}, ${obj.y})`);
   }
 
+  setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+    if (!enabled) {
+      this.interactHint?.setVisible(false);
+    }
+  }
+
   destroy() {
     this.interactKey?.off("down", this.onInteractKeyDown);
     this.interactHint?.destroy();
@@ -79,6 +87,11 @@ export class InteractionSystem {
   }
 
   update() {
+    if (!this.enabled) {
+      this.interactHint?.setVisible(false);
+      return;
+    }
+
     // 首次记录调试信息
     if (!this._loggedKeys) {
       console.log(`[InteractionSystem] 🔑 已注册交互对象数: ${this.interactables.length}`);
@@ -115,6 +128,8 @@ export class InteractionSystem {
 
   /** 实际触发交互（由 JustDown 或 keyboard.on('keydown-E') 调用） */
   private _triggerInteract() {
+    if (!this.enabled) return;
+
     const nearest = this.findNearest();
     if (!nearest) return;
 
