@@ -450,7 +450,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "???"
+              "value": "E女厕所"
             }
           ]
         },
@@ -475,7 +475,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "???"
+              "value": "E男厕所"
             }
           ]
         },
@@ -500,7 +500,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "???1??"
+              "value": "E进入教室"
             }
           ]
         },
@@ -525,7 +525,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "???3??"
+              "value": "E高三（3）班"
             }
           ]
         },
@@ -550,7 +550,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "??"
+              "value": "E离开教学楼"
             }
           ]
         },
@@ -575,7 +575,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "??"
+              "value": "E上楼"
             }
           ]
         },
@@ -600,7 +600,7 @@
             {
               "name": "hintText",
               "type": "string",
-              "value": "???2??"
+              "value": "E高三（2）班"
             }
           ]
         }

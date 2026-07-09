@@ -182,21 +182,6 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
 
   return (
     <div className="dialog-overlay">
-      {/* 选项栏 — 在对话框上方 */}
-      {showChoices && (
-        <div className="dialog-choices">
-          {scene.choices!.map((choice) => (
-            <button
-              key={choice.id}
-              className="dialog-choice-btn"
-              onClick={() => onChoose(choice)}
-            >
-              {choice.text}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* 对话主区域 */}
       <div className="dialog-main">
         {/* 左侧立绘 — 主角 */}
@@ -206,20 +191,37 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
           )}
         </div>
 
-        {/* 对话框 */}
-        <div className="dialog-box" onClick={handleSpace}>
-          <div className="dialog-header">
-            {label && <span className="dialog-speaker">{label}</span>}
-          </div>
-          <div className={`dialog-text${isNarrator ? " narrator" : ""}`}>
-            {fullText.slice(0, displayedChars)}
-            {!typingDone && <span className="typing-cursor">|</span>}
-          </div>
-          {showArrow && (
-            <div className="dialog-arrow-down">
-              <span className="arrow-icon">▼</span>
+        <div className="dialog-content-column">
+          {/* 选项栏 — 与对话框处于同一列 */}
+          {showChoices && (
+            <div className="dialog-choices">
+              {scene.choices!.map((choice) => (
+                <button
+                  key={choice.id}
+                  className="dialog-choice-btn"
+                  onClick={() => onChoose(choice)}
+                >
+                  {choice.text}
+                </button>
+              ))}
             </div>
           )}
+
+          {/* 对话框 */}
+          <div className="dialog-box" onClick={handleSpace}>
+            <div className="dialog-header">
+              {label && <span className="dialog-speaker">{label}</span>}
+            </div>
+            <div className={`dialog-text${isNarrator ? " narrator" : ""}`}>
+              {fullText.slice(0, displayedChars)}
+              {!typingDone && <span className="typing-cursor">|</span>}
+            </div>
+            {showArrow && (
+              <div className="dialog-arrow-down">
+                <span className="arrow-icon">▼</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 右侧立绘 — NPC */}

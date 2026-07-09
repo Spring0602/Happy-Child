@@ -81,6 +81,14 @@ export function PersonalityPortrait({ onClose }: Props) {
                   <span className="portrait-ending-title">{r.endingTitle}</span>
                   <span className="portrait-record-time">{r.timestamp}</span>
                 </div>
+                {r.imageDataUrl && (
+                  <img
+                    className="portrait-generated-image"
+                    src={r.imageDataUrl}
+                    alt={`${r.endingTitle} 人格画像`}
+                  />
+                )}
+                {r.summary && <p className="portrait-generated-summary">{r.summary}</p>}
                 <div className="portrait-traits-grid">
                   {Object.keys(TRAIT_LABELS).map(key => (
                     <TraitBar key={key} name={key} value={r.traits[key] ?? 0} />

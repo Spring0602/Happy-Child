@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { GameState } from "../types/game";
 import { getAllSaves, saveToSlot, loadSlot, deleteSlot, type SaveSlot } from "../engine/save";
+import { gameBridge } from "../game/bridge/GameBridge";
 
 interface Props {
   state: GameState;
@@ -11,13 +12,16 @@ interface Props {
   onShowBacklog: () => void;
   onShowNotebook: () => void;
   dialogPreview: string;
+  initialPage?: MenuPage;
+  onSaveComplete?: () => void;
+  forceSave?: boolean;
 }
 
 type MenuPage = "main" | "save" | "load";
 
-export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle, onShowBacklog, onShowNotebook, dialogPreview }: Props) {
-  const [page, setPage] = useState<MenuPage>("main");
-  const [saves, setSaves] = useState<SaveSlot[]>([]);
+export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle, onShowBacklog, onShowNotebook, dialogPreview, initialPage = "main", onSaveComplete, forceSave = false }: Props) {
+  const [page, setPage] = useState<MenuPage>(initialPage);
+  const [saves, setSaves] = useState<SaveSlot[]>(() => initialPage === "main" ? [] : getAllSaves());
   const [confirmAction, setConfirmAction] = useState<string | null>(null);
 
   function openSaves(pageMode: "save" | "load") {
@@ -26,8 +30,15 @@ export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle
   }
 
   function handleSave(slot: number) {
-    saveToSlot(slot, state, dialogPreview);
-    setSaves(getAllSaves());
+    try {
+      const runtime = gameBridge.captureMapRuntime();
+      saveToSlot(slot, runtime ? { ...state, mapRuntime: runtime } : state, dialogPreview);
+      setSaves(getAllSaves());
+      onSaveComplete?.();
+    } catch (error) {
+      console.error("[Save] 保存失败", error);
+      window.alert("存档失败，原有存档未被覆盖。请检查浏览器存储空间。");
+    }
   }
 
   function handleLoad(slot: number) {
@@ -105,7 +116,12 @@ export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle
           <>
             <h2 className="game-menu-title">{page === "save" ? "选择存档位置" : "选择读档位置"}</h2>
             <div className="load-slots">
-              {Array.from({ length: 10 }, (_, i) => {
+              {page === "load" && saves.length === 0 && (
+                <div className="load-slot-row">
+                  <span className="load-slot-preview empty-slot">暂无可读取的存档</span>
+                </div>
+              )}
+              {(page === "save" ? Array.from({ length: 10 }, (_, index) => index) : saves.map((save) => save.slot)).map((i) => {
                 const s = saves.find(sv => sv.slot === i);
                 return (
                   <div key={i} className="load-slot-row">
@@ -139,9 +155,11 @@ export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle
                 );
               })}
             </div>
-            <button className="start-btn back-btn" onClick={() => setPage("main")}>
-              返回
-            </button>
+            {!forceSave && (
+              <button className="start-btn back-btn" onClick={() => setPage("main")}>
+                返回
+              </button>
+            )}
           </>
         )}
       </div>

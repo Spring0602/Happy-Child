@@ -84,6 +84,39 @@ export interface AITrace {
   createdAt: string;
 }
 
+export interface MapRuntimeNpcSnapshot {
+  npcKey: string;
+  framesPrefix: string;
+  textureKey: string;
+  x: number;
+  y: number;
+  scaleX: number;
+  scaleY: number;
+  depth: number;
+  bodyWidth: number;
+  bodyHeight: number;
+}
+
+export interface MapRuntimeSnapshot {
+  version: 1;
+  mapId: string;
+  player: {
+    x: number;
+    y: number;
+    direction: "left" | "right" | "up" | "down";
+    sitting: boolean;
+    frozen: boolean;
+    depth: number;
+  };
+  npcs: MapRuntimeNpcSnapshot[];
+  camera: {
+    scrollX: number;
+    scrollY: number;
+    zoom: number;
+    followsPlayer: boolean;
+  };
+}
+
 export interface GameState {
   // ====== 现有字段 ======
   currentSceneId: string;
@@ -101,6 +134,8 @@ export interface GameState {
   playerPosition: { x: number; y: number };
   flags: Record<string, boolean>;
   interactedItems: string[];
+  /** 地图运行时快照：存档时由 Phaser 即时采集，读档时完整重建现场 */
+  mapRuntime?: MapRuntimeSnapshot;
 
   // ====== 结局标记（结局后才显示画像和AI分析） ======
   endingReached: boolean;

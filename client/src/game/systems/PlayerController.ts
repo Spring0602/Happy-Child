@@ -174,6 +174,14 @@ export class PlayerController {
     return this.isSitting;
   }
 
+  get direction() {
+    return this.lastDirection;
+  }
+
+  get isFrozen() {
+    return this.frozen;
+  }
+
   /** 设置角色朝向（用于剧情事件控制） */
   setDirection(dir: Direction) {
     this.lastDirection = dir;

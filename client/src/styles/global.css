@@ -122,11 +122,11 @@ body {
 .dialog-choices {
   pointer-events: auto;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  padding: 0 16px 6px;
-  margin: 0 8%;
+  padding: 0 0 6px;
+  width: 100%;
 }
 
 .dialog-choice-btn {
@@ -138,7 +138,12 @@ body {
   color: #d7e7ff;
   cursor: pointer;
   font-size: 14px;
-  white-space: nowrap;
+  width: fit-content;
+  max-width: 50vw;
+  box-sizing: border-box;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.45;
   transition: background 0.15s;
 }
 .dialog-choice-btn:hover {
@@ -154,6 +159,14 @@ body {
   gap: 0;
   padding: 0 4% 0;
   min-height: 120px;
+}
+
+.dialog-content-column {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 /* 立绘区域 */
@@ -175,6 +188,7 @@ body {
 
 .dialog-portrait {
   max-height: 50vh;
+  max-width: 26vw;
   width: auto;
   object-fit: contain;
   object-position: bottom;
@@ -186,7 +200,7 @@ body {
 
 /* 对话框 */
 .dialog-box {
-  flex: 1;
+  width: 100%;
   padding: 10px 16px;
   border: 1px solid rgba(180, 220, 255, 0.35);
   border-radius: 12px;
@@ -452,6 +466,17 @@ body {
   inset: 0;
   z-index: 12;
   pointer-events: none;
+  background: #000;
+}
+
+.cg-overlay.cg-exiting .cg-background,
+.cg-overlay.cg-exiting .cg-portrait-area,
+.cg-overlay.cg-exiting .cg-choices,
+.cg-overlay.cg-exiting .cg-dialog-area,
+.cg-overlay.cg-exiting .cg-center-portrait-image,
+.cg-overlay.cg-exiting .papers-fall-layer {
+  opacity: 0;
+  transition: opacity 0.35s ease-in;
 }
 
 .cg-background {
@@ -460,6 +485,67 @@ body {
   background-size: cover;
   background-position: center;
   image-rendering: auto;
+}
+
+.cg-background-fade-in {
+  animation: cgSceneFadeIn 0.7s ease-out both;
+}
+
+@keyframes cgSceneFadeIn {
+  from {
+    opacity: 0;
+    filter: brightness(0);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+.papers-fall-layer {
+  position: absolute;
+  inset: -12vh 0 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.falling-paper {
+  position: absolute;
+  top: -14vh;
+  display: block;
+  border: 1px solid rgba(130, 35, 35, 0.65);
+  background:
+    linear-gradient(90deg, transparent 12%, rgba(180, 32, 32, 0.72) 13% 17%, transparent 18%),
+    repeating-linear-gradient(180deg, #f2ead8 0 7px, #b8a991 8px, #f2ead8 9px 13px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  animation-name: paperFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.falling-paper:nth-child(3n) {
+  background:
+    linear-gradient(90deg, transparent 58%, rgba(180, 32, 32, 0.72) 59% 65%, transparent 66%),
+    repeating-linear-gradient(180deg, #eee6d5 0 6px, #aa9b85 7px, #eee6d5 8px 12px);
+}
+
+@keyframes paperFall {
+  0% {
+    opacity: 0;
+    transform: translate3d(-20px, -10vh, 0) rotate(0deg) rotateY(0deg);
+  }
+  8% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translate3d(48px, 56vh, 0) rotate(190deg) rotateY(110deg);
+  }
+  100% {
+    opacity: 0.78;
+    transform: translate3d(-35px, 125vh, 0) rotate(420deg) rotateY(240deg);
+  }
 }
 
 .cg-countdown-display {
@@ -476,26 +562,44 @@ body {
   text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
 }
 
-/* CG 立绘区域 — 左下角，底部贴合屏幕底部 */
-.cg-portrait-area {
+/* CG UI 与地图对话统一：选项在上，立绘和对话框横向并列 */
+.cg-ui-stack {
   position: absolute;
-  bottom: 0;
-  z-index: 2;
+  inset: auto 0 0 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.cg-dialog-main {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-end;
+  min-height: 120px;
+  padding: 0 4%;
+}
+
+.cg-portrait-area {
+  flex: 0 0 auto;
   pointer-events: none;
   display: flex;
   align-items: flex-end;
+  justify-content: flex-end;
+  align-self: stretch;
 }
 
 .cg-portrait-area.left {
-  left: 2%;
+  order: -1;
+  margin-right: 4px;
 }
 
 .cg-portrait-area.right {
-  right: 2%;
+  order: 1;
+  margin-left: 4px;
 }
 
 .cg-portrait {
   max-height: 50vh;
+  max-width: 26vw;
   width: auto;
   object-fit: contain;
   object-position: bottom;
@@ -506,16 +610,13 @@ body {
 
 /* CG 选项 — 紧挨底部对话框 */
 .cg-choices {
-  position: absolute;
-  bottom: 14%;
-  left: 10%;
-  right: 10%;
-  z-index: 3;
   pointer-events: auto;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0 0 6px;
 }
 
 .cg-choice-btn {
@@ -527,7 +628,12 @@ body {
   color: #d7e7ff;
   cursor: pointer;
   font-size: 15px;
-  white-space: nowrap;
+  width: fit-content;
+  max-width: 50vw;
+  box-sizing: border-box;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.45;
   transition: background 0.15s;
 }
 .cg-choice-btn:hover {
@@ -537,11 +643,17 @@ body {
 
 /* CG 底部对话框 */
 .cg-dialog-area {
-  position: absolute;
-  inset: auto 0 0 0;
-  z-index: 3;
+  width: 100%;
   pointer-events: auto;
-  padding: 0 6% 16px;
+  padding: 0;
+}
+
+.cg-content-column {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .cg-dialog-box {
@@ -667,12 +779,12 @@ body {
   font-weight: 800;
   text-align: center;
   white-space: nowrap;
-  color: #fff4f4;
-  background: linear-gradient(180deg, #ffffff 0%, #ff3f3f 100%);
+  color: #fff8d8;
+  background: linear-gradient(180deg, #ffffff 0%, #fff4be 38%, #f5c451 72%, #d99a20 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 18px rgba(255, 40, 40, 0.95), 0 0 42px rgba(255, 255, 255, 0.55);
+  text-shadow: 0 0 18px rgba(255, 220, 105, 0.95), 0 0 42px rgba(255, 255, 255, 0.62);
   animation: floatingTextCenterIn 0.25s ease-out both, ritualShake 0.12s infinite;
 }
 
@@ -1373,6 +1485,76 @@ body {
   backdrop-filter: blur(12px);
   box-shadow: 0 0 50px rgba(60, 120, 220, 0.2);
   overflow: auto;
+}
+
+.portrait-generated-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border: 2px solid rgba(216, 180, 91, 0.75);
+  background: #080b18;
+}
+
+.portrait-generated-summary {
+  margin: 10px 0 16px;
+  color: #cbd6ea;
+  line-height: 1.6;
+}
+
+.cg-center-portrait-image {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 43%;
+  width: min(78vw, 1120px);
+  max-height: 68vh;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform: translate(-50%, -50%);
+  border: 4px solid rgba(216, 180, 91, 0.9);
+  box-shadow: 0 0 36px rgba(216, 180, 91, 0.3);
+  background: #080b18;
+}
+
+.demo-portrait-generating {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.ai-scene-generating {
+  position: absolute;
+  inset: 0;
+  z-index: 44;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.ai-scene-generating-text {
+  padding: 12px 22px;
+  border: 1px solid rgba(180, 220, 255, 0.45);
+  border-radius: 10px;
+  color: #e8f0ff;
+  background: rgba(5, 8, 20, 0.88);
+  box-shadow: 0 0 24px rgba(80, 120, 255, 0.22);
+  letter-spacing: 0.08em;
+}
+
+.demo-portrait-generating-text {
+  color: #f5d878;
+  font-size: 28px;
+  letter-spacing: 4px;
+  animation: typingBlink 1.2s ease-in-out infinite;
 }
 
 .portrait-title {

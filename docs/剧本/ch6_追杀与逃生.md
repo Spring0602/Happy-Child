@@ -34,11 +34,9 @@
 [旁白]我得想办法逃出去。
 → 跳转：ch6_class3_first_reaction
 
-### [地图]突破人群
+### [CG]突破人群
 
-地图：classroom_3
-出生点：spawn_classroom_3_default
-冻结玩家：是
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\3班\突脸.png
 
 → 选项：我奋力推开挡路的学生，直接冲向教室门
     AI标签：果断求生, 暴力突破, 目标明确
@@ -59,6 +57,8 @@
     跳转：ch6_class3_door_locked
 
 ### [AI对话]周隽秀的迟疑
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\3班\突脸.png
 
 背景：3班教室，所有学生正在阻拦主角，周隽秀也受规则影响
 NPC自主扮演: 周隽秀
@@ -96,6 +96,8 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 → 跳转：ch6_class3_survival_choice
 
 ### [CG]坚持到铃响
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\3班\逃生.png
 
 → 选项：突然松开门把手，借后方拉力撞倒人群
     AI标签：临场反击, 果断, 环境利用
@@ -145,7 +147,7 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 
 ## 二、迟到者的惩罚
 
-### [地图]奔回本班
+### [混合]奔回本班
 
 地图：corridor
 出生点：spawn_spawn_38
@@ -153,6 +155,7 @@ AI提示：根据第五章周隽秀对主角的印象，生成她在规则控制
 冻结玩家：否
 [NPC:系统]技能“违规提醒”发动中。
 [NPC:系统]注意：该技能只能保护您20秒！
+（玩家在结束了以上对话后开始倒计时，需要在屏幕顶部居中处显示倒计时）
 倒计时提醒：从20开始倒计时，若到0仍未交互trigger_36，则跳转：ch6_corridor_timeout_death
 [旁白]熟悉的窒息感再次袭来，迫使我放慢速度。
 [主角]（该死，现在这技能还帮倒忙了。）
@@ -218,6 +221,9 @@ NPC：
 [旁白]我据理力争，
 [主角说]现在还没到19:01，这也算迟到？
 [NPC:刘宇]已经打铃了。你跟我去见班主任。
+NPC动作：
+    - npc_liuyu: walk_right -> spawn_spawn_251 -> walk_down -> spawn_spawn_252 -> walk_right -> spawn_spawn_248 -> walk_down -> spawn_spawn_253 -> 面朝：right
+    （动作完成后再继续对话）
 [旁白]不由得我再狡辩些什么，刘宇就一把抓过我的手腕，拖着我往教师办公室走去。
 → 跳转：ch6_to_teacher_office
 
@@ -228,6 +234,8 @@ NPC：
 [旁白]我感受着手腕上逐渐收紧的力道，竟然莫名地觉得安心。\n\n他塞给我一个纸团，小声嘱咐道，
 → 跳转：ch6_liuyu_route_note
 ### [AI对话]刘宇交付路线图
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\美术教室\楼梯.png
 
 背景：晚自习开始后的走廊，刘宇正押送主角前往教师办公室，周围不能公开交流
 NPC自主扮演: 刘宇
@@ -248,6 +256,9 @@ AI提示：根据刘宇对主角的印象及第五章谈判方式，生成他秘
 → 对话结束后：跳转 ch6_liuyu_route_note
 
 ### [CG]逃生路线
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\美术教室\楼梯.png
+
 [主角说]好，谢谢你了。
 [旁白]我展开刘宇塞来的纸团。这是一张学校内部地形图，一条红线从教师办公室延伸至一楼厕所，关键位置标着简短批注。
 [旁白]来到办公室门前，刘宇敲了敲门，听到老师的许可声后推开了门。
@@ -267,7 +278,8 @@ NPC：
 [NPC:班主任]好，你先回去吧。
 [旁白]刘宇与我交换了一个眼神，就转身离开。
 NPC动作：
-    - npc_liuyu: walk_right -> spawn_spawn_37 -> walk_down ->spawn_spawn_39 -> walk_left -> spawn_spawn_38 -> walk_down -> spawn_spawn_40 ->消失
+    - npc_liuyu: walk_right -> spawn_spawn_44 -> walk_down ->spawn_spawn_39 -> walk_left -> spawn_spawn_38 -> walk_down -> spawn_spawn_40 ->消失
+    （动作完成后再继续对话）
 [旁白]老师还在批改作业，我们谁也没有开口，办公室内寂静得诡异，惹得一阵强烈的不祥预感顺着我的脊椎一路攀援直冲天灵盖。\n\n我不禁打了个寒颤，未知的恐惧仍在一点点随着时间积累——因为我压根听不见她批改作业时本该发出的“沙沙”声。
 [旁白]不知过了多久，她终于停下笔，抬头看向我。
 [NPC:班主任]不听话的孩子，就应该受到应有的惩罚。
@@ -349,7 +361,9 @@ NPC：
 [旁白]我抓紧时间破坏通风管道，根本无暇顾及背后的怪物，只有听觉上能判断她的大致方位。等我抽空回头看她的时候她已经伸出利爪抓向了我。
 → 跳转：ch6_teacher_attack_choice
 
-### [地图]怪物逼近
+### [CG]怪物逼近
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\逼近.png
 
 → 选项：继续砸击管道，相信自己能抢在攻击前打开出口
     AI标签：专注目标, 承担风险, 果断
@@ -413,6 +427,8 @@ NPC：
 
 ### [AI片段]厕所里的学生
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\厕所奇遇.png
+
 背景：晚自习期间的一楼厕所，男生因压力崩溃躲在洗手台前哭，主角从通风管道逃出后腿部受伤且必须赶回教室参加周测
 参与角色：主角, 男生
 AI提示：根据玩家此前人格画像与本次选择“主动帮助”，生成一段4～8行剧本编码格式片段。
@@ -473,6 +489,7 @@ NPC：
     - 周骐瑞：spawn_spawn_175 -> walk_up -> spawn_spawn_172
 
 [旁白]晚自习结束后，刘宇很自然地拉过我和周骐瑞，我们跟三兄弟一样勾肩搭背地走着，虽然是刘宇单方面所为。
+（三人动作完成后继续下面对话）
 [主角说]嘶——
 [旁白]他走得有些快了，我扯到了刚刚结痂的伤口，疼得倒吸一口凉气。
 NPC动作：
@@ -553,6 +570,9 @@ AI提示：根据刘宇对主角的印象、本章逃生表现，以及玩家选
 → 跳转：ch6_root_rule_experiment_choice
 
 ### [CG]根本规则触发
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\祭祀\转头.png
+
 [旁白]我刻意提高了音量，尽量让远处的人听见。
 [主角说]我说——哪怕我逃了晚自习，老师也不能把我怎么样。
 [NPC:系统]由于您的天赋效果，该话语的份量正在上升。

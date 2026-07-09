@@ -84,6 +84,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentMapId: action.mapId,
         currentSpawnId: action.spawnId,
         playerPosition: action.position,
+        mapRuntime: undefined,
       };
 
     case "SET_FLAG":

@@ -33,8 +33,10 @@ export type PhaserToReactEvent =
   | { type: "TRIGGER_DOOR"; targetMap: string; spawnId: string };
 
 /** GameBridge: React → Phaser 指令 */
+import type { MapRuntimeSnapshot } from "../../types/game";
+
 export type ReactToPhaserCommand =
-  | { type: "CHANGE_MAP"; mapId: string; spawnId: string; playerState?: string }
+  | { type: "CHANGE_MAP"; mapId: string; spawnId: string; playerState?: string; runtimeSnapshot?: MapRuntimeSnapshot }
   | { type: "FREEZE_PLAYER" }
   | { type: "UNFREEZE_PLAYER" }
   | { type: "STORY_EVENT"; eventId: string; payload?: Record<string, unknown> };

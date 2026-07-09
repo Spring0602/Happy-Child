@@ -1,5 +1,6 @@
 import type { PhaserToReactEvent, ReactToPhaserCommand } from "../types/gameMap";
 import type { GameState } from "../../types/game";
+import type { MapRuntimeSnapshot } from "../../types/game";
 
 type Listener<T> = (event: T) => void;
 
@@ -17,6 +18,7 @@ class GameBridge {
   private pendingPhaserCommands: ReactToPhaserCommand[] = [];
   private lastChangeMapCommand: ReactToPhaserCommand | null = null;
   private _gameState: GameState | null = null;
+  private mapRuntimeProvider: (() => MapRuntimeSnapshot | null) | null = null;
 
   /** Phaser 侧调用：监听 React 发来的指令 */
   onReactCommand(type: string, handler: Listener<ReactToPhaserCommand>) {
@@ -61,6 +63,14 @@ class GameBridge {
   /** 共享 GameState */
   set gameState(state: GameState | null) { this._gameState = state; }
   get gameState() { return this._gameState; }
+
+  setMapRuntimeProvider(provider: (() => MapRuntimeSnapshot | null) | null) {
+    this.mapRuntimeProvider = provider;
+  }
+
+  captureMapRuntime(): MapRuntimeSnapshot | null {
+    return this.mapRuntimeProvider?.() ?? null;
+  }
 
   /** 清理所有监听器 */
   removeAllListeners() {

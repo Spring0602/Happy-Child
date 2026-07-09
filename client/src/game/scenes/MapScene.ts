@@ -5,6 +5,15 @@ import { gameBridge } from "../bridge/GameBridge";
 import { PlayerController } from "../systems/PlayerController";
 import { InteractionSystem } from "../systems/InteractionSystem";
 import { TriggerSystem } from "../systems/TriggerSystem";
+import type { MapRuntimeNpcSnapshot, MapRuntimeSnapshot } from "../../types/game";
+
+interface RuntimeNpcEntry {
+  sprite: Phaser.GameObjects.Sprite;
+  zone: Phaser.GameObjects.Zone;
+  framesPrefix: string;
+  bodyWidth: number;
+  bodyHeight: number;
+}
 
 export class MapScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap;
@@ -16,6 +25,7 @@ export class MapScene extends Phaser.Scene {
   private groundImage: Phaser.GameObjects.Image | null = null;
   private currentMapId = "";
   private playerFrozen = false;
+  private cameraFollowsPlayer = true;
   /** 全屏黑幕遮罩，防止地图切换时闪现旧底图 */
   private transitionOverlay: Phaser.GameObjects.Rectangle | null = null;
 
@@ -42,6 +52,7 @@ export class MapScene extends Phaser.Scene {
     console.log(`[MapScene] 🚀 create() 被调用, mapId=${this.currentMapId}`);
     try {
       this.loadMap(this.currentMapId);
+      gameBridge.setMapRuntimeProvider(() => this.captureRuntimeSnapshot());
 
       // 覆盖全屏黑幕，防止初始底图（如 dormitory sleep.png）在
       // 读档/首个场景转换到来之前闪现一帧
@@ -161,6 +172,7 @@ export class MapScene extends Phaser.Scene {
       this.cameras.main.setBounds(0, 0, entry.width, entry.height);
       const lerp = entry.width > 2000 ? 0.05 : 0.08;
       this.cameras.main.startFollow(this.player, true, lerp, lerp);
+      this.cameraFollowsPlayer = true;
 
       // === 5. 初始化子系统（必须在 processObjectLayers 之前） ===
       this.playerCtrl = new PlayerController(this, this.player);
@@ -562,7 +574,7 @@ export class MapScene extends Phaser.Scene {
   private listenBridge() {
     gameBridge.onReactCommand("CHANGE_MAP", (cmd) => {
       if (cmd.type === "CHANGE_MAP") {
-        this.transitionToMap(cmd.mapId, cmd.spawnId, cmd.playerState);
+        this.transitionToMap(cmd.mapId, cmd.spawnId, cmd.playerState, cmd.runtimeSnapshot);
       }
     });
     gameBridge.onReactCommand("FREEZE_PLAYER", () => {
@@ -671,12 +683,14 @@ export class MapScene extends Phaser.Scene {
         const point = spawnId ? this.getSpawnCenter(spawnId) : null;
         if (point) {
           this.cameras.main.stopFollow();
+          this.cameraFollowsPlayer = false;
           this.cameras.main.pan(point.x, point.y, duration, "Sine.easeInOut");
         }
         break;
       }
       case "camera_follow_player": {
         this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+        this.cameraFollowsPlayer = true;
         break;
       }
       case "flash_screen": {
@@ -848,11 +862,7 @@ export class MapScene extends Phaser.Scene {
           break;
         }
 
-        const npcList = (this.registry.get("npcSprites") as Map<string, {
-          sprite: Phaser.GameObjects.Sprite;
-          zone: Phaser.GameObjects.Zone;
-          framesPrefix: string;
-        }>) || new Map();
+        const npcList = (this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry>) || new Map();
         // 若 NPC 已存在则销毁旧精灵和旧碰撞体
         const existing = npcList.get(npcKey);
         if (existing) {
@@ -882,7 +892,7 @@ export class MapScene extends Phaser.Scene {
             this.physics.add.existing(zone, true);
             this.collisionGroup.add(zone);
             // 存储 NPC 引用（含 framesPrefix 用于方向切换）
-            npcList.set(npcKey, { sprite, zone, framesPrefix });
+            npcList.set(npcKey, { sprite, zone, framesPrefix, bodyWidth: bodyW, bodyHeight: bodyH });
             this.registry.set("npcSprites", npcList);
             const pendingDirections = this.registry.get("pendingNpcDirections") as Map<string, string> | undefined;
             const pendingDirection = pendingDirections?.get(npcKey);
@@ -899,11 +909,7 @@ export class MapScene extends Phaser.Scene {
         const npcKey = payload?.npcKey as string;
         const direction = payload?.direction as string;
         if (!npcKey || !direction) break;
-        const npcList = this.registry.get("npcSprites") as Map<string, {
-          sprite: Phaser.GameObjects.Sprite;
-          zone: Phaser.GameObjects.Zone;
-          framesPrefix: string;
-        }> | undefined;
+        const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
         const entry = npcList?.get(npcKey);
         if (entry) {
           // 映射方向到帧方向名
@@ -935,11 +941,7 @@ export class MapScene extends Phaser.Scene {
         const direction = (payload?.direction as string) || "front";
         const pose = ((payload?.pose as string) || "stand") === "sit" ? "sit" : "stand";
         if (!npcKey) break;
-        const npcList = this.registry.get("npcSprites") as Map<string, {
-          sprite: Phaser.GameObjects.Sprite;
-          zone: Phaser.GameObjects.Zone;
-          framesPrefix: string;
-        }> | undefined;
+        const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
         const entry = npcList?.get(npcKey);
         if (!entry) break;
         const dirMap: Record<string, string> = { front: "front", back: "back", left: "left", right: "right", down: "front", up: "back" };
@@ -970,11 +972,7 @@ export class MapScene extends Phaser.Scene {
         const spawnLayer = this.map.getObjectLayer("player_spawn");
         if (!spawnLayer) break;
 
-        const npcList = (this.registry.get("npcSprites") as Map<string, {
-          sprite: Phaser.GameObjects.Sprite;
-          zone: Phaser.GameObjects.Zone;
-          framesPrefix: string;
-        }>) || new Map();
+        const npcList = (this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry>) || new Map();
 
         for (const obj of spawnLayer.objects) {
           const spawnName = obj.name || "";
@@ -1008,7 +1006,7 @@ export class MapScene extends Phaser.Scene {
           const zone = this.add.zone(cx, cy, 24, 36);
           this.physics.add.existing(zone, true);
           this.collisionGroup.add(zone);
-          npcList.set(npcKey, { sprite, zone, framesPrefix });
+          npcList.set(npcKey, { sprite, zone, framesPrefix, bodyWidth: 24, bodyHeight: 36 });
         }
         this.registry.set("npcSprites", npcList);
         break;
@@ -1017,11 +1015,7 @@ export class MapScene extends Phaser.Scene {
         const npcKey = payload?.npcKey as string;
         const path = (payload?.path as string[]) || [];
         if (!npcKey || path.length === 0) break;
-        const npcList = this.registry.get("npcSprites") as Map<string, {
-          sprite: Phaser.GameObjects.Sprite;
-          zone: Phaser.GameObjects.Zone;
-          framesPrefix: string;
-        }> | undefined;
+        const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
         const entry = npcList?.get(npcKey);
         if (!entry) break;
         this.moveSpriteAlongSpawns(entry.sprite, entry.zone, path, (payload?.speed as number) || 120, entry.framesPrefix, () => {
@@ -1135,7 +1129,12 @@ export class MapScene extends Phaser.Scene {
   }
 
   /** 地图切换（淡入淡出） — 使用自控黑幕遮罩，杜绝旧底图闪现 */
-  private transitionToMap(mapId: string, spawnId: string, playerState?: string) {
+  private transitionToMap(
+    mapId: string,
+    spawnId: string,
+    playerState?: string,
+    runtimeSnapshot?: MapRuntimeSnapshot
+  ) {
     console.log(`[MapScene] 🗺️ 开始切换地图: ${mapId} (spawn=${spawnId})`);
 
     // 清理下雨效果
@@ -1172,6 +1171,9 @@ export class MapScene extends Phaser.Scene {
         this.interactionSys = null as unknown as InteractionSystem;
 
         this.loadMap(mapId, spawnId, playerState);
+        if (runtimeSnapshot?.mapId === mapId) {
+          this.restoreRuntimeSnapshot(runtimeSnapshot);
+        }
 
         // loadMap 会清理旧地图的所有显示对象，因此需要为新地图重新创建黑幕。
         const fadeOverlay = this.add.rectangle(
@@ -1209,6 +1211,92 @@ export class MapScene extends Phaser.Scene {
     };
   }
 
+  private captureRuntimeSnapshot(): MapRuntimeSnapshot | null {
+    if (!this.player?.active || !this.playerCtrl || !this.currentMapId) return null;
+    const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
+    const npcs: MapRuntimeNpcSnapshot[] = Array.from(npcList?.entries() ?? []).map(([npcKey, entry]) => ({
+      npcKey,
+      framesPrefix: entry.framesPrefix,
+      textureKey: entry.sprite.texture.key,
+      x: entry.sprite.x,
+      y: entry.sprite.y,
+      scaleX: entry.sprite.scaleX,
+      scaleY: entry.sprite.scaleY,
+      depth: entry.sprite.depth,
+      bodyWidth: entry.bodyWidth,
+      bodyHeight: entry.bodyHeight,
+    }));
+    const camera = this.cameras.main;
+    return {
+      version: 1,
+      mapId: this.currentMapId,
+      player: {
+        x: this.player.x,
+        y: this.player.y,
+        direction: this.playerCtrl.direction,
+        sitting: this.playerCtrl.sitting,
+        frozen: this.playerCtrl.isFrozen,
+        depth: this.player.depth,
+      },
+      npcs,
+      camera: {
+        scrollX: camera.scrollX,
+        scrollY: camera.scrollY,
+        zoom: camera.zoom,
+        followsPlayer: this.cameraFollowsPlayer,
+      },
+    };
+  }
+
+  private restoreRuntimeSnapshot(snapshot: MapRuntimeSnapshot) {
+    this.player.setPosition(snapshot.player.x, snapshot.player.y);
+    this.playerCtrl.standFacing(snapshot.player.direction);
+    if (snapshot.player.sitting) {
+      const mapHeight = MapRegistry[this.currentMapId]?.height || this.map.heightInPixels || 600;
+      this.playerCtrl.sit(snapshot.player.y, true, mapHeight);
+    }
+    this.player.setDepth(snapshot.player.depth);
+    this.setPlayerFrozen(snapshot.player.frozen);
+
+    const existing = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
+    existing?.forEach((entry) => {
+      entry.sprite.destroy();
+      entry.zone.destroy();
+    });
+    const restored = new Map<string, RuntimeNpcEntry>();
+    snapshot.npcs.forEach((npc) => {
+      if (!this.textures.exists(npc.textureKey)) {
+        console.warn(`[MapScene] 跳过无法恢复的 NPC 纹理: ${npc.textureKey}`);
+        return;
+      }
+      const sprite = this.add.sprite(npc.x, npc.y, npc.textureKey)
+        .setScale(npc.scaleX, npc.scaleY)
+        .setDepth(npc.depth);
+      const zone = this.add.zone(npc.x, npc.y, npc.bodyWidth, npc.bodyHeight);
+      this.physics.add.existing(zone, true);
+      this.collisionGroup.add(zone);
+      restored.set(npc.npcKey, {
+        sprite,
+        zone,
+        framesPrefix: npc.framesPrefix,
+        bodyWidth: npc.bodyWidth,
+        bodyHeight: npc.bodyHeight,
+      });
+    });
+    this.registry.set("npcSprites", restored);
+
+    const camera = this.cameras.main;
+    camera.setZoom(snapshot.camera.zoom);
+    if (snapshot.camera.followsPlayer) {
+      camera.startFollow(this.player, true, 0.08, 0.08);
+      this.cameraFollowsPlayer = true;
+    } else {
+      camera.stopFollow();
+      this.cameraFollowsPlayer = false;
+    }
+    camera.setScroll(snapshot.camera.scrollX, snapshot.camera.scrollY);
+  }
+
   private moveSpriteAlongSpawns(
     sprite: Phaser.GameObjects.Sprite,
     zone: Phaser.GameObjects.Zone | undefined,
@@ -1217,8 +1305,25 @@ export class MapScene extends Phaser.Scene {
     framesPrefix?: string,
     onComplete?: () => void
   ) {
+    const spawnLayer = this.map.getObjectLayer("player_spawn");
+    let previousPoint = { x: sprite.x, y: sprite.y };
     const points = path
-      .map((spawnId) => this.getSpawnCenter(spawnId))
+      .map((spawnId) => {
+        const candidates = (spawnLayer?.objects ?? [])
+          .filter((object) => object.name === spawnId)
+          .map((object) => ({
+            x: object.x! + (object.width ?? 32) / 2,
+            y: object.y! + (object.height ?? 32) / 2,
+          }));
+        if (candidates.length === 0) return null;
+        const nearest = candidates.reduce((best, candidate) => {
+          const bestDistance = Phaser.Math.Distance.Between(previousPoint.x, previousPoint.y, best.x, best.y);
+          const candidateDistance = Phaser.Math.Distance.Between(previousPoint.x, previousPoint.y, candidate.x, candidate.y);
+          return candidateDistance < bestDistance ? candidate : best;
+        });
+        previousPoint = nearest;
+        return nearest;
+      })
       .filter((point): point is { x: number; y: number } => Boolean(point));
     if (points.length === 0) {
       onComplete?.();

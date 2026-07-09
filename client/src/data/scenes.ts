@@ -3055,8 +3055,8 @@ export const scenes: Record<string, Scene> = {
   ch6_class3_first_reaction: {
     id: "ch6_class3_first_reaction",
     chapter: "第6章 · 追杀与逃生",
-    background: "/assets/maps/classroom_3/教室.png",
-    playerState: "yps_frames_stand_left",
+    background: "/assets/CG/3班/突脸.png",
+    cgMode: true,
     speaker: "旁白",
     text: "教室门就在不远处，但人群正在合拢。",
     choices: [
@@ -3069,8 +3069,8 @@ export const scenes: Record<string, Scene> = {
   ch6_zhoujunxiu_reaction: {
     id: "ch6_zhoujunxiu_reaction",
     chapter: "第6章 · 追杀与逃生",
-    background: "/assets/maps/classroom_3/教室.png",
-    playerState: "yps_frames_stand_left",
+    background: "/assets/CG/3班/突脸.png",
+    cgMode: true,
     speaker: "周隽秀",
     text: "她张了张嘴，像是想说“他是来帮我的”，可声音被某种看不见的力量扭曲成含混的气音。\n\n那一瞬间的迟疑让靠近我的几名学生慢了半拍。\n\n但她终究没能违抗规则，眼神很快变得陌生。",
     nextSceneId: "ch6_class3_door_locked",
@@ -3106,7 +3106,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/3班/人群.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我抽出水果刀，刀尖在灯光下闪过一道冷光。\n\n但一旁的学生瞬间把刀夺了过去。抓着我脚踝的学生顺势把我架起，还没等我反应过来，刀尖已经刺入心脏。\n\n生命本就如此脆弱。无论是在副本中，还是副本外的现实生活，本质上并没有什么区别。\n\n我死了。",
+    text: "[旁白]我抽出藏在校服里的水果刀，刀尖在灯光下闪过一道冷光。\\n\\n但一旁的学生直接瞬间把刀夺了过来，抓着我脚踝的学生顺势把我架起，还没等我反应过来，刀尖已经刺入了我的心脏。\\n\\n快得我甚至都没感觉到疼痛。\\n\\n鲜血从伤口涌出，迟来的疼痛带着我的意识逐渐飞远。\n\n[主角]（就这么结束了……？）\n\n[旁白]生命本就如此脆弱，无论是在副本中，还是在副本外的现实生活，本质上并没有什么区别。\\n\\n我死了。",
     nextSceneId: "title_screen",
   },
 
@@ -3116,7 +3116,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/3班/人群.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我突然松开门把手。后方拉扯的力量让我狠狠摔进人群，数名学生失去重心倒在地上，抓住脚踝的手也随之松开。\n\n我趁机翻身爬起，拿出水果刀指向他们。\n\n“谁再靠近，我就用它杀谁。”\n\n五分钟被拉得无比漫长。直到晚自习铃声响起，3班学生迅速而有序地回到座位，紧锁的教室门也终于打开了。\n\n我立即夺门而出，朝自班教室跑去。",
+    text: "[旁白]我突然松开门把手。后方拉扯的力量让我狠狠摔进人群，数名学生失去重心倒在地上，抓住脚踝的手也随之松开。\n\n[旁白]我趁机翻身爬起，拿出水果刀指向他们。\n\n[主角说]谁再靠近，我就用它杀谁。\n\n[旁白]周围的人后退了一些，明显忌惮着我手里的武器。\\n\\n校园里禁止携带管制刀具，当然，只要不被老师发现也可以偷偷带。\\n\\n而在这个基本被驯化的班级里，学生基本上都是遵守纪律的“好孩子”，自然不会随身携带武器。\n\n[旁白]五分钟被拉得无比漫长。直到——\n\n[旁白]晚自习铃声响起。3班学生迅速而有序地回到座位，紧锁的教室门也终于打开了。\n\n[旁白]我立即夺门而出，朝自班教室跑去。",
     nextSceneId: "ch6_corridor_return",
   },
 
@@ -3126,7 +3126,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/3班/人群.png",
     cgMode: true,
     speaker: "旁白",
-    text: "水果刀划开最先抓向我的手臂。鲜血涌出，周围学生终于本能地后退了一步，抓住我脚踝的手也随之松开。\n\n我趁机翻身爬起，将刀指向他们。\n\n“谁再靠近，我就用它杀谁。”\n\n直到晚自习铃声响起，3班学生迅速而有序地回到座位，紧锁的教室门也终于打开了。\n\n我立即夺门而出，朝自班教室跑去。",
+    text: "[旁白]水果刀划开最先抓向我的手臂。鲜血涌出，周围学生终于本能地后退了一步，抓住我脚踝的手也随之松开。\\n\\n我趁机翻身爬起，将手中的水果刀指向他们。\n\n[主角说]谁再靠近，我就用它杀谁。\n\n[旁白]周围的人后退了一些，明显忌惮着我手里的武器。\\n\\n校园里禁止携带管制刀具，当然，只要不被老师发现也可以偷偷带。\\n\\n而在这个基本被驯化的班级里，学生基本上都是遵守纪律的“好孩子”，自然不会随身携带武器。\n\n[旁白]五分钟被拉得无比漫长。直到——\n\n[旁白]晚自习铃声响起。3班学生迅速而有序地回到座位，紧锁的教室门也终于打开了。\n\n[旁白]我立即夺门而出，朝自班教室跑去。",
     nextSceneId: "ch6_corridor_return",
   },
 
@@ -3137,7 +3137,27 @@ export const scenes: Record<string, Scene> = {
     playerState: "yps_frames_stand_front",
     speaker: "系统",
     text: "技能“违规提醒”发动中。\n\n注意：该技能只能保护您20秒！",
-    onCgEnd: "ch6_free_corridor_return",
+    nextSceneId: "ch6_corridor_pressure",
+  },
+
+  ch6_corridor_pressure: {
+    id: "ch6_corridor_pressure",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    playerState: "yps_frames_stand_front",
+    speaker: "旁白",
+    text: "熟悉的窒息感再次袭来，迫使我放慢速度。",
+    nextSceneId: "ch6_corridor_slowed_thought",
+  },
+
+  ch6_corridor_slowed_thought: {
+    id: "ch6_corridor_slowed_thought",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    playerState: "yps_frames_stand_front",
+    speaker: "叶平生",
+    text: "（该死，现在这技能还帮倒忙了。）",
+    onCgEnd: "ch6_free_corridor_return_active",
   },
 
   ch6_corridor_wrong_room: {
@@ -3145,7 +3165,32 @@ export const scenes: Record<string, Scene> = {
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/maps/corridor/走廊.png",
     speaker: "旁白",
-    text: "不是这里。现在没有时间浪费。",
+    text: "不是这里。",
+  },
+
+  ch6_corridor_reached_classroom: {
+    id: "ch6_corridor_reached_classroom",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    speaker: "旁白",
+    text: "我用尽最后一口气赶到教室门口，猛地推开门。",
+    nextSceneId: "ch6_liuyu_catches_late",
+  },
+
+  ch6_corridor_wrong_direction: {
+    id: "ch6_corridor_wrong_direction",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    speaker: "旁白",
+    text: "（1）班在楼梯口附近。",
+  },
+
+  ch6_corridor_toilet_direction: {
+    id: "ch6_corridor_toilet_direction",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/corridor/走廊.png",
+    speaker: "旁白",
+    text: "方向反了哥们。",
   },
 
   ch6_corridor_timeout_death: {
@@ -3154,7 +3199,7 @@ export const scenes: Record<string, Scene> = {
     background: "",
     cgMode: true,
     speaker: "系统",
-    text: "技能“违规提醒”强烈发动中。\n\n我离本班教室只剩最后一段距离，可胸口的窒息感像一只手猛地攥紧了肺。\n\n倒计时归零。被动技能已失效。\n\n最后一口空气从喉咙里被抽走。我伸向门的指尖停在半空，随后无力垂下。\n\n我死了。",
+    text: "[NPC:系统]技能“违规提醒”强烈发动中。\n\n[旁白]我离本班教室只剩最后一段距离，可胸口的窒息感像一只手猛地攥紧了肺。\n\n[主角]（不行……还差一点……）\n\n[旁白]脚步声戛然而止，我的膝盖重重砸在地上，视野逐渐变得愈加狭隘。\n\n[旁白]教室门近在咫尺，晚自习的灯光从门缝里漏出来，却安静得像另一个世界。\\n\\n也是，我本来就不属于这里。\n\n[NPC:系统]倒计时归零。被动技能已失效。\n\n[旁白]最后一口空气从喉咙里被抽走。\\n\\n我伸向门的指尖停在半空，随后无力垂下。\n\n[主角]（但就算我不属于这里，我也想活下去……）\n\n[旁白]我死了。",
     nextSceneId: "title_screen",
   },
 
@@ -3162,9 +3207,19 @@ export const scenes: Record<string, Scene> = {
     id: "ch6_liuyu_catches_late",
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/maps/classroom/教室.png",
-    playerState: "yps_frames_stand_front",
-    speaker: "刘宇",
-    text: "你迟到了，叶平生。\n\n我据理力争：“现在还没到19:01，这也算迟到？”\n\n刘宇漠然地看着我：“已经打铃了。你跟我去见班主任。”\n\n不由得我再狡辩些什么，他一把抓过我的手腕，拖着我往教师办公室走去。",
+    playerState: "yps_frames_stand_left",
+    speaker: "旁白",
+    text: "[旁白]我猛地推开门，就看见刘宇正坐在讲台上，漠然的视线轻飘飘地与我的交汇在一起。其他同学都木然地低着头学习，丝毫没有注意这边发生了什么。\n\n[NPC:刘宇]你迟到了，叶平生。\n\n[旁白]我据理力争，\n\n[主角说]现在还没到19:01，这也算迟到？\n\n[NPC:刘宇]已经打铃了。你跟我去见班主任。",
+    nextSceneId: "ch6_liuyu_walks_to_player",
+  },
+
+  ch6_liuyu_takes_player: {
+    id: "ch6_liuyu_takes_player",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/classroom/教室.png",
+    playerState: "yps_frames_stand_left",
+    speaker: "旁白",
+    text: "不由得我再狡辩些什么，刘宇就一把抓过我的手腕，拖着我往教师办公室走去。",
     nextSceneId: "ch6_to_teacher_office",
   },
 
@@ -3174,7 +3229,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/美术教室/楼梯.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我感受着手腕上逐渐收紧的力道，竟然莫名觉得安心。\n\n他塞给我一个纸团，小声嘱咐道。",
+    text: "我感受着手腕上逐渐收紧的力道，竟然莫名地觉得安心。\\n\\n他塞给我一个纸团，小声嘱咐道，",
     nextSceneId: "ch6_liuyu_route_note",
   },
 
@@ -3185,6 +3240,16 @@ export const scenes: Record<string, Scene> = {
     cgMode: true,
     speaker: "刘宇",
     text: "按纸上的路线跑。教师办公室的门从里面打不开，别试图跟老师硬碰硬。\n\n通风管道通往一楼厕所。水果刀拧不开螺丝，砸老化的角。\n\n周测开始前必须回来，不得旷考。这次算提前通知你了。",
+    nextSceneId: "ch6_escape_route",
+  },
+
+  ch6_escape_route: {
+    id: "ch6_escape_route",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/CG/美术教室/楼梯.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]好，谢谢你了。\n\n[旁白]我展开刘宇塞来的纸团。这是一张学校内部地形图，一条红线从教师办公室延伸至一楼厕所，关键位置标着简短批注。\n\n[旁白]来到办公室门前，刘宇敲了敲门，听到老师的许可声后推开了门。",
     nextSceneId: "ch6_teacher_office_enter",
   },
 
@@ -3192,9 +3257,19 @@ export const scenes: Record<string, Scene> = {
     id: "ch6_teacher_office_enter",
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/maps/teacher_office/教师办公室.png",
-    playerState: "yps_frames_stand_left",
-    speaker: "班主任",
-    text: "不听话的孩子，就应该受到应有的惩罚。\n\n她的声音逐渐失去人类质感。周围环境迅速变得昏暗，连办公室的布局都变得难以辨认。",
+    playerState: "yps_frames_stand_back",
+    speaker: "刘宇",
+    text: "[NPC:刘宇]老师，迟到的人我带来了。\n\n[NPC:班主任]好，你先回去吧。\n\n[旁白]刘宇与我交换了一个眼神，就转身离开。",
+    nextSceneId: "ch6_teacher_office_liuyu_leaves",
+  },
+
+  ch6_teacher_office_after_liuyu_leaves: {
+    id: "ch6_teacher_office_after_liuyu_leaves",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/teacher_office/教师办公室.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[旁白]老师还在批改作业，我们谁也没有开口，办公室内寂静得诡异，惹得一阵强烈的不祥预感顺着我的脊椎一路攀援直冲天灵盖。\\n\\n我不禁打了个寒颤，未知的恐惧仍在一点点随着时间积累——因为我压根听不见她批改作业时本该发出的“沙沙”声。\n\n[旁白]不知过了多久，她终于停下笔，抬头看向我。\n\n[NPC:班主任]不听话的孩子，就应该受到应有的惩罚。\n\n[旁白]她的声音逐渐失去人类质感。周围环境迅速变得昏暗，连办公室的布局都变得难以辨认。",
     nextSceneId: "ch6_office_escape_choice",
   },
 
@@ -3202,9 +3277,9 @@ export const scenes: Record<string, Scene> = {
     id: "ch6_office_escape_choice",
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/maps/teacher_office/教师办公室.png",
-    playerState: "yps_frames_stand_left",
+    playerState: "yps_frames_stand_back",
     speaker: "旁白",
-    text: "老师的皮肤惨白如纸，牙齿变得尖锐，嘴角咧到了耳根。\n\n门、窗户、通风管道……我必须抓紧时间谨慎行事。",
+    text: "[旁白]老师的皮肤惨白如纸，甚至透着骇人的青灰色。而牙齿变得尖锐，嘴角咧到了耳根；指甲变得锋利，目露凶光。\n\n[旁白]我咬紧后槽牙，目光迅速扫过整个办公室。门、窗户、通风管道……\n\n[主角]（门应该是打不开的，但刘宇提到每个办公室都有一个足够大的通风管道，可供人通过。）\n\n[主角]（邮件中也提到过，违反规则会召来杀身之祸，但并不代表我一定会死。换句话说，比赛中并不存在绝对的死局。）\n\n[主角]（我必须抓紧时间谨慎行事。）",
     choices: [
       { id: "ch6_followed_liuyu_map", text: "拿出纸团，按照刘宇给的路线图行动，立刻跑向通风管道", nextSceneId: "ch6_break_vent", effects: { trust: 1, realityJudgment: 1 }, tags: ["信任协作", "执行计划"] },
       { id: "ch6_verified_escape_route", text: "先检查一下门窗，确认刘宇给的线索是否可靠", nextSceneId: "ch6_verified_route_death", effects: { selfProtection: 1, trust: -1 }, tags: ["谨慎验证", "风险评估"] },
@@ -3219,7 +3294,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "我没有立刻冲向通风管道，而是先去拧办公室门把手。门锁纹丝不动。\n\n正当我准备去检查窗户时，冰冷的气息贴上后颈。\n\n利爪贯穿胸口，剧烈的疼痛把没来得及出口的话钉回肺里。\n\n弥留之际，最后看见的是办公桌上那张被我丢开的路线图。红线仍然指向通风管道。\n\n我死了。",
+    text: "[旁白]我没有立刻冲向通风管道，而是先去拧办公室门把手。\\n\\n门锁纹丝不动。\n\n[主角]（果然打不开。那窗户呢？）\n\n[旁白]正当我准备去检查窗户时，一道仿佛来自深渊之底的声音撕咬着我的耳膜，让我汗毛倒竖。\n\n[NPC:班主任]坏孩子，做错事了还变本加厉，嗯？\n\n[主角]（完了，没时间了。）\n\n[旁白]冰冷的气息贴上我的后颈，死亡的恐惧捏紧了我的心脏。等我转身时，怪物令人作呕的脸已经近在咫尺。\n\n[主角说]等——\n\n[旁白]利爪贯穿胸口，剧烈的疼痛硬生生将没来得及出口的话被钉回肺里。\\n\\n我低头看见自己的上衣被鲜血迅速浸透，耳边仍能听见老师温柔而又残忍的呢喃。\n\n[NPC:班主任]迟到、顶嘴、逃罚。这样的孩子，应该好好记住教训。\n\n[旁白]我的视野逐渐模糊。弥留之际，最后看见的，是办公桌上那张被我丢开的路线图。\\n\\n红线仍然指向通风管道，那是一道我已经来不及抓住的生路。\n\n[主角]（我怎么这么蠢……）\n\n[旁白]我死了。",
     nextSceneId: "title_screen",
   },
 
@@ -3229,7 +3304,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "我踮起脚尖，尝试用水果刀拧开通风管道口的螺丝。可惜水果刀无法当一字批头使用。\n\n好在管道有些年头，我用刀柄猛砸老化最明显的一角，它逐渐松动了。\n\n等我抽空回头，怪物已经伸出利爪抓向了我。",
+    text: "[旁白]我踮起脚尖，尝试用水果刀拧开通风管道口的螺丝。可惜水果刀无法当一字批头使用，螺丝无法拧动。\n\n[主角]（该死，只能暴力打开了吗？）\n\n[NPC:班主任]这个孩子的味道，会不会比上次更精彩呢？\n\n[旁白]她伸出纤长的舌头舔了舔嘴唇，开始朝我移动。\n\n[旁白]好在这管道有些年头，我用刀柄猛砸老化最明显的一角，它逐渐松动了。\n\n[旁白]我抓紧时间破坏通风管道，根本无暇顾及背后的怪物，只有听觉上能判断她的大致方位。等我抽空回头看她的时候她已经伸出利爪抓向了我。",
     nextSceneId: "ch6_teacher_attack_choice",
   },
 
@@ -3239,7 +3314,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "“老师，迟到应该有具体惩罚吧？您不先告诉我吗？”\n\n班主任伸出细长的舌头：“被我吃掉，就是惩罚。”\n\n拖延只换来了几秒，却足够我确认通风管道的位置。我用刀柄猛砸老化的一角，怪物也朝我扑来。",
+    text: "[主角说]老师，迟到应该有具体惩罚吧？您不先告诉我吗？\n\n[NPC:班主任]被我吃掉，就是惩罚。\n\n[旁白]她伸出细长的舌头舔过嘴唇。拖延只换来了几秒，却足够我确认通风管道的位置。\n\n[旁白]我踮起脚尖，尝试用水果刀拧开通风管道口的螺丝。可惜水果刀无法当一字批头使用，螺丝无法拧动。\n\n[主角]（该死，只能暴力打开了吗？）\n\n[NPC:班主任]这个孩子的味道，会不会比上次更精彩呢？\n\n[旁白]她伸出纤长的舌头舔了舔嘴唇，开始朝我移动。\n\n[旁白]好在这管道有些年头，我用刀柄猛砸老化最明显的一角，它逐渐松动了。\n\n[旁白]我抓紧时间破坏通风管道，根本无暇顾及背后的怪物，只有听觉上能判断她的大致方位。等我抽空回头看她的时候她已经伸出利爪抓向了我。",
     nextSceneId: "ch6_teacher_attack_choice",
   },
 
@@ -3249,7 +3324,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "我挥动水果刀，划伤怪物的手臂。她痛苦地呻吟一声，不得不后退几步。\n\n水果刀只能造成很小的伤害。我趁着她恢复的时间，用刀柄猛砸通风管道老化的一角。\n\n怪物再次逼近。",
+    text: "[旁白]我挥动水果刀，划伤了怪物的手臂，她痛苦地呻吟了一声，不得不后退几步。\\n\\n刀柄被汗水浸湿。面对这种怪物，水果刀只能造成很小的伤害，我要趁着她恢复的时间赶紧撬开通风管道。\n\n[旁白]我踮起脚尖，尝试用水果刀拧开通风管道口的螺丝。可惜水果刀无法当一字批头使用，螺丝无法拧动。\n\n[主角]（该死，只能暴力打开了吗？）\n\n[NPC:班主任]这个孩子的味道，会不会比上次更精彩呢？\n\n[旁白]她伸出纤长的舌头舔了舔嘴唇，开始朝我移动。\n\n[旁白]好在这管道有些年头，我用刀柄猛砸老化最明显的一角，它逐渐松动了。\n\n[旁白]我抓紧时间破坏通风管道，根本无暇顾及背后的怪物，只有听觉上能判断她的大致方位。等我抽空回头看她的时候她已经伸出利爪抓向了我。",
     nextSceneId: "ch6_teacher_attack_choice",
   },
 
@@ -3259,7 +3334,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "管道口即将脱落，怪物的利爪也即将落下。",
+    text: "",
     choices: [
       { id: "ch6_vent_commit", text: "继续砸击管道，相信自己能抢在攻击前打开出口", nextSceneId: "ch6_vent_escape_commit", effects: { realityJudgment: 1, selfProtection: 1 }, tags: ["专注目标"] },
       { id: "ch6_blocked_teacher", text: "回身用水果刀格挡利爪，再继续破坏管道", nextSceneId: "ch6_vent_escape_block", effects: { selfProtection: 1, authorityResistance: 1 }, tags: ["战斗反应"] },
@@ -3273,7 +3348,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "利爪破空的声音从身后袭来，我立刻闪躲，但还是在最后一刻被划伤小腿。\n\n伤口火辣辣地疼。但我顾不上疼痛，只能用尽全力砸下最后一次。\n\n管道口终于应声脱落。我爬进通风管道，按照刘宇给的示意图拐了好几个弯，最后在一楼厕所落地。",
+    text: "[旁白]利爪破空的声音从身后袭来，我立刻闪躲，但还是在最后一刻被划伤了小腿。\n\n[主角说]呃！\n\n[旁白]伤口火辣辣地疼。但我顾不上疼痛，只能用尽全力砸下最后一次。\\n\\n管道口终于应声脱落。\n\n[旁白]我一跃而起，眼看老师即将一口咬过来，我双手发力，爬进了通风管道里。\\n\\n一张血盆大口砰的一声撞到通风管道口，那长舌头还在管道内扫着，我连忙往内部爬去。\n\n[主角]（差一点就死了。）\n\n[旁白]我看着那长舌，努力喘了几口气，回过神来手心已经满是冷汗。我咽了口唾沫，抓紧做我该做的事。\\n\\n按照刘宇所给的示意图，我拐了好几个弯，最后在一楼的厕所落地。",
     nextSceneId: "ch6_toilet_encounter",
   },
 
@@ -3283,7 +3358,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "我回身用水果刀挡向利爪，可惜人类力气不如怪物，刀身瞬间被拍飞，另一只爪子在我小腿上留下深可见骨的伤口。\n\n我强忍疼痛砸下最后一次，管道口终于脱落。我爬进通风管道，最后在一楼厕所落地。",
+    text: "[旁白]我回身用水果刀挡向利爪，可惜人类力气不如怪物，刀身瞬间被拍飞，怪物的另一只爪子在我小腿上留下了深可见骨的伤口。\n\n[主角说]呃！\n\n[旁白]伤口火辣辣地疼。但我顾不上疼痛，只能用尽全力砸下最后一次。\\n\\n管道口终于应声脱落。\n\n[旁白]我一跃而起，眼看老师即将一口咬过来，我双手发力，爬进了通风管道里。\\n\\n一张血盆大口砰的一声撞到通风管道口，那长舌头还在管道内扫着，我连忙往内部爬去。\n\n[主角]（差一点就死了。）\n\n[旁白]我看着那长舌，努力喘了几口气，回过神来手心已经满是冷汗。我咽了口唾沫，抓紧做我该做的事。\\n\\n按照刘宇所给的示意图，我拐了好几个弯，最后在一楼的厕所落地。",
     nextSceneId: "ch6_toilet_encounter",
   },
 
@@ -3293,7 +3368,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/逼近.jpg",
     cgMode: true,
     speaker: "旁白",
-    text: "我将桌上的文件和台灯推向怪物。她的攻击被阻碍了一瞬，利爪仍擦过我的小腿，留下狭长伤口。\n\n我砸下最后一次，管道口终于脱落。我爬进通风管道，按照路线在一楼厕所落地。",
+    text: "[旁白]我将桌上的文件和台灯推向怪物。她的攻击被阻碍了一瞬，利爪仍擦过我的小腿，留下狭长伤口。\n\n[主角说]呃！\n\n[旁白]伤口火辣辣地疼。但我顾不上疼痛，只能用尽全力砸下最后一次。\\n\\n管道口终于应声脱落。\n\n[旁白]我一跃而起，眼看老师即将一口咬过来，我双手发力，爬进了通风管道里。\\n\\n一张血盆大口砰的一声撞到通风管道口，那长舌头还在管道内扫着，我连忙往内部爬去。\n\n[主角]（差一点就死了。）\n\n[旁白]我看着那长舌，努力喘了几口气，回过神来手心已经满是冷汗。我咽了口唾沫，抓紧做我该做的事。\\n\\n按照刘宇所给的示意图，我拐了好几个弯，最后在一楼的厕所落地。",
     nextSceneId: "ch6_toilet_encounter",
   },
 
@@ -3303,11 +3378,11 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/厕所奇遇.png",
     cgMode: true,
     speaker: "旁白",
-    text: "厕所里传来压抑的哭声。好像是有同学压力太大了，晚自习偷跑来这里发泄情绪，甚至不惜违反规则。\n\n真勇。不过我也没资格吐槽他，我这是五十步笑百步。",
+    text: "[旁白]厕所里传来压抑的哭声。好像是有同学压力太大了，晚自习偷跑来这里发泄情绪，甚至不惜违反规则。\n\n[主角]（真勇。不过我也没资格吐槽他，我这是五十步笑百步。）",
     choices: [
       { id: "ch6_ignored_crying_student", text: "没剩多少时间了，我决定装作没有看见，立刻赶回教室参加周测", nextSceneId: "ch6_weekly_exam", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["目标优先"] },
-      { id: "ch6_warned_crying_student", text: "提醒他如果被其他同学发现，可能会被举报违规", nextSceneId: "ch6_weekly_exam", effects: { empathy: 1, realityJudgment: 1 }, tags: ["关心他人"] },
-      { id: "ch6_helped_crying_student", text: "走到他身后拍了拍他的肩膀：“同学，需要帮忙吗？”", nextSceneId: "ch6_crying_student_response", effects: { empathy: 2, selfProtection: -1 }, tags: ["主动帮助"] },
+      { id: "ch6_warned_crying_student", text: "如果他被其他同学发现会不会被举报？这样的话他就违规了，我还是提醒他一下吧", nextSceneId: "ch6_weekly_exam", effects: { empathy: 1, realityJudgment: 1 }, tags: ["关心他人"] },
+      { id: "ch6_helped_crying_student", text: "不知道为什么，哪怕他有可能举报我逃了晚自习，我还是走到他身后拍了拍他的肩膀：“同学，需要帮忙吗？”", nextSceneId: "ch6_crying_student_response", effects: { empathy: 2, selfProtection: -1 }, tags: ["主动帮助"] },
     ],
   },
 
@@ -3316,8 +3391,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/CG/祭祀/厕所奇遇.png",
     cgMode: true,
-    speaker: "男生",
-    text: "你、你别告诉老师。\n\n他慌乱地抹了把脸，像是终于意识到这里也并不安全。\n\n“可我真的不想回去。”\n\n我看了一眼自己仍在渗血的裤腿，只能压低声音提醒他去洗把脸，别让人看出异常。男生沉默地点点头，低声道了句谢，随后低头离开。",
+    speaker: "旁白",
+    text: "[NPC:男生]你、你别告诉老师。\n\n[旁白]他慌乱地抹了把脸，像是终于意识到这里也并不安全。\n\n[NPC:男生]可我真的不想回去。\n\n[旁白]我看了一眼自己仍在渗血的裤腿，只能压低声音提醒他去洗把脸，别让人看出异常。男生沉默地点点头，低声道了句谢，随后低头离开。",
     nextSceneId: "ch6_weekly_exam",
   },
 
@@ -3327,7 +3402,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/教室/教室夜晚.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我赶回教室不久，周测试卷便发了下来。\n\n我凭残存记忆完成了大约七成题目，其余只能靠猜。\n\n收卷时，我才意识到腿上的伤口仍在流血，裤腿已经被血液染深。周围同学却对此视而不见。\n\n这么晚医务室也不会开了，只能回家处理伤口。",
+    text: "[旁白]我赶回教室不久，周测试卷便发了下来。\\n\\n真是一秒钟都不让我喘息啊。\n\n[旁白]我凭残存记忆完成了大约七成题目，其余只能靠猜。短短一个小时根本不足以写完全部试题。\n\n[旁白]收卷时，我才意识到腿上的伤口仍在流血，裤腿已经被血液染深。\n\n[旁白]周围同学却对此视而不见，收卷时连头也没有抬一下。\\n\\n我想叹气，但是教室里静得诡异，让我大气不敢出，硬生生又咽了回去。\n\n[主角]（按之前的经验，这次周测成绩我应该是班里倒数，进小班辅导指日可待，就是应付父母这一块有些棘手。）\n\n[旁白]晚自习剩下的时间我抓紧完成了作业，但是我计划表上额外任务还一点没动，我是真拼尽全力无法战胜了。\\n\\n这意味着我回家之后的探索时间会大量减少，有些事拖到后面再调查只会耽误更多事，今晚很可能要熬夜了。\n\n[主角]（这么晚医务室也不会开了，只能回家处理伤口。）\n\n[主角]（哈……真头疼。）",
     nextSceneId: "ch6_after_school_walk",
   },
 
@@ -3337,7 +3412,17 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/gate/校门夜晚.png",
     playerState: "yps_frames_stand_back",
     speaker: "旁白",
-    text: "晚自习结束后，刘宇很自然地拉过我和周骐瑞，我们跟三兄弟一样勾肩搭背地走着，虽然是刘宇单方面所为。\n\n他走得有些快，我扯到了刚刚结痂的伤口，疼得倒吸一口凉气。\n\n刘宇和周骐瑞看向我，却没有发现任何异常。\n\n“我的右腿受伤了……你们看不到吗？伤得很重。”\n\n周骐瑞小心撩起我的裤腿，随后摇头：“没有任何伤口。”\n\n刘宇的声音严肃得不太正常：“你怎么受伤的？”",
+    text: "晚自习结束后，刘宇很自然地拉过我和周骐瑞，我们跟三兄弟一样勾肩搭背地走着，虽然是刘宇单方面所为。",
+    nextSceneId: "ch6_after_school_injury",
+  },
+
+  ch6_after_school_injury: {
+    id: "ch6_after_school_injury",
+    chapter: "第6章 · 追杀与逃生",
+    background: "/assets/maps/gate/校门夜晚.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[主角说]嘶——\n\n[旁白]他走得有些快了，我扯到了刚刚结痂的伤口，疼得倒吸一口凉气。\n\n[NPC:刘宇]怎么了你？\n\n[旁白]刘宇担心地看着我，连周骐瑞也看了过来。\\n\\n他的目光在我身上扫了一圈，最后并没有发现什么异常。\n\n[主角说]我的右腿受伤了……你们看不到吗？伤得很重。\n\n[NPC:周骐瑞]你架着他，我看看。\n\n[旁白]周骐瑞小心撩起我的裤腿，随后摇头。\n\n[NPC:周骐瑞]没有任何伤口。\n\n[主角]（逗我玩呢，我这条腿都鲜血淋漓了。）\n\n[旁白]我的内心正在进行一场暴风雨般的吐槽，这时另一个声音又在我耳边响起。\n\n[NPC:刘宇]你怎么受伤的？\n\n[旁白]我警觉地瞥了他一眼，总感觉他说这句话时严肃得不太正常。",
     nextSceneId: "ch6_injury_explanation_choice",
   },
 
@@ -3347,7 +3432,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/gate/校门夜晚.png",
     playerState: "yps_frames_stand_back",
     speaker: "旁白",
-    text: "我警觉地瞥了刘宇一眼。",
+    text: "",
     choices: [
       { id: "ch6_concealed_teacher_monster", text: "……", nextSceneId: "ch6_liuyu_root_rule_test", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["谨慎"] },
       { id: "ch6_partial_injury_truth", text: "我在办公室的时候，看到老师……", nextSceneId: "ch6_root_rule_atmosphere", effects: { trust: 1, selfProtection: 1 }, tags: ["有限坦诚"] },
@@ -3360,8 +3445,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/maps/gate/校门夜晚.png",
     playerState: "yps_frames_stand_back",
-    speaker: "刘宇",
-    text: "怎么突然不说话了？\n\n他的声音压得很低，却像故意把问题推回给我。\n\n我下意识开口：“我在办公室的时候，被老师……”\n\n话说到一半，周围几个学生的脚步忽然慢了下来。周骐瑞的目光也变得僵硬。\n\n我猛地闭嘴，意识到伤口不可见的问题也许不在伤口本身，而在造成伤口的那段事实。",
+    speaker: "旁白",
+    text: "[NPC:刘宇]怎么突然不说话了？\n\n[旁白]他的声音压得很低，却像故意把问题推回给我。\n\n[NPC:刘宇]那你觉得老师能把你怎么样？\n\n[主角说]我在办公室的时候，被老师……\n\n[旁白]话说到一半，周围几个学生的脚步忽然慢了下来。周骐瑞的目光也变得僵硬。\n\n[旁白]我猛地闭嘴，意识到伤口不可见的问题也许不在伤口本身，而在造成伤口的那段事实。",
     nextSceneId: "ch6_root_rule_experiment_choice",
   },
 
@@ -3371,7 +3456,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/转头.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我几乎脱口而出，然后突然意识到了什么，连忙住口。\n\n为什么周围突然这么安静？现在可是在放学后的室外。\n\n当我再次抬起头，对上了周骐瑞阴翳的脸。越过他的肩膀，前方所有同学都转过一个诡异的弧度，冷漠地看着我。\n\n我很可能触碰了某条不能公开的学校规则。",
+    text: "[旁白]我几乎脱口而出，然后突然意识到了什么，连忙住口。\\n\\n为什么周围突然这么安静？现在可是在放学后的室外。\n\n[旁白]当我再次抬起头的时候，对上了周骐瑞阴翳的脸。越过他的肩膀，我还看到前方所有的同学头都转过一个诡异的弧度，冷漠地看着我，这些人的眼睛有些无神有些尚有光彩，但他们看我的眼神绝对说不上友善。\n\n[旁白]我惊诧地看向刘宇，却发现他的表情和周骐瑞别无二致。\\n\\n我瞬间如坠冰窟。\n\n[主角]（我刚才提到了在办公室的经历，很有可能触碰了某条不能公开的学校规则。）",
     nextSceneId: "ch6_root_rule_experiment_choice",
   },
 
@@ -3380,8 +3465,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/CG/祭祀/转头.png",
     cgMode: true,
-    speaker: "主角",
-    text: "我现在还来不及思考这么多，当务之急是离开学校。\n\n还有，为什么“违规提醒”没有发动？\n\n既然如此，我就大胆再试探一下。",
+    speaker: "旁白",
+    text: "[旁白]我现在还来不及思考这么多，当务之急是离开学校。最重要的问题在于一个受制于人的瘸子如何能快速逃离这个是非之地，不过这看起来不太现实。\n\n[主角]（还有，为什么“违规提醒”没有发动？）\n\n[主角]（既然如此，我就大胆再试探一下。）",
     nextSceneId: "ch6_root_rule_trigger",
   },
 
@@ -3390,8 +3475,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第6章 · 追杀与逃生",
     background: "/assets/CG/祭祀/转头.png",
     cgMode: true,
-    speaker: "主角",
-    text: "我刻意提高音量，尽量让远处的人听见。\n\n“我说——哪怕我逃了晚自习，老师也不能把我怎么样。”\n\n系统提示：由于您的天赋效果，该话语的份量正在上升。\n\n四周的氛围如同地震般猛烈震动。越来越多的呢喃声聚集。\n\n系统提示：由于您违反副本根本性规则，且被动技能处于使用状态，您即刻遭到全校追杀。",
+    speaker: "旁白",
+    text: "[旁白]我刻意提高了音量，尽量让远处的人听见。\n\n[主角说]我说——哪怕我逃了晚自习，老师也不能把我怎么样。\n\n[NPC:系统]由于您的天赋效果，该话语的份量正在上升。\n\n[旁白]四周的氛围如同地震般猛烈震动。\n\n[NPC:学生]你是个坏孩子……\n\n[旁白]不知是谁，梦呓一般念叨着。\n\n[NPC:学生]你是个坏孩子，你是个坏孩子，你是个坏孩子……\n\n[旁白]越来越多的呢喃声聚集，杂乱的嘈杂声伴随莫名的烦躁让我愈加不安。\n\n[NPC:系统]技能“违规提醒”强烈发动中。\n\n[主角说]咳咳……\n\n[主角]（这次彻底违反学校规则了。其内容应该与服从和尊重老师有关。）\n\n[NPC:系统]由于您违反副本根本性规则，且被动技能处于使用状态，您即刻遭到全校追杀。\n\n[主角]（我靠，完了。）",
     nextSceneId: "ch6_capture_ritual",
   },
 
@@ -3401,7 +3486,7 @@ export const scenes: Record<string, Scene> = {
     background: "",
     cgMode: true,
     speaker: "旁白",
-    text: "离我最近的刘宇和周骐瑞面无表情地将我撂倒，然后几个学生上来死死扣住我的四肢。\n\n其他学生以我为中心围成圆圈。姗姗来迟的老师们整齐排列在圈的内层，全都已经怪物化。\n\n他们双手合十，虔诚祈祷。\n\n系统提示：叛逆值已达到主动技能初始化条件。开始初始化。\n\n10%。",
+    text: "[旁白]离我最近的刘宇和周骐瑞面无表情地将我撂倒，然后几个学生上来死死扣住我的四肢。\n\n[旁白]其他学生以我为中心围成圆圈。姗姗来迟的老师们则整齐地排列在圈的内层，我余光瞥到他们全都已经怪物化，但没有一个扑上来撕咬我。\n\n[旁白]仿佛在为一场杀戮做必要的仪式，或者说是一种请神仪式，而我就是仪式中献给神明的祭品。\n\n[旁白]他们双手合十，虔诚祈祷，每个人都近乎癫狂地重复着一些话。\n\n[NPC:系统]叛逆值已达到主动技能初始化条件。开始初始化。\n\n[NPC:系统]10%。\n\n[主角]（哪怕现在我仍然生死一线，这个实验也不算失败。）",
     nextSceneId: "ch6_ritual_wishes",
   },
 
@@ -3411,7 +3496,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/天空.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我的咳嗽声与脑内警报盖过师生的声音。\n\n我索性屏住呼吸，配合颈部不断收紧的力量，平静地望向灰蒙蒙的夜空。\n\n这些愿望本身没有错。我知道的。",
+    text: "[旁白]我的咳嗽声与脑内警报盖过师生的声音。\\n\\n我索性屏住呼吸，配合颈部不断收紧的力量，平静地、径直地望向灰蒙蒙的夜空。\n\n[旁白]云层遮蔽月亮和星辰，什么都看不到。\n\n[主角]（这些愿望本身没有错。我知道的。）",
     nextSceneId: "ch6_ritual_desire_snowball",
   },
 
@@ -3421,7 +3506,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/天空.png",
     cgMode: true,
     speaker: "旁白",
-    text: "阴风掠过，大量试卷和总结报告从天而降。内容模糊不清，唯独页眉处的数字大得骇人。\n\n它们落到我的身上，散布到我的周围，挡住我的眼睛。",
+    text: "[旁白]阴风掠过，大量试卷和总结报告从天而降。内容模糊不清，唯独页眉处的数字大得骇人。它们落到我的身上，散布到我的周围，挡住我的眼睛。\n\n[旁白]于是愿望如滚雪球般越滚越大，最终变成吞噬一切的欲望。",
     nextSceneId: "ch6_ritual_backlash",
   },
 
@@ -3431,7 +3516,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/仪式.png",
     cgMode: true,
     speaker: "旁白",
-    text: "接着，欢呼声逐渐消失，抱怨声夹杂着呜咽声如浪涛般一阵盖过一阵。",
+    text: "[旁白]接着，欢呼声逐渐消失，抱怨声夹杂着呜咽声如浪涛般一阵盖过一阵。\n\n[旁白]所有人最终都被黑洞般的欲望反噬，却仍不敢停止祈祷，仅仅是因为他们认为已经没有回头路了。\n\n[NPC:系统]60%。",
     nextSceneId: "ch6_numbers_attack",
   },
 
@@ -3441,7 +3526,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/仪式.png",
     cgMode: true,
     speaker: "旁白",
-    text: "几名学生捡起地上的试卷，粗暴地将它们揉成团，塞进我的嘴里。\n\n剩余纸张上的猩红数字缓慢脱离页面。每一道笔画的首尾都尖锐得像刀尖，在夜色中对准我的四肢。\n\n系统……再快一点。\n\n系统提示：60%。",
+    text: "[旁白]几名学生捡起地上的试卷，粗暴地将它们揉成团，塞进我的嘴里。\n\n[旁白]剩余纸张上的猩红数字缓慢脱离页面。每一道笔画的首尾都尖锐得像刀尖，在夜色中对准我的四肢。\n\n[主角]（系统……再快一点。）",
     nextSceneId: "ch7_rule_skill_initialize",
   },
 
@@ -3461,7 +3546,17 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/浴室/镜子.png",
     cgMode: true,
     speaker: "旁白",
-    text: "镜中空间里的血腥味与人影同时消失。\n\n我立刻转头寻找，可受限于镜面的大小，只能看见极其有限的角度。\n\n它去哪了？\n\n一张血淋淋的鬼脸骤然贴到眼前，咧开的腥臭巨口几乎贴上我的脸。\n\n我吓得一屁股摔到地上，惊魂未定地看着那面镜子，却只能看到自己惨白的脸。",
+    text: "[旁白]镜中空间里的血腥味与人影同时消失。\n\n[旁白]我立刻转头寻找，可受限于镜面的大小，只能看见极其有限的角度。\n\n[主角]（它去哪了？）",
+    nextSceneId: "ch8_mirror_ghost",
+  },
+
+  ch8_mirror_ghost: {
+    id: "ch8_mirror_ghost",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/镜中女鬼.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]一张血淋淋的鬼脸骤然贴到眼前。\\n\\n它咧开腥臭巨口，嘴角一直延伸到耳根，血红眼珠贪婪地盯着我。\n\n[主角说]卧槽——！\n\n[旁白]我吓得一屁股摔到了地上，惊魂未定地看着那面镜子，却只能看到自己惨白的脸。\\n\\n我深呼吸平复惊恐的情绪，却又在这时——",
     nextSceneId: "ch8_bathroom_knocking",
   },
 
@@ -3471,7 +3566,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/bathroom/卫生间.png",
     playerState: "yps_frames_stand_front",
     speaker: "旁白",
-    text: "砰砰砰——\n\n毛玻璃门上映出一个人影。从身高与头发判断，应该是母亲。\n\n违规提醒没有发动，现在应该还没到凌晨一点。母亲敲门，很可能与镜子里的东西有关。\n\n门外的人没有叫我的名字，只是一遍遍地敲门。这很反常。",
+    text: "[旁白]砰砰砰——\n\n[旁白]毛玻璃门上映出一个人影。从身高与头发判断，应该是母亲。\n\n[主角]（违规提醒没有发动，现在应该还没到凌晨一点。母亲敲门，很可能与镜子里的东西有关。）\n\n[旁白]门外的人没有叫我的名字，只是一遍遍地敲门。这很反常。",
     nextSceneId: "ch8_door_response_choice",
   },
 
@@ -3481,32 +3576,72 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/bathroom/卫生间.png",
     playerState: "yps_frames_stand_front",
     speaker: "旁白",
-    text: "我必须确认门外到底是什么。",
+    text: "",
     choices: [
-      { id: "ch8_asked_door_identity", text: "我隔着门喊了一嗓子：“谁啊？”", nextSceneId: "ch8_door_check_result", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["谨慎验证"] },
-      { id: "ch8_checked_door_gap", text: "我就地趴下，从门缝中看去", nextSceneId: "ch8_door_check_result", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["细节观察"] },
-      { id: "ch8_checked_mirror_again", text: "我把头重新伸进镜子中，查看那只鬼是否还在镜中", nextSceneId: "ch8_door_check_result", effects: { truthDesire: 2, selfProtection: -1 }, tags: ["冒险调查"] },
+      { id: "ch8_asked_door_identity", text: "我隔着门喊了一嗓子：“谁啊？”", nextSceneId: "ch8_door_identity_result", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["谨慎验证"] },
+      { id: "ch8_checked_door_gap", text: "我就地趴下，从门缝中看去", nextSceneId: "ch8_walk_to_bathroom_door_gap", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["细节观察"] },
+      { id: "ch8_checked_mirror_again", text: "我连忙把头重新伸进镜子中，查看那只鬼是否还在镜中", nextSceneId: "ch8_mirror_check_result", effects: { truthDesire: 2, selfProtection: -1 }, tags: ["冒险调查"] },
       { id: "ch8_opened_door_directly", text: "凌晨一点我必须躺在床上，如今没多少时间了，我只能硬刚了", nextSceneId: "ch8_mother_ghost_enters", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["果断行动"] },
     ],
   },
 
-  ch8_door_check_result: {
-    id: "ch8_door_check_result",
+  ch8_door_identity_result: {
+    id: "ch8_door_identity_result",
     chapter: "第8章 · 天台和解",
     background: "/assets/maps/bathroom/卫生间.png",
     playerState: "yps_frames_stand_front",
     speaker: "旁白",
-    text: "门外没有回答。\n\n若从门缝看去，那双米色拖鞋确实属于母亲；若回看镜中，漆黑的空间又像被什么东西堵住了风口。\n\n可眼下我必须回房间睡觉，一点母亲会来房间检查。管她是不是母亲，违反规则才是致命的。\n\n我深吸一口气，打开了门。",
+    text: "敲门声戛然而止，但门外的人影并没有离开。\\n\\n该死的是我没拿手机进来，不然就可以通过电话确认母亲在哪里。\\n\\n可眼下我必须回房间睡觉，一点母亲会来房间检查。管她是不是母亲，违反规则才是致命的。",
+    nextSceneId: "ch8_walk_to_bathroom_door_identity",
+  },
+
+  ch8_door_gap_result: {
+    id: "ch8_door_gap_result",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_front",
+    speaker: "旁白",
+    text: "门外是一双米色拖鞋，确实属于母亲。\\n\\n可眼下我必须回房间睡觉，一点母亲会来房间检查。管她是不是母亲，违反规则才是致命的。\n\n我深吸一口气，打开了门。",
+    nextSceneId: "ch8_mother_ghost_enters",
+  },
+
+  ch8_mirror_check_result: {
+    id: "ch8_mirror_check_result",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/镜子.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]镜中一片漆黑，血腥鬼脸已经消失。但和之前不同的是，这次我没有感受到冷风拂面，这意味着，可能有什么东西挡住了风的源头。\n\n[主角]（是门口那个人影堵住了风口吗？但从空间角度看，这是不符合逻辑的。假设这个推论成立，那么风口应该位于我家走廊，但无论怎么看我家也不存在一个密室吧？）\n\n[旁白]可眼下我必须回房间睡觉，一点母亲会来房间检查。管她是不是母亲，违反规则才是致命的。",
+    nextSceneId: "ch8_walk_to_bathroom_door_mirror",
+  },
+
+  ch8_open_bathroom_door: {
+    id: "ch8_open_bathroom_door",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_front",
+    speaker: "旁白",
+    text: "我深吸一口气，打开了门。",
     nextSceneId: "ch8_mother_ghost_enters",
   },
 
   ch8_mother_ghost_enters: {
     id: "ch8_mother_ghost_enters",
     chapter: "第8章 · 天台和解",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]刚才镜中的鬼脸，又和我对视了，阴冷的气息爬上我的后背，我狂压下面对死亡的恐惧，僵硬地往后退一步。\n\n[旁白]这只鬼的装束完全和母亲一样。\n\n[主角]（镜子里应该是一条通道。但这只鬼为什么能出现在厕所门外？难道家里还有其他类似的通道？）\n\n[旁白]鬼踏入厕所的瞬间，我的头仿佛炸开一般的疼。",
+    nextSceneId: "ch8_bathroom_death_vision",
+  },
+
+  ch8_bathroom_death_vision: {
+    id: "ch8_bathroom_death_vision",
+    chapter: "第8章 · 天台和解",
     background: "/assets/CG/浴室/人亡.png",
     cgMode: true,
     speaker: "旁白",
-    text: "刚才镜中的鬼脸，又和我对视了。\n\n这只鬼的装束完全和母亲一样。\n\n鬼踏入厕所的瞬间，我的头仿佛炸开一般疼痛。恍惚间，白色调的厕所被血色渲染，墙壁、镜子、盥洗池上满是飞溅的血迹。\n\n地板上一滩血液还在缓慢流动，未被污染的区域是一个躺倒在地的人形轮廓。\n\n这里死人了。\n\n鬼影痛苦扭曲着钻回镜中。系统提示：恭喜您找到“镜中真相碎片1”。副本探索进度达到15%。",
+    text: "[旁白]我捂住额头，恍惚间看到空间碎裂又拼合，原本白色调的厕所被血色渲染，墙壁、镜子、盥洗池上满是飞溅的血迹，而我脚下的地板上，一滩血液还在缓慢地流动着，未被污染的区域是一个躺倒在地的人形轮廓。\n\n[主角]（这里死人了。）\n\n[旁白]鬼影突然悬空升起，发出意义不明的长啸，痛苦扭曲着钻回镜中。\n\n[旁白]头部的疼痛消失。我再次睁眼，厕所已经恢复原状，仿佛刚才发生的一切都是幻觉。\n\n[NPC:系统]恭喜您找到“镜中真相碎片1”。\n\n[NPC:系统]副本探索进度达到15%。\n\n[主角]（在厕所有人遇害了，而真相与我的家庭状况有关。鬼影很可能是母亲，但她身上没有伤口，衣服却沾满鲜血。）",
     nextSceneId: "ch8_return_to_bed",
   },
 
@@ -3516,7 +3651,7 @@ export const scenes: Record<string, Scene> = {
     background: "",
     cgMode: true,
     speaker: "旁白",
-    text: "我思考着，回到房间，关灯躺上床。\n\n凌晨一点，母亲像前几天一样打开房门。她确认我已经睡觉后，安心地合上门。\n\n那时，我已有预感，如果我再不做些什么改变现状，母亲就会变成那只鬼。",
+    text: "[旁白]我思考着，回到房间，关灯躺上床。\n\n[旁白]凌晨一点，母亲像前几天一样打开房门。她确认我已经睡觉后，安心地合上门。\\n\\n那时，我已有预感，如果我再不做些什么改变现状，母亲就会变成那只鬼。",
     nextSceneId: "ch8_inner_voice_returns",
   },
 
@@ -3525,8 +3660,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "/assets/CG/意识/与“我”对话.png",
     cgMode: true,
-    speaker: "“我”",
-    text: "父亲失业了，母亲比以前更加病态，整个家都覆上一层阴霾。我要窒息了。\n\n系统提示：技能“违规提醒”正在发动。\n\n“我会乖乖听她的话。她会后悔的。”\n\n我叹了口气：“不止她会后悔，你也会后悔。”\n\n“我”冷冷回答：“所有人都会后悔的，我已经不在乎了。”\n\n我真是被他气笑了。",
+    speaker: "旁白",
+    text: "[旁白]睡意刚刚来临，“我”的声音便在脑海中响起。\n\n[NPC:“我”]父亲失业了，母亲比以前更加病态，整个家都覆上一层阴霾。我要窒息了。\n\n[NPC:系统]技能“违规提醒”正在发动。\n\n[旁白]这次，我并没有反驳，因为我认可“我”的话。\n\n[NPC:“我”]对父亲的数落越甚，对我的期望就越高。她拼命地想要抓住身边的一切，好像这么做能给她自欺欺人的安全感，却不知道这样做会先缢死父亲，再缢死我。\n\n[NPC:“我”]我会乖乖听她的话。她会后悔的。\n\n[主角说]不止她会后悔，你也会后悔。\n\n[NPC:“我”]后悔？所有人都会后悔的，我已经不在乎了。\n\n[旁白]我叹了口气。\n\n[主角]（难搞。）\n\n[旁白]你叫不醒一个装睡的人。\\n\\n昨天顺着他的意好好哄着他，运气好哄好了，但这显然不是长久之计。这货脑子从里到外都不正常，和他讲道理没用，打一顿可能更有效。\n\n[主角说]你真是把我气笑了。",
     nextSceneId: "ch8_inner_voice_first_choice",
   },
 
@@ -3535,13 +3670,13 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "/assets/CG/意识/与“我”对话.png",
     cgMode: true,
-    speaker: "主角",
-    text: "该怎么回应这份绝望？",
+    speaker: "旁白",
+    text: "",
     choices: [
       { id: "ch8_challenged_inner_voice", text: "你自己尝试过改变自己、改变现状吗？被自己妄想的绝望困住，这是比懦弱更蠢的做法", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["直接挑战"] },
-      { id: "ch8_guided_small_choice", text: "我知道这么做很难，但是，你真的甘愿一辈子腐烂发臭吗？", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { empathy: 1, realityJudgment: 1 }, tags: ["共情引导"] },
-      { id: "ch8_shared_fear_with_self", text: "你以为只有你一个人承受着这样的绝望吗？但为什么有的人能创造机遇？", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { truthDesire: 1, empathy: 1 }, tags: ["自我暴露"] },
-      { id: "ch8_used_school_change_as_proof", text: "这就是我和你的差距。我已经改变了一条副本的根本规则", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { authorityResistance: 2, trust: -1 }, tags: ["行动证明"] },
+      { id: "ch8_guided_small_choice", text: "我知道这么做很难，但是，你真的甘愿静静地躺在你所厌恶的这片泥潭中，垂死也不挣扎、一辈子腐烂发臭吗？", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { empathy: 1, realityJudgment: 1 }, tags: ["共情引导"] },
+      { id: "ch8_shared_fear_with_self", text: "你以为只有你一个人承受着这样的绝望吗？共处在同一个社会环境下，谁比谁又好的到哪去？但为什么有的人无论环境如何不利都能创造机遇，而有的人只能在泥潭中苟活？而你，又为什么不曾想过自己可以成为前者？", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { truthDesire: 1, empathy: 1 }, tags: ["自我暴露"] },
+      { id: "ch8_used_school_change_as_proof", text: "这就是我和你的差距。当你还站在原地自怨自艾的时候，我已经改变了一条副本的根本规则", nextSceneId: "ch8_inner_voice_dynamic_response", effects: { authorityResistance: 2, trust: -1 }, tags: ["行动证明"] },
     ],
   },
 
@@ -3550,18 +3685,18 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "/assets/CG/意识/与“我”对话.png",
     cgMode: true,
-    speaker: "“我”",
-    text: "你说得头头是道，但你自己做得到吗？你有什么资格指责我？\n\n窒息感仍在持续，黑暗中的心跳声被无限放大。\n\n我想继续反驳，却忽然意识到，语言已经没有意义。他不相信“改变”两个字，除非我真的做给他看。\n\n那就先做一件小事，证明我不是只会站着说话。",
+    speaker: "旁白",
+    text: "[NPC:“我”]你说得头头是道，但你自己做得到吗？你有什么资格指责我？\n\n[旁白]窒息感仍在持续，黑暗中的心跳声被无限放大。\n\n[主角]（继续争论没有意义。他不相信“改变”两个字，除非我真的做给他看。）\n\n[主角]（那就先做一件小事，证明我不是只会站着说话。）",
     nextSceneId: "ch8_leave_for_rooftop",
   },
 
   ch8_leave_for_rooftop: {
     id: "ch8_leave_for_rooftop",
     chapter: "第8章 · 天台和解",
-    background: "",
+    background: "/assets/CG/意识/与“我”对话.png",
     cgMode: true,
-    speaker: "主角",
-    text: "想让我证明给你看，也要你先给我一点行动空间。如果我死在你手里，你还能看到结果吗？\n\n“想在我手里活下来，你就得给我带来快乐。”\n\n行。那你现在可要睁大眼睛好好看着。\n\n我忍住窒息感，偷偷溜出房门，通过电梯到达顶楼，从逃生通道走到天台。",
+    speaker: "旁白",
+    text: "[主角说]想让我证明给你看，也要你先给我一点行动空间。如果我死在你手里，你还能看到结果吗？\n\n[NPC:“我”]想在我手里活下来，你就得给我带来快乐。\n\n[主角说]行。那你现在可要睁大眼睛好好看着。\n\n[旁白]我忍住窒息感带来的不适，偷偷溜出房门，通过电梯到达顶楼，从逃生通道走到天台。\\n\\n刚一推门，寒冷的晚风扑面而来，让原来困倦的我清醒不少。",
     nextSceneId: "ch8_rooftop_arrival",
   },
 
@@ -3571,7 +3706,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/rooftop/天台.png",
     playerState: "yps_frames_stand_back",
     speaker: "旁白",
-    text: "深夜，天色如墨，为稀疏的云层绘上一层淡淡的白。\n\n这栋楼有四十层，从这里望去几乎能看到这座城市的全貌。哪怕是深夜，城市似乎仍没有睡着。\n\n我沉默着俯瞰了城市很久。\n\n“你没来过这里。”\n\n“我是没来过。来这地方一来不能学习，二来上上下下很浪费时间，我有什么必要来这里？”",
+    text: "[旁白]深夜，天色如墨，为稀疏的云层绘上一层淡淡的白。过滤出来的月光惨淡，顺着地平线描摹着整座城市。\n\n[旁白]这栋楼有四十层，从这里望去几乎能看到这座城市的全貌。哪怕是深夜，城市似乎仍没有睡着。\n\n[旁白]我沉默着俯瞰了城市很久。\n\n[主角说]你没来过这里。\n\n[NPC:“我”]我是没来过。来这地方一来不能学习，二来上上下下很浪费时间，我有什么必要来这里？",
     nextSceneId: "ch8_rooftop_observation_choice",
   },
 
@@ -3580,13 +3715,13 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "/assets/maps/rooftop/天台.png",
     playerState: "yps_frames_stand_back",
-    speaker: "主角",
-    text: "我要让他看见什么？",
+    speaker: "旁白",
+    text: "",
     choices: [
-      { id: "ch8_showed_working_city", text: "看那边。凌晨一点，依旧有卡车送货，立交桥上还有救护车在跑。", nextSceneId: "ch8_rooftop_perspective", effects: { empathy: 1, realityJudgment: 1 }, tags: ["扩展视角"] },
-      { id: "ch8_showed_sensory_city", text: "高楼层顶会留灯，街道路灯也不会熄灭，是为了让人看清脚下的路。", nextSceneId: "ch8_rooftop_perspective", effects: { joyPerception: 2, empathy: 1 }, tags: ["快乐感知"] },
-      { id: "ch8_admitted_uncertainty", text: "也许你确实不会感到快乐，那我也愿赌服输，只能死在你手里。", nextSceneId: "ch8_rooftop_perspective", effects: { empathy: 1, trust: 1 }, tags: ["坦诚陪伴"] },
-      { id: "ch8_framed_rooftop_as_choice", text: "现在你正站在这个你曾经从来不会踏入的地方，这其实就是一种改变。", nextSceneId: "ch8_rooftop_perspective", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["主体性"] },
+      { id: "ch8_showed_working_city", text: "喏，看那边。凌晨一点，依旧有卡车送货，立交桥上还有救护车在跑。总有比你奔波至更晚的人。", nextSceneId: "ch8_rooftop_perspective", effects: { empathy: 1, realityJudgment: 1 }, tags: ["扩展视角"] },
+      { id: "ch8_showed_sensory_city", text: "你看。高楼大厦已经熄灯，但层顶总会留一盏灯——那是为了指示天上的飞机避让；街道的路灯也不会熄灭，是为了让往来奔波的行人和车辆看清脚下的路。", nextSceneId: "ch8_rooftop_perspective", effects: { joyPerception: 2, empathy: 1 }, tags: ["快乐感知"] },
+      { id: "ch8_admitted_uncertainty", text: "也许你最后确实不会从中感受到一丝快乐，那我也愿赌服输，只能死在你手里。", nextSceneId: "ch8_rooftop_perspective", effects: { empathy: 1, trust: 1 }, tags: ["坦诚陪伴"] },
+      { id: "ch8_framed_rooftop_as_choice", text: "现在你正站在这个你曾经从来不会踏入的地方，这其实就是一种改变，不是么？", nextSceneId: "ch8_rooftop_perspective", effects: { authorityResistance: 1, realityJudgment: 1 }, tags: ["主体性"] },
     ],
   },
 
@@ -3595,8 +3730,61 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "/assets/CG/浴室/城市夜景.png",
     cgMode: true,
-    speaker: "主角",
-    text: "人们为不同的目的而活着，命运在某些时候奇妙地交汇，又在下一站分开。\n\n单一、片面的标准把你困住了，这会让你痛苦。但你永远有权利决定自己想成为什么样的人。\n\n你把圈凿出一个孔，就有路了。\n\n不是推翻整个世界。就你个人而言，只要打破那些束缚住思维的条条框框，就已经能看到圈外的路。\n\n当然，你仍身在圈内。但至少你拥有了培养取悦自己的能力的机会。",
+    speaker: "旁白",
+    text: `[旁白]【条件：ch8_showed_working_city】
+[主角说]我还知道，楼下那家包子店老板每天要四点钟起床准备食材，扫地大妈五点就开始扫大街，领居家的黄婶也要这个点起给她家老大做早饭送他上学。你看，也总有人起得比你早。
+
+[NPC:“我”]你什么意思？你觉得我还不够努力？
+
+[旁白]我轻笑了一声。
+
+[主角说]你说的对，你当然没他们努力。
+
+[旁白]【条件：ch8_showed_sensory_city】
+[主角说]人们为不同的目的而活着，他们的命运在某些时候奇妙地交汇在一起，然后又会在下一站分开。
+
+[NPC:“我”]那我更没必要关注这些“过客”了。
+
+[主角说]他们可以是过客，也可以是未来的下一个你。
+
+[主角说]单一、片面的标准把你困住了，这会让你痛苦。但你永远有权利决定自己想成为什么样的人。
+
+[NPC:“我”]这是我能奈何的吗？高考考不好，就是会对人生带来诸多不顺，这是既定的事实。
+
+[旁白]【条件：ch8_admitted_uncertainty】
+[主角说]但是，这对我而言是生机，对你而言是一个蜕变的机会，不去尝试，也就不存在改变现状的可能性。
+
+[NPC:“我”]你拿自己的命试？
+
+[主角说]对，就像你拿命试自己能不能考一个更高的分数一样。
+
+[NPC:“我”]这是我能奈何的吗？高考考不好，就是会对人生带来诸多不顺，这是既定的事实。
+
+[旁白]【条件：ch8_framed_rooftop_as_choice】
+[NPC:“我”]你……！
+
+[旁白]哈哈，没想到吧，这招先声夺人还是刘宇教我的。
+
+[主角说]诶诶，先别生气。做出改变，把自己的路走宽，这不是很好嘛。
+
+[NPC:“我”]把自己的路走宽，你睡糊涂了吗？现在我就高考这一条路，其他的路只会让我分心。
+
+[主角说]你说的没错。但在这之后呢？
+
+[主角说]就算你考上了不错的学校，那你在大学要干什么？
+
+[主角说]卷保研，再不济考研？还是早早实习找个薪资不错的工作继续在更恶劣的竞争体系里卷？或者考公考编享受稳定生活？好像确实不错，无论哪个选择，但凡你做到了，大家都会佩服你，认为你“成功”了。
+`,
+    nextSceneId: "ch8_rooftop_circle_argument",
+  },
+
+  ch8_rooftop_circle_argument: {
+    id: "ch8_rooftop_circle_argument",
+    chapter: "第8章 · 天台和解",
+    background: "/assets/CG/浴室/城市夜景.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]可你想想，如果再这样下去和同龄学生内卷、出了社会和同行内卷，眼界放宽甚至你本质上要和所有人竞争有限的资源，这样有出路吗？这是你想要的吗？你能忍受到退休那天吗？\n\n[NPC:“我”]我没得选。\n\n[主角说]你有得选。\n\n[NPC:“我”]……\n\n[旁白]“我”似乎被冒犯到了，气得说不出话来。\n\n[主角说]你把圈凿出一个孔，就有路了。\n\n[NPC:“我”]你疯了吗？我还没成年就让我造反？你当自己是龙傲天？\n\n[主角说]……\n\n[主角]（你脑回路还挺清奇。）\n\n[主角]（不过，你这话又点醒了我。）\n\n[旁白]放在以前，我也是断然不敢想这种事的。但这个世界已经够荒唐了，那我也不妨再荒唐一点。\\n\\n而且啊，这是单人副本，我不能指望任何人帮我改变底层规则。\n\n[主角说]不是推翻整个世界。就你个人而言，你只要把那些束缚住你思维的条条框框打破，那你已经能看到圈外的路了。\n\n[主角说]当然，你仍身在圈内。\n\n[主角说]但至少你拥有了培养取悦自己的能力的机会。这样，你就一直都能快乐下去。\n\n[主角]（是啊，这样我每天晚上就不用左右脑互搏了。）",
     nextSceneId: "ch8_rooftop_method_choice",
   },
 
@@ -3604,8 +3792,8 @@ export const scenes: Record<string, Scene> = {
     id: "ch8_rooftop_method_choice",
     chapter: "第8章 · 天台和解",
     background: "/assets/maps/rooftop/天台.png",
-    speaker: "“我”",
-    text: "你兜圈子兜了这么久，到底想做什么？你现在唯一该做的，就是让我感受到快乐。\n\n我咳了几声：“别急……我做这么多不就是为了让你感受到快乐吗？来，我教你。”\n\n什么都别想。把注意力集中到感官上，用心感受现在。\n\n风声、鸣笛声、车辆驶过的声音，冬日独有的烟火气，还有远处灯火带来的错觉。\n\n多管闲事也是我的爱好。如果我眼里只有自己，那生活就会很无趣。\n\n但这背后的根源到底是什么？",
+    speaker: "旁白",
+    text: "[旁白]“我”怒了，\n\n[NPC:“我”]你兜圈子兜了这么久，到底想做什么？你现在唯一该做的，就是让我感受到快乐。再这样拖延时间，我看你是真不想活了。\n\n[旁白]扼住咽喉的力道加大，我又咳了几声。\n\n[主角说]别急……我做这么多不就是为了让你感受到快乐吗？来，我教你。\n\n[旁白]如果“我”就是我，那么我的兴趣估计也是他的兴趣。\n\n[主角说]什么都别想。把注意力集中到感官上，用心感受现在。\n\n[旁白]没错，发呆是我的爱好之一。\n\n[主角说]你听见了什么？\n\n[NPC:“我”]风声、鸣笛声、车辆驶过的声音……\n\n[主角说]好听吗？\n\n[NPC:“我”]不好听。\n\n[主角说]好。现在把注意力集中到嗅觉上。你闻到了什么？\n\n[NPC:“我”]冬日独有的烟火气……冷，有些刺鼻。\n\n[主角说]我喜欢这种味道，很有人情味。我总是能通过它联想到各家安居乐业的场景。你觉得如何？\n\n[NPC:“我”]安居乐业？\n\n[主角说]是啊。哪怕大部分人过得很辛苦，看到过年时家人团聚，听到人们偶遇时的寒暄，就算是表面工夫也很暖。\n\n[NPC:“我”]我干嘛要关心别人的事，我都自顾不暇。又是高考，又是当父母的精神补给……\n\n[主角说]哈，你倒是坦诚，这一点跟我一样。不过你表现出这些负面情绪不会被判定为违规吗？\n\n[旁白]我很好奇“我”在这个副本里的角色定位是什么，他应该是重要角色，不知道受限状况如何。\\n\\n“我”思索了一会回答道，\n\n[NPC:“我”]那是你的规则。\n\n[旁白]之后便不再多说。\\n\\n还挺机灵。\\n\\n我也识相地不再多问，把他惹急了我可能真会死。这分寸要把握好。\n\n[主角说]多管闲事么……是啊，多管闲事也是我的爱好。如果我眼里只有自己，那生活就会很无趣。\n\n[主角说]从小到大，师长们说想要学习好专注非常重要，除了学习的事，啥都是不务正业。但这真的是为了我好吗？\n\n[主角说]上一代还不至于变态到这样。如今的教育制度相较之前并没有特别大的改革，而导致恶性内卷的根源也不在制度。",
     nextSceneId: "ch8_inner_truth_choice",
   },
 
@@ -3613,11 +3801,11 @@ export const scenes: Record<string, Scene> = {
     id: "ch8_inner_truth_choice",
     chapter: "第8章 · 天台和解",
     background: "/assets/maps/rooftop/天台.png",
-    speaker: "“我”",
-    text: "所以，造成这一切的根源到底是什么？\n\n我在心里默念那个思考已久的答案，却意识到，有些东西说出口就成了一种教条，甚至是一种路径依赖。",
+    speaker: "旁白",
+    text: "[NPC:“我”]所以，造成这一切的根源到底是什么？\n\n[旁白]我在心里默念那个思考已久的答案，却意识到，有些东西说出口就成了一种教条，甚至是一种路径依赖。",
     choices: [
       { id: "ch8_refused_standard_answer", text: "……告诉你就没有意义了", nextSceneId: "ch8_inner_voice_final_response", effects: { empathy: 1, selfProtection: 1 }, tags: ["尊重主体性"] },
-      { id: "ch8_admitted_no_complete_answer", text: "这个答案不一定完整，但对我来说至少目前是正确的——错位", nextSceneId: "ch8_inner_voice_final_response", effects: { truthDesire: 1, realityJudgment: 1 }, tags: ["认识局限"] },
+      { id: "ch8_admitted_no_complete_answer", text: "这个答案不一定完整，也不一定是绝对正确的，但对于我这个个体来说，它至少目前是正确的——错位", nextSceneId: "ch8_inner_voice_final_response", effects: { truthDesire: 1, realityJudgment: 1 }, tags: ["认识局限"] },
       { id: "ch8_explained_collective_pressure", text: "每个人的答案都不一样，而你的答案需要你自己寻找，我无权干涉", nextSceneId: "ch8_inner_voice_final_response", effects: { realityJudgment: 1, empathy: 1 }, tags: ["主体寻找"] },
       { id: "ch8_asked_present_feeling", text: "答案不重要……倒是你，现在快乐一点了吗？", nextSceneId: "ch8_inner_voice_final_response", effects: { joyPerception: 2 }, tags: ["体验验证"] },
     ],
@@ -3629,7 +3817,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/浴室/城市夜景.png",
     cgMode: true,
     speaker: "旁白",
-    text: "风从栏杆缝隙里穿过，城市灯光像散落在夜色里的碎屑。\n\n“我”沉默了很久。\n\n它第一次感觉到，自己不是任务目标，不是需要被矫正的失败品，而是一个被允许自己思考答案的独立个体。\n\n这份尊重不是功利哄劝，也不是把某个标准答案塞进它嘴里。哪怕“错位”这个答案指向物质供给与精神需求之间的裂缝，它也只是主角目前的答案，不是必须被接受的真理。\n\n窒息感没有完全消失，却明显松动了。\n\n它终于忍不住问：为什么？",
+    text: "[旁白]风从栏杆缝隙里穿过，城市灯光像散落在夜色里的碎屑。\n\n[旁白]“我”沉默了很久。它第一次感觉到，自己不是任务目标，不是需要被矫正的失败品，而是一个被允许自己思考答案的独立个体。\n\n[旁白]这份尊重不是功利哄劝，也不是把某个标准答案塞进它嘴里。哪怕“错位”这个答案指向物质供给与精神需求之间的裂缝——中国社会物质条件已较为丰富，但许多人仍长期处于精神匮乏、情感支持不足、意义感缺失的状态——它也只是主角目前的答案，不是必须被接受的真理。\n\n[旁白]窒息感没有完全消失，却明显松动了。问题没有解决，但“我”愿意继续看一眼。\n\n[主角]（我绕了这么远的路，不是为了粗暴夺走他的答案。）\n\n[旁白]它终于忍不住想问：主角为什么要做这些，为什么要说这么多？",
     nextSceneId: "ch8_rooftop_resolution",
   },
 
@@ -3638,8 +3826,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "/assets/CG/浴室/城市夜景.png",
     cgMode: true,
-    speaker: "“我”",
-    text: "为什么？这对你没有一点好处。你为什么要和我说这么多？\n\n我放松身体，将手臂搭在栏杆上。冷风肆意拨乱我的头发，我眼中却无比清明。\n\n“你就当我，多管闲事吧。”\n\n“神金。”\n\n它语气仍然嫌弃，心情却似乎好了不少。\n\n“再睁眼看看这个令人厌恶的世界。其实也很奇妙，不是吗？”\n\n源于人类本性中纯粹的欲望，纯粹的好奇，于是变成了纯粹的快乐。\n\n脑内警报声停止，“我”的存在也暂时沉寂。",
+    speaker: "旁白",
+    text: "[NPC:“我”]为什么？这对你没有一点好处。你为什么要和我说这么多？\n\n[旁白]我放松身体，将手臂搭在栏杆上。冷风肆意拨乱我的头发，我眼中却无比清明，像是在混乱中永远能守住秩序，在秽土中永远能寻到一方净土。\\n\\n我的笑容映照着月亮的清辉，不知谁更像一块玉玦。\n\n[主角说]你就当我，多管闲事吧。\n\n[NPC:“我”]神金。\n\n[旁白]它语气仍然嫌弃，心情却似乎好了不少。\n\n[主角说]再睁眼看看这个令人厌恶的世界。\n\n[旁白]鳞次栉比的高楼大厦隐匿于夜色撒下的帷幔之下，一时分不清彼此。昏黄的灯光和月光融为一体，自然造物和人类造物达成了诡异的和谐。\n\n[主角说]其实也很奇妙，不是吗？\n\n[旁白]源于人类本性中纯粹的欲望，纯粹的好奇，于是变成了纯粹的快乐。\\n\\n“我”现在才意识到，原来快乐就在眼前，以前为什么就看不到呢？\n\n[NPC:“我”]嗯。\n\n[旁白]脑内警报声停止，“我”的存在也暂时沉寂。\n\n[主角说]好了。你高兴了，我也可以安心回去睡觉了。",
     nextSceneId: "ch8_return_home",
   },
 
@@ -3648,8 +3836,8 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · 天台和解",
     background: "",
     cgMode: true,
-    speaker: "系统",
-    text: "我蹑手蹑脚回到房间，倒头就睡。\n\n恭喜您找到“被遗弃的呐喊碎片2”。\n\n副本探索进度达到20%。\n\n家庭区域叛逆值达到35%。\n\n混沌磁场范围扩大。由于天赋加持效果，您的磁场影响力增强。",
+    speaker: "旁白",
+    text: "[旁白]我伸了个懒腰，转身回到楼道。\\n\\n在电梯里，我险些站着睡着，额头撞到电梯镜面才猛然清醒。\n\n[主角]（真不能再熬下去了，这怕是任务还没完成呢我就先要猝死了。）\n\n[旁白]我蹑手蹑脚回到房间，倒头就睡。\n\n[NPC:系统]恭喜您找到“被遗弃的呐喊碎片2”。\n\n[NPC:系统]副本探索进度达到20%。\n\n[NPC:系统]家庭区域叛逆值达到35%。\n\n[NPC:系统]混沌磁场范围扩大。由于天赋加持效果，您的磁场影响力增强。",
     nextSceneId: "ch8_demo_personality_review",
   },
 
@@ -3659,7 +3847,7 @@ export const scenes: Record<string, Scene> = {
     background: "",
     cgMode: true,
     speaker: "系统",
-    text: "Demo阶段人格回响：当前结果只是阶段观察，并非最终人格判定。\n\n你展现出“凿孔者”与“守灯者”的混合倾向：既会寻找规则缝隙，也愿意在自身困难时照亮另一个自己。\n\n优势与风险并存。你能改变一些事，也可能在改变中承担过多重量。\n\n副本尚未结束，未来行为仍会改变画像与关系。\n\n观察仍将继续。",
+    text: "",
     nextSceneId: "ch8_unfinished_threads",
   },
 
@@ -3669,7 +3857,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/浴室/手机.png",
     cgMode: true,
     speaker: "旁白",
-    text: "我睡着以后，手机屏幕在黑暗中悄然亮起。\n\n试胆活动群聊中，周骐瑞发来一条新消息：学校重新开放后，不要立刻回来。\n\n刘宇紧接着回复：晚了。他肯定会来。\n\n另一条未读消息来自陌生号码，内容只有三个词：\n\n镜中尸骸。\n湖中遗物。\n书中落叶。\n\n卫生间的镜面泛起微不可见的涟漪。父母卧室中，本该躺着两个人的床上却空空如也。\n\n而“成为好孩子”的规则，仍存在于学校之外的每一个区域。",
+    text: "[旁白]我睡着以后，手机屏幕在黑暗中悄然亮起。\n\n[旁白]试胆活动群聊中，周骐瑞发来一条新消息。\n\n[NPC:周骐瑞]学校重新开放后，不要立刻回来。\n\n[NPC:刘宇]晚了。他肯定会来。\n\n[旁白]另一条未读消息来自陌生号码，内容只有三个词：\n\n[NPC:未知]镜中尸骸。\n\n[NPC:未知]湖中遗物。\n\n[NPC:未知]书中落叶。\n\n[旁白]卫生间的镜面泛起微不可见的涟漪。\\n\\n父母卧室中，本该躺着两个人的床上却空空如也。\n\n[旁白]学校尚未重新开放，试胆活动尚未开始，家庭中的死亡真相尚未揭晓。\\n\\n而“成为好孩子”的规则，仍存在于学校之外的每一个区域。",
     nextSceneId: "ch8_demo_ending",
   },
 
@@ -3678,9 +3866,9 @@ export const scenes: Record<string, Scene> = {
     chapter: "第8章 · Demo结束",
     background: "",
     cgMode: true,
-    speaker: "系统",
-    text: "《快乐小孩》Demo剧情已完成。\n\n当前副本探索进度：20%。\n\n这不是副本的终点。\n\n你的选择已经改变了角色对你的看法，也改变了叶平生面对规则的方式。\n\n在后续剧情中，未完成的交易、尚未开始的试胆活动、重新修复的学校与家庭中的真相，将继续回应你留下的每一道痕迹。",
-    nextSceneId: "title_screen",
+    speaker: "旁白",
+    text: "[NPC:系统]《快乐小孩》Demo剧情已完成。\n\n[NPC:系统]当前副本探索进度：20%。\n\n[NPC:系统]这不是副本的终点。\n\n[旁白]你的选择已经改变了角色对你的看法，也改变了叶平生面对规则的方式。\\n\\n在后续剧情中，未完成的交易、尚未开始的试胆活动、重新修复的学校与家庭中的真相，将继续回应你留下的每一道痕迹。",
+    nextSceneId: "ch8_open_final_save",
   },
 
 };

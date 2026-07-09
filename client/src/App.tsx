@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useCallback, useState, useRef } from "react";
 import { scenes } from "./data/scenes";
+import { aiSceneConfigs } from "./data/aiSceneConfig";
 import { gameReducer, initialGameState } from "./engine/gameReducer";
 import {
   saveGame,
@@ -17,8 +18,17 @@ import { Backlog, type DialogLogEntry } from "./components/Backlog";
 import { PersonalityPortrait } from "./components/PersonalityPortrait";
 import { PhoneChatOverlay } from "./components/PhoneChatOverlay";
 import { gameBridge } from "./game/bridge/GameBridge";
+import { playSceneSounds, unlockScriptedAudio } from "./services/scriptedAudio";
 import { MapRegistry } from "./game/config/mapRegistry";
-import { analyzeChoice, generateNpcDialogue, judgeEnding } from "./services/aiClient";
+import {
+  analyzeChoice,
+  createFallbackPersonalityPortrait,
+  generateAiScene,
+  generateNpcDialogue,
+  generatePersonalityPortrait,
+  judgeEnding,
+  type GeneratedPersonalityPortrait,
+} from "./services/aiClient";
 import type { AITrace, Choice, GameState } from "./types/game";
 import "./styles/global.css";
 
@@ -246,8 +256,16 @@ export default function App() {
   const [showPortraitPanel, setShowPortraitPanel] = useState(false);
   const [showNotebookToast, setShowNotebookToast] = useState(false);
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
+  const [floatingTextPerformanceActive, setFloatingTextPerformanceActive] = useState(false);
   const [completedPhoneChats, setCompletedPhoneChats] = useState<Record<string, boolean>>({});
   const [dialogHistory, setDialogHistory] = useState<DialogLogEntry[]>([]);
+  const [corridorCountdown, setCorridorCountdown] = useState<number | null>(null);
+  const [demoPortrait, setDemoPortrait] = useState<GeneratedPersonalityPortrait | null>(null);
+  const [demoPortraitGenerating, setDemoPortraitGenerating] = useState(false);
+  const [finalSaveRequired, setFinalSaveRequired] = useState(false);
+  const [aiSceneTexts, setAiSceneTexts] = useState<Record<string, string>>({});
+  const [aiSceneLoadingId, setAiSceneLoadingId] = useState<string | null>(null);
+  const aiSceneRequestsRef = useRef<Set<string>>(new Set());
   const prevSceneIdRef = useRef<string>("");
   const corridorDeathTimerRef = useRef<number | null>(null);
 
@@ -256,14 +274,62 @@ export default function App() {
     ? state.currentSceneId
     : null;
   const rawDialogScene = dialogSceneId ? scenes[dialogSceneId] : null;
+  const aiSceneConfig = dialogSceneId ? aiSceneConfigs[dialogSceneId] : undefined;
+  const aiGeneratedText = dialogSceneId ? aiSceneTexts[dialogSceneId] : undefined;
+  const aiSceneIsLoading = !!aiSceneConfig && !aiGeneratedText;
   const dialogScene = rawDialogScene
-    ? { ...rawDialogScene, text: filterConditionalSceneText(rawDialogScene.text, state) }
+    ? {
+        ...rawDialogScene,
+        text: aiSceneConfig
+          ? (aiGeneratedText ?? "")
+          : filterConditionalSceneText(rawDialogScene.text, state),
+      }
     : null;
+
+  useEffect(() => {
+    if (!dialogSceneId || !rawDialogScene || !aiSceneConfig || aiSceneTexts[dialogSceneId]) return;
+    if (aiSceneRequestsRef.current.has(dialogSceneId)) return;
+
+    aiSceneRequestsRef.current.add(dialogSceneId);
+    setAiSceneLoadingId(dialogSceneId);
+    const prompt = (aiSceneConfig.prompt ?? rawDialogScene.text)
+      .replace(/\[旁白\]/g, "")
+      .trim();
+
+    void generateAiScene(
+      state,
+      dialogSceneId,
+      aiSceneConfig.mode,
+      prompt,
+      aiSceneConfig.requiredLines
+    )
+      .then((response) => {
+        const script = response.result?.script?.trim();
+        if (!script || !/\[(?:旁白|主角|主角说|NPC:[^\]]+)\]/.test(script)) {
+          throw new Error("AI scene returned invalid script format");
+        }
+        setAiSceneTexts((previous) => ({ ...previous, [dialogSceneId]: script }));
+      })
+      .catch((error) => {
+        console.error(`[AI] 场景 ${dialogSceneId} 生成失败，使用安全保底文本`, error);
+        setAiSceneTexts((previous) => ({ ...previous, [dialogSceneId]: aiSceneConfig.fallback }));
+      })
+      .finally(() => {
+        setAiSceneLoadingId((current) => current === dialogSceneId ? null : current);
+      });
+  }, [dialogSceneId]);
+
+  function resetAiSceneRuntime() {
+    aiSceneRequestsRef.current.clear();
+    setAiSceneTexts({});
+    setAiSceneLoadingId(null);
+  }
 
   // 同步 GameBridge + 自动存档
   useEffect(() => {
     if (gamePhase === "playing") {
-      saveGame(state);
+      const runtime = gameBridge.captureMapRuntime();
+      saveGame(runtime?.mapId === state.currentMapId ? { ...state, mapRuntime: runtime } : state);
     }
     gameBridge.gameState = state;
   }, [state, gamePhase]);
@@ -287,12 +353,32 @@ export default function App() {
     }
   }, [dialogScene]);
 
+  useEffect(() => {
+    if (!dialogScene) return;
+    return playSceneSounds(dialogScene.id);
+  }, [dialogScene?.id]);
+
+  useEffect(() => {
+    const unlock = () => {
+      unlockScriptedAudio();
+      window.removeEventListener("keydown", unlock);
+      window.removeEventListener("pointerdown", unlock);
+    };
+    window.addEventListener("keydown", unlock);
+    window.addEventListener("pointerdown", unlock);
+    return () => {
+      window.removeEventListener("keydown", unlock);
+      window.removeEventListener("pointerdown", unlock);
+    };
+  }, []);
+
   // ESC 键：打开/关闭游戏内菜单
   useEffect(() => {
     if (gamePhase !== "playing") return;
     const onKey = (e: KeyboardEvent) => {
       if (e.code === "Escape") {
         e.preventDefault();
+        if (finalSaveRequired) return;
         // 如果回溯或画像面板开着，先关闭
         if (showBacklog) {
           setShowBacklog(false);
@@ -307,7 +393,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [gamePhase, showBacklog, showPortraitPanel]);
+  }, [gamePhase, showBacklog, showPortraitPanel, finalSaveRequired]);
 
   // 监听关闭 AI Trace / 笔记本提示
   useEffect(() => {
@@ -338,6 +424,7 @@ export default function App() {
   // ── 开始新游戏 ──
   function handleNewGame() {
     clearSave();
+    resetAiSceneRuntime();
     dispatch({ type: "RESET" });
     gameBridge.sendToPhaser({
       type: "CHANGE_MAP",
@@ -351,6 +438,7 @@ export default function App() {
 
   function handleStartChapter4() {
     clearSave();
+    resetAiSceneRuntime();
     dispatch({ type: "RESET" });
     dispatch({ type: "DIALOG_START", sceneId: "ch4_exploration_progress" });
     gameBridge.sendToPhaser({
@@ -363,26 +451,37 @@ export default function App() {
     setGamePhase("playing");
   }
 
-  // ── 读取存档进入游戏 ──
-  function handleLoadGame(loaded: GameState) {
+  function restoreLoadedGame(loaded: GameState, closeGameMenu = false) {
+    resetAiSceneRuntime();
     const normalized = normalizeLoadedState(loaded);
     const playerState = scenes[normalized.state.currentSceneId]?.playerState;
+    const runtimeSnapshot = normalized.state.mapRuntime?.mapId === normalized.mapId
+      ? normalized.state.mapRuntime
+      : undefined;
     dispatch({ type: "LOAD", state: normalized.state });
     gameBridge.sendToPhaser({
       type: "CHANGE_MAP",
       mapId: normalized.mapId,
       spawnId: normalized.spawnId,
       ...(playerState ? { playerState } : {}),
+      ...(runtimeSnapshot ? { runtimeSnapshot } : {}),
     });
-    restoreDynamicMapActors(normalized.state);
+    if (!runtimeSnapshot) restoreDynamicMapActors(normalized.state);
     setDialogHistory([]);
     prevSceneIdRef.current = "";
+    if (closeGameMenu) setGameMenuOpen(false);
     setGamePhase("playing");
+  }
+
+  // ── 读取存档进入游戏 ──
+  function handleLoadGame(loaded: GameState) {
+    restoreLoadedGame(loaded);
   }
 
   // ── 重新开始（清存档，回到初始场景） ──
   function handleRestart() {
     clearSave();
+    resetAiSceneRuntime();
     dispatch({ type: "RESET" });
     gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_spawn_52" });
     setDialogHistory([]);
@@ -393,6 +492,7 @@ export default function App() {
 
   // ── 退出到标题 ──
   function handleExitToTitle() {
+    resetAiSceneRuntime();
     setGameMenuOpen(false);
     setGamePhase("menu");
   }
@@ -512,6 +612,24 @@ export default function App() {
     if (choice.id === "ch6_class3_cut_student") {
       dispatch({ type: "SET_FLAG", flag: "ch6_harmed_class3_student" });
     }
+    if (choice.id === "ch8_checked_door_gap") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_player_path",
+        payload: {
+          path: ["spawn_bathroom_door"],
+          direction: "front",
+          standAfter: true,
+          freezeAfter: true,
+          speed: 120,
+        },
+      });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId: "ch8_door_gap_result" });
+      }, 1800);
+      return;
+    }
 
     // AI分析静默运行
     if (choice.needAIAnalysis) {
@@ -602,6 +720,11 @@ export default function App() {
           startCorridorDeathTimer();
           return;
         }
+        if (currentScene.onCgEnd === "ch6_free_corridor_return_active") {
+          dispatch({ type: "DIALOG_END" });
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          return;
+        }
       }
       if (currentScene?.id === "balcony_night_narrate_2") {
         dispatch({ type: "DIALOG_END" });
@@ -621,6 +744,13 @@ export default function App() {
       dialogScene.phoneChat.blockNextUntilComplete !== false &&
       !completedPhoneChats[dialogScene.id]
     ) {
+      return;
+    }
+
+    if (nextSceneId === "ch6_corridor_pressure") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_corridor_returning" });
+      startCorridorDeathTimer();
+      dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
 
@@ -1036,8 +1166,8 @@ export default function App() {
       clearCorridorDeathTimer();
       enterClassroomScene("spawn_spawn_156", nextSceneId, () => {
         fillClassroomSeats(["spawn_spawn_127", "spawn_spawn_132", "spawn_spawn_145", "spawn_spawn_156", "spawn_spawn_258"]);
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_258", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_258", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "front" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames", pose: "sit", direction: "back" } });
       });
       return;
     }
@@ -1047,10 +1177,58 @@ export default function App() {
       return;
     }
 
+    if (nextSceneId === "ch6_liuyu_walks_to_player") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: {
+          npcKey: "npc_liuyu",
+          path: ["spawn_spawn_251", "spawn_spawn_252", "spawn_spawn_248", "spawn_spawn_253"],
+          direction: "right",
+          speed: 150,
+        },
+      });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_liuyu_takes_player" });
+      }, 4800);
+      return;
+    }
+
+    if (nextSceneId === "ch6_teacher_office_liuyu_leaves") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: {
+          npcKey: "npc_liuyu",
+          path: ["spawn_spawn_44", "spawn_spawn_39", "spawn_spawn_38", "spawn_spawn_40"],
+          direction: "front",
+          speed: 150,
+        },
+      });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_teacher_office_after_liuyu_leaves" });
+      }, 3800);
+      return;
+    }
+
     if (nextSceneId === "ch6_office_escape_choice") {
       setReactFlash("red");
       setTimeout(() => setReactFlash(null), 800);
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "spawn_npc",
+        payload: {
+          spawnId: "spawn_spawn_36",
+          npcKey: "npc_teacher",
+          scale: 0.75,
+          framesPrefix: "teacher_monster_frames",
+          pose: "sit",
+          direction: "front",
+        },
+      });
       dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
@@ -1065,6 +1243,13 @@ export default function App() {
     if (nextSceneId === "ch6_after_school_walk") {
       dispatch({ type: "SET_FLAG", flag: "ch6_weekly_exam_completed" });
       enterGateNightScene(nextSceneId);
+      return;
+    }
+
+    if (nextSceneId === "ch6_after_school_injury") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "front" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "front" } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
 
@@ -1104,7 +1289,41 @@ export default function App() {
       return;
     }
 
-    if (dialogScene?.id === "ch8_mother_ghost_enters" && nextSceneId === "ch8_return_to_bed") {
+    if (nextSceneId === "ch8_mirror_ghost") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch8_walk_to_bathroom_door_identity" || nextSceneId === "ch8_walk_to_bathroom_door_mirror") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_player_path",
+        payload: {
+          path: ["spawn_bathroom_door"],
+          direction: "front",
+          standAfter: true,
+          freezeAfter: true,
+          speed: 120,
+        },
+      });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId: "ch8_open_bathroom_door" });
+      }, 1800);
+      return;
+    }
+
+    if (nextSceneId === "ch8_bathroom_death_vision") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (dialogScene?.id === "ch8_bathroom_death_vision" && nextSceneId === "ch8_return_to_bed") {
       dispatch({ type: "SET_FLAG", flag: "ch8_mirror_truth_fragment_1" });
       dispatch({ type: "SET_FLAG", flag: "ch8_mother_ghost_suspected" });
       dispatch({ type: "SET_FLAG", flag: "ch8_home_mirrors_connected_suspected" });
@@ -1128,7 +1347,39 @@ export default function App() {
     if (dialogScene?.id === "ch8_return_home" && nextSceneId === "ch8_demo_personality_review") {
       dispatch({ type: "SET_FLAG", flag: "ch8_abandoned_cry_fragment_2" });
       dispatch({ type: "SET_FLAG", flag: "ch8_demo_story_completed" });
-      dispatch({ type: "GO_NEXT", nextSceneId });
+      dispatch({ type: "DIALOG_END" });
+      setDemoPortraitGenerating(true);
+      void (async () => {
+        let portrait: GeneratedPersonalityPortrait;
+        try {
+          const response = await generatePersonalityPortrait(state);
+          portrait = response.result;
+          addAITrace("ending_judge", {
+            type: "personality_portrait",
+            title: portrait.title,
+            summary: portrait.summary,
+          });
+        } catch {
+          portrait = createFallbackPersonalityPortrait(state);
+        }
+        setDemoPortrait(portrait);
+        savePortrait({
+          endingTitle: portrait.title,
+          traits: { ...state.traits },
+          timestamp: new Date().toLocaleString("zh-CN"),
+          imageDataUrl: portrait.imageDataUrl,
+          summary: portrait.summary,
+        });
+        setDemoPortraitGenerating(false);
+        dispatch({ type: "DIALOG_START", sceneId: "ch8_unfinished_threads" });
+      })();
+      return;
+    }
+
+    if (nextSceneId === "ch8_open_final_save") {
+      dispatch({ type: "SET_FLAG", flag: "demo_personality_archive" });
+      setFinalSaveRequired(true);
+      setGameMenuOpen(true);
       return;
     }
 
@@ -1175,6 +1426,19 @@ export default function App() {
 
   function handleCloseDialog() {
     const currentScene = dialogScene;
+
+    if (currentScene?.onCgEnd === "ch6_free_corridor_return") {
+      dispatch({ type: "SET_FLAG", flag: "ch6_corridor_returning" });
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      startCorridorDeathTimer();
+      return;
+    }
+    if (currentScene?.onCgEnd === "ch6_free_corridor_return_active") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      return;
+    }
 
     if (currentScene?.id === "ch1_game_start_system") {
       dispatch({ type: "DIALOG_END" });
@@ -1473,15 +1737,23 @@ export default function App() {
       if (actualSceneId === "trigger_36") {
         clearCorridorDeathTimer();
         dispatch({ type: "SET_FLAG", flag: "ch6_reached_classroom_in_time" });
-        enterClassroomScene("spawn_spawn_156", "ch6_liuyu_catches_late", () => {
-          fillClassroomSeats(["spawn_spawn_127", "spawn_spawn_132", "spawn_spawn_145", "spawn_spawn_156", "spawn_spawn_258"]);
-          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_258", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
-          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
-        });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_reached_classroom" });
         return;
       }
-      if (["trigger_53", "trigger_51", "trigger_50", "trigger_34", "trigger_35", "trigger_37"].includes(actualSceneId)) {
+      if (["trigger_37", "trigger_53"].includes(actualSceneId)) {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
         dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_wrong_room" });
+        return;
+      }
+      if (["trigger_51", "trigger_50"].includes(actualSceneId)) {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_wrong_direction" });
+        return;
+      }
+      if (["trigger_34", "trigger_35"].includes(actualSceneId)) {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_toilet_direction" });
         return;
       }
     }
@@ -1575,18 +1847,29 @@ export default function App() {
 
   const clearCorridorDeathTimer = useCallback(() => {
     if (corridorDeathTimerRef.current !== null) {
-      window.clearTimeout(corridorDeathTimerRef.current);
+      window.clearInterval(corridorDeathTimerRef.current);
       corridorDeathTimerRef.current = null;
     }
+    setCorridorCountdown(null);
   }, []);
 
   const startCorridorDeathTimer = useCallback(() => {
     clearCorridorDeathTimer();
-    corridorDeathTimerRef.current = window.setTimeout(() => {
-      gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
-      dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_timeout_death" });
-      corridorDeathTimerRef.current = null;
-    }, 20000);
+    setCorridorCountdown(20);
+    corridorDeathTimerRef.current = window.setInterval(() => {
+      setCorridorCountdown((remaining) => {
+        if (remaining === null) return null;
+        if (remaining > 1) return remaining - 1;
+
+        if (corridorDeathTimerRef.current !== null) {
+          window.clearInterval(corridorDeathTimerRef.current);
+          corridorDeathTimerRef.current = null;
+        }
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch6_corridor_timeout_death" });
+        return null;
+      });
+    }, 1000);
   }, [clearCorridorDeathTimer]);
 
   const getScenePlayerState = useCallback((sceneId: string, fallback?: string) => {
@@ -1624,6 +1907,7 @@ export default function App() {
   }, []);
 
   const runFloatingTextSequence = useCallback(async (sequence: "wishes" | "snowball" | "backlash", nextSceneId: string) => {
+    setFloatingTextPerformanceActive(true);
     const show = async (item: Omit<FloatingTextItem, "id">, delay: number) => {
       addFloatingText(item);
       await wait(delay);
@@ -1651,6 +1935,7 @@ export default function App() {
       }
       setFloatingTexts([]);
       await wait(500);
+      setFloatingTextPerformanceActive(false);
       dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
@@ -1670,6 +1955,7 @@ export default function App() {
         await show({ text, x, y, fontSize, width, variant: "gold" }, delay);
       }
       setFloatingTexts([]);
+      setFloatingTextPerformanceActive(false);
       dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
@@ -1688,6 +1974,7 @@ export default function App() {
       await show({ text, x, y, fontSize, width, variant: "backlash" }, delay);
     }
     setFloatingTexts([]);
+    setFloatingTextPerformanceActive(false);
     dispatch({ type: "GO_NEXT", nextSceneId });
   }, [addFloatingText, removeFloatingText]);
 
@@ -1819,8 +2106,8 @@ export default function App() {
     changeMapForScene("teacher_office", "spawn_spawn_35", sceneId, fallbackPlayerState);
     dispatch({ type: "DIALOG_END" });
     setTimeout(() => {
-      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_36", npcKey: "npc_teacher", scale: 0.75, framesPrefix: "teacher_frames" } });
-      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_37", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_36", npcKey: "npc_teacher", scale: 0.75, framesPrefix: "teacher_frames", pose: "sit", direction: "front" } });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_37", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" } });
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_teacher", direction: "front" } });
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "back" } });
       gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
@@ -1832,12 +2119,60 @@ export default function App() {
     changeMapForScene("gate_night", "spawn_spawn_176", sceneId, fallbackPlayerState);
     dispatch({ type: "DIALOG_END" });
     setTimeout(() => {
+      const reservedSpawns = new Set([
+        "spawn_spawn_171",
+        "spawn_spawn_172",
+        "spawn_spawn_173",
+        "spawn_spawn_174",
+        "spawn_spawn_175",
+        "spawn_spawn_176",
+      ]);
+      const gateSpawnCandidates = Array.from(
+        { length: 21 },
+        (_, index) => `spawn_spawn_${164 + index}`,
+      ).filter((spawnId) => !reservedSpawns.has(spawnId));
+      const randomGateSpawns = [...gateSpawnCandidates]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 6);
+      const directions = ["front", "back", "left", "right"];
+
+      randomGateSpawns.forEach((spawnId, index) => {
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "spawn_npc",
+          payload: {
+            spawnId,
+            npcKey: `npc_gate_passerby_${index}`,
+            scale: 0.75,
+            framesPrefix: index % 2 === 0 ? "npc_female1_frames" : "npc_male_frames",
+            direction: directions[Math.floor(Math.random() * directions.length)],
+          },
+        });
+      });
+
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_174", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames" } });
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_175", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames" } });
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "back" } });
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "back" } });
       gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
-      dispatch({ type: "DIALOG_START", sceneId });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_player_path",
+        payload: { path: ["spawn_spawn_173"], direction: "back", standAfter: true, freezeAfter: true, speed: 120 },
+      });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_171"], direction: "back", speed: 120 },
+      });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: { npcKey: "npc_zhouqirui", path: ["spawn_spawn_172"], direction: "back", speed: 120 },
+      });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId });
+      }, 1800);
     }, 700);
   }, [changeMapForScene]);
 
@@ -1901,6 +2236,45 @@ export default function App() {
       {/* ── React 闪屏层 ── */}
       {reactFlash && <div className={`react-flash-overlay ${reactFlash}`} />}
 
+      {demoPortraitGenerating && (
+        <div className="demo-portrait-generating">
+          <div className="demo-portrait-generating-text">正在生成阶段人格画像……</div>
+        </div>
+      )}
+
+      {aiSceneLoadingId && (
+        <div className="ai-scene-generating">
+          <div className="ai-scene-generating-text">正在生成动态剧情……</div>
+        </div>
+      )}
+
+      {/* ── 第六章奔回本班倒计时 ── */}
+      {corridorCountdown !== null && (
+        <div
+          style={{
+            position: "absolute",
+            zIndex: 45,
+            top: 22,
+            left: "50%",
+            transform: "translateX(-50%)",
+            minWidth: 104,
+            padding: "8px 18px",
+            border: "2px solid rgba(255,255,255,0.85)",
+            borderRadius: 8,
+            background: "rgba(10, 10, 14, 0.78)",
+            color: corridorCountdown <= 5 ? "#ff5252" : "#fff",
+            fontSize: 30,
+            fontWeight: 700,
+            lineHeight: 1,
+            textAlign: "center",
+            textShadow: "0 2px 6px #000",
+            pointerEvents: "none",
+          }}
+        >
+          {corridorCountdown}
+        </div>
+      )}
+
       {/* ── 屏幕文字演出层 ── */}
       {floatingTexts.length > 0 && (
         <div className="floating-text-layer">
@@ -1937,9 +2311,16 @@ export default function App() {
           scene={dialogScene}
           onNext={handleNext}
           onChoose={handleChoose}
+          hideUi={floatingTextPerformanceActive || aiSceneIsLoading}
+          centerImageSrc={dialogScene.id === "ch8_demo_ending" ? demoPortrait?.imageDataUrl : undefined}
+          preserveForPerformance={[
+            "ch6_ritual_wishes",
+            "ch6_ritual_desire_snowball",
+            "ch6_ritual_backlash",
+          ].includes(dialogScene.id)}
         />
       )}
-      {dialogScene && !dialogScene.cgMode && (
+      {dialogScene && !floatingTextPerformanceActive && !aiSceneIsLoading && !dialogScene.cgMode && (
         <DialogOverlay
           scene={dialogScene}
           onNext={handleNext}
@@ -1956,28 +2337,22 @@ export default function App() {
       {/* ── 游戏内菜单（ESC 打开） ── */}
       {gameMenuOpen && (
         <GameMenu
+          key={finalSaveRequired ? "final-save" : "game-menu"}
           state={state}
           onClose={() => setGameMenuOpen(false)}
-          onLoadState={(loaded) => {
-            const normalized = normalizeLoadedState(loaded);
-            const playerState = scenes[normalized.state.currentSceneId]?.playerState;
-            dispatch({ type: "LOAD", state: normalized.state });
-            gameBridge.sendToPhaser({
-              type: "CHANGE_MAP",
-              mapId: normalized.mapId,
-              spawnId: normalized.spawnId,
-              ...(playerState ? { playerState } : {}),
-            });
-            restoreDynamicMapActors(normalized.state);
-            setDialogHistory([]);
-            prevSceneIdRef.current = "";
-            setGameMenuOpen(false);
-          }}
+          onLoadState={(loaded) => restoreLoadedGame(loaded, true)}
           onRestart={handleRestart}
           onExitToTitle={handleExitToTitle}
           onShowBacklog={() => setShowBacklog(true)}
           onShowNotebook={() => setShowNotebookToast(true)}
           dialogPreview={dialogPreview}
+          initialPage={finalSaveRequired ? "save" : "main"}
+          forceSave={finalSaveRequired}
+          onSaveComplete={finalSaveRequired ? () => {
+            setFinalSaveRequired(false);
+            setGameMenuOpen(false);
+            setGamePhase("menu");
+          } : undefined}
         />
       )}
 

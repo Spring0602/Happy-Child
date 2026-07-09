@@ -32,7 +32,11 @@
 [旁白]镜中空间里的血腥味与人影同时消失。
 [旁白]我立刻转头寻找，可受限于镜面的大小，只能看见极其有限的角度。
 [主角]（它去哪了？）
--> 图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\浴室\镜中女鬼.png
+
+### [CG]女鬼
+
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\浴室\镜中女鬼.png
+效果：flash_red
 → 音效: horror_sting (once)
 [旁白]一张血淋淋的鬼脸骤然贴到眼前。\n\n它咧开腥臭巨口，嘴角一直延伸到耳根，血红眼珠贪婪地盯着我。
 [主角说]卧槽——！
@@ -92,7 +96,7 @@
 [旁白]我深吸一口气，打开了门。
 
 条件：ch8_checked_mirror_again
-图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\浴室\镜子.png
+播放CG图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\浴室\镜子.png
 效果：淡入
 [旁白]镜中一片漆黑，血腥鬼脸已经消失。但和之前不同的是，这次我没有感受到冷风拂面，这意味着，可能有什么东西挡住了风的源头。
 [主角]（是门口那个人影堵住了风口吗？但从空间角度看，这是不符合逻辑的。假设这个推论成立，那么风口应该位于我家走廊，但无论怎么看我家也不存在一个密室吧？）
@@ -113,13 +117,13 @@
 [主角]（镜子里应该是一条通道。但这只鬼为什么能出现在厕所门外？难道家里还有其他类似的通道？）
 [旁白]鬼踏入厕所的瞬间，我的头仿佛炸开一般的疼。
 → 效果: flash_red
-->图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\浴室\人亡.png
+->播放CG图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\浴室\人亡.png
 效果：淡入
 [旁白]我捂住额头，恍惚间看到空间碎裂又拼合，原本白色调的厕所被血色渲染，墙壁、镜子、盥洗池上满是飞溅的血迹，而我脚下的地板上，一滩血液还在缓慢地流动着，未被污染的区域是一个躺倒在地的人形轮廓。
 [主角]（这里死人了。）
 [旁白]鬼影突然悬空升起，发出意义不明的长啸，痛苦扭曲着钻回镜中。
 [旁白]头部的疼痛消失。我再次睁眼，厕所已经恢复原状，仿佛刚才发生的一切都是幻觉。
-->图片：无
+->图片：无，之前CG消失
 [NPC:系统]恭喜您找到“镜中真相碎片1”。
 [NPC:系统]副本探索进度达到15%。
 [主角]（在厕所有人遇害了，而真相与我的家庭状况有关。鬼影很可能是母亲，但她身上没有伤口，衣服却沾满鲜血。）
@@ -159,6 +163,8 @@
 
 ### [CG]如何回应绝望
 
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\意识\与“我”对话.png
+
 → 选项：你自己尝试过改变自己、改变现状吗？被自己妄想的绝望困住，这是比懦弱更蠢的做法
     AI标签：直接挑战, 建设性反抗, 现实判断
     设置flag: ch8_challenged_inner_voice
@@ -181,6 +187,7 @@
 
 ### [AI片段]“我”质疑主角
 场景ID：ch8_inner_voice_dynamic_response
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\意识\与“我”对话.png
 
 背景：深夜卧室，主角正在承受违规提醒造成的窒息，“我”因家庭压力陷入绝望并拒绝相信语言说服
 参与角色：主角, 我
@@ -210,6 +217,7 @@ AI提示：根据玩家此前人格画像与本次“如何回应绝望”的选
 
 ### [CG]前往天台
 场景ID：ch8_leave_for_rooftop
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\意识\与“我”对话.png
 
 [主角说]想让我证明给你看，也要你先给我一点行动空间。如果我死在你手里，你还能看到结果吗？
 [NPC:“我”]想在我手里活下来，你就得给我带来快乐。

@@ -5,6 +5,9 @@ interface Props {
   scene: Scene;
   onNext: (nextSceneId: string) => void;
   onChoose: (choice: Choice) => void;
+  hideUi?: boolean;
+  centerImageSrc?: string;
+  preserveForPerformance?: boolean;
 }
 
 /** 主角说话者名单 */
@@ -88,12 +91,13 @@ function splitDialogSegments(text: string, fallbackSpeaker: string | undefined):
   return segments.length > 0 ? segments : [{ speaker: fallbackSpeaker, text: normalizedText }];
 }
 
-export function CgOverlay({ scene, onNext, onChoose }: Props) {
+export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImageSrc, preserveForPerformance = false }: Props) {
   const hasChoices = scene.choices && scene.choices.length > 0;
 
   // 稳定化 paragraphs 数组引用，避免每次都触发 useEffect
   const paragraphs = useMemo(() => splitDialogSegments(scene.text, scene.speaker), [scene.text, scene.speaker]);
   const [currentParagraph, setCurrentParagraph] = useState(0);
+  const [exiting, setExiting] = useState(false);
   const totalParagraphs = paragraphs.length;
   const currentSegment = paragraphs[currentParagraph] ?? { speaker: scene.speaker, text: "" };
   const speakerLabel = getSpeakerLabel(currentSegment.speaker);
@@ -105,6 +109,7 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
   // ⚠️ scene 切换时重置段落（修复选项后对话框空白的 bug）
   useEffect(() => {
     setCurrentParagraph(0);
+    setExiting(false);
   }, [scene.id]);
 
   // 打字机效果状态
@@ -152,6 +157,22 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
   // 当前段落的完整文本
   const fullText = currentSegment.text || "";
 
+  const goNextWithFade = useCallback(() => {
+    if (exiting) return;
+    if (preserveForPerformance) {
+      onNext(scene.nextSceneId || "");
+      return;
+    }
+    setExiting(true);
+    window.setTimeout(() => onNext(scene.nextSceneId || ""), 360);
+  }, [exiting, onNext, preserveForPerformance, scene.nextSceneId]);
+
+  const chooseWithFade = useCallback((choice: Choice) => {
+    if (exiting) return;
+    setExiting(true);
+    window.setTimeout(() => onChoose(choice), 360);
+  }, [exiting, onChoose]);
+
   // 空格键：快进打字 / 下一段 / 下一页
   const handleSpace = useCallback(() => {
     if (showChoices) return;
@@ -165,11 +186,12 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
       setCurrentParagraph(prev => prev + 1);
     } else {
       // 进入下一场景（即使 nextSceneId 为空也触发，让上层处理关闭逻辑）
-      onNext(scene.nextSceneId || "");
+      goNextWithFade();
     }
-  }, [showChoices, typingDone, currentParagraph, totalParagraphs, scene.nextSceneId, onNext, fullText.length]);
+  }, [showChoices, typingDone, currentParagraph, totalParagraphs, goNextWithFade, fullText.length]);
 
   useEffect(() => {
+    if (hideUi) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.code === "Space") {
         e.preventDefault();
@@ -178,70 +200,100 @@ export function CgOverlay({ scene, onNext, onChoose }: Props) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handleSpace]);
+  }, [handleSpace, hideUi]);
 
   // 是否显示向下箭头（当前段打字完成 且 还有内容）
   const showArrow = typingDone && !showChoices;
 
   return (
-    <div className="cg-overlay">
+    <div className={`cg-overlay${exiting ? " cg-exiting" : ""}`}>
       {/* 全屏 CG 背景 */}
       <div
-        className="cg-background"
+        key={scene.id}
+        className="cg-background cg-background-fade-in"
         style={scene.background
           ? { backgroundImage: `url(${scene.background})`, backgroundColor: "#000" }
           : { backgroundColor: "#000" }}
       />
 
-      {scene.id === "ch1_game_eve_countdown" && (
-        <div className="cg-countdown-display">00:00</div>
-      )}
-
-      {/* 立绘 */}
-      {showPortrait && (
-        <div className={`cg-portrait-area ${portraitSide}`}>
-          <img
-            className="cg-portrait"
-            src={portraitSrc!}
-            alt={speakerLabel ?? ""}
-          />
-        </div>
-      )}
-
-      {/* 选项 — 在对话框上方 */}
-      {showChoices && (
-        <div className="cg-choices">
-          {scene.choices!.map((choice) => (
-            <button
-              key={choice.id}
-              className="cg-choice-btn"
-              onClick={() => onChoose(choice)}
-            >
-              {choice.text}
-            </button>
+      {scene.id === "ch6_ritual_desire_snowball" && (
+        <div className="papers-fall-layer" aria-hidden="true">
+          {Array.from({ length: 28 }, (_, index) => (
+            <span
+              key={index}
+              className="falling-paper"
+              style={{
+                left: `${(index * 37) % 101}%`,
+                animationDelay: `${(index % 9) * -0.62}s`,
+                animationDuration: `${5.2 + (index % 7) * 0.48}s`,
+                width: `${34 + (index % 4) * 7}px`,
+                height: `${48 + (index % 3) * 9}px`,
+              }}
+            />
           ))}
         </div>
       )}
 
-      {/* 底部对话框 */}
-      <div className="cg-dialog-area">
-        <div className="cg-dialog-box" onClick={handleSpace}>
-          <div className="cg-dialog-header">
-            {speakerLabel && (
-              <span className="cg-dialog-speaker">{speakerLabel}</span>
-            )}
-          </div>
-          <div className={`cg-dialog-text${isNarrator ? " narrator" : ""}`}>
-            {fullText.slice(0, displayedChars)}
-            {!typingDone && <span className="typing-cursor">|</span>}
-          </div>
-          {showArrow && (
-            <div className="dialog-arrow-down">
-              <span className="arrow-icon">▼</span>
+      {scene.id === "ch1_game_eve_countdown" && (
+        <div className="cg-countdown-display">00:00</div>
+      )}
+
+      {centerImageSrc && (
+        <img className="cg-center-portrait-image" src={centerImageSrc} alt="Demo阶段人格画像" />
+      )}
+
+      {!hideUi && (
+        <div className="cg-ui-stack">
+          <div className="cg-dialog-main">
+            <div className="cg-portrait-area left">
+              {showPortrait && portraitSide === "left" && (
+                <img className="cg-portrait" src={portraitSrc!} alt={speakerLabel ?? ""} />
+              )}
             </div>
-          )}
+
+            <div className="cg-content-column">
+              {showChoices && (
+                <div className="cg-choices">
+                  {scene.choices!.map((choice) => (
+                    <button
+                      key={choice.id}
+                      className="cg-choice-btn"
+                      onClick={() => chooseWithFade(choice)}
+                    >
+                      {choice.text}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="cg-dialog-area">
+                <div className="cg-dialog-box" onClick={handleSpace}>
+                  <div className="cg-dialog-header">
+                    {speakerLabel && (
+                      <span className="cg-dialog-speaker">{speakerLabel}</span>
+                    )}
+                  </div>
+                  <div className={`cg-dialog-text${isNarrator ? " narrator" : ""}`}>
+                    {fullText.slice(0, displayedChars)}
+                    {!typingDone && <span className="typing-cursor">|</span>}
+                  </div>
+                  {showArrow && (
+                    <div className="dialog-arrow-down">
+                      <span className="arrow-icon">▼</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="cg-portrait-area right">
+              {showPortrait && portraitSide === "right" && (
+                <img className="cg-portrait" src={portraitSrc!} alt={speakerLabel ?? ""} />
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

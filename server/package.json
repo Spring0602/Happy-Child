@@ -11,7 +11,8 @@
   "dependencies": {
     "cors": "latest",
     "dotenv": "latest",
-    "express": "latest"
+    "express": "latest",
+    "undici": "^6.27.0"
   },
   "devDependencies": {
     "@types/cors": "latest",
