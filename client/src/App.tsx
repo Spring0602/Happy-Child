@@ -29,10 +29,12 @@ import {
   judgeEnding,
   type GeneratedPersonalityPortrait,
 } from "./services/aiClient";
-import type { AITrace, Choice, GameState } from "./types/game";
+import type { AITrace, Choice, GameState, PhoneChatMessage } from "./types/game";
 import "./styles/global.css";
 
 type GamePhase = "menu" | "playing";
+const ENABLE_AI_FALLBACK_TEXT = import.meta.env.VITE_AI_ALLOW_FALLBACK === "true";
+const PHONE_CHAT_VISIBLE_HISTORY_LIMIT = 8;
 
 type FloatingTextItem = {
   id: string;
@@ -72,6 +74,17 @@ function filterConditionalSceneText(text: string, state: GameState): string {
   });
 
   return result.trim() || text.replace(markerPattern, "").trim();
+}
+
+function createAiFailureScript(sceneId: string, error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  const safeMessage = message.replace(/Bearer\s+[A-Za-z0-9._-]+/gi, "Bearer ***").slice(0, 240);
+  return [
+    "[NPC:系统]AI服务连接失败，本场景没有使用默认占位剧情。",
+    `[旁白]场景ID：${sceneId}`,
+    "[旁白]请确认后端服务正在运行：在项目根目录执行 npm run dev:server，并确认 server/.env 中 MODEL_PROVIDER=hunyuan。",
+    `[旁白]错误摘要：${safeMessage}`,
+  ].join("\n\n");
 }
 
 function inferSpawnIdForScene(sceneId: string, mapId: string): string {
@@ -258,6 +271,7 @@ export default function App() {
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
   const [floatingTextPerformanceActive, setFloatingTextPerformanceActive] = useState(false);
   const [completedPhoneChats, setCompletedPhoneChats] = useState<Record<string, boolean>>({});
+  const [phoneChatHistories, setPhoneChatHistories] = useState<Record<string, PhoneChatMessage[]>>({});
   const [dialogHistory, setDialogHistory] = useState<DialogLogEntry[]>([]);
   const [corridorCountdown, setCorridorCountdown] = useState<number | null>(null);
   const [demoPortrait, setDemoPortrait] = useState<GeneratedPersonalityPortrait | null>(null);
@@ -277,14 +291,63 @@ export default function App() {
   const aiSceneConfig = dialogSceneId ? aiSceneConfigs[dialogSceneId] : undefined;
   const aiGeneratedText = dialogSceneId ? aiSceneTexts[dialogSceneId] : undefined;
   const aiSceneIsLoading = !!aiSceneConfig && !aiGeneratedText;
+  const phoneChatIsBlocking = !!(
+    rawDialogScene?.phoneChat &&
+    rawDialogScene.phoneChat.blockNextUntilComplete !== false &&
+    dialogSceneId &&
+    !completedPhoneChats[dialogSceneId]
+  );
+  const phoneChatKey = rawDialogScene?.phoneChat
+    ? `${rawDialogScene.phoneChat.title}::${rawDialogScene.phoneChat.subtitle ?? ""}`
+    : "";
+  const effectivePhoneChat = rawDialogScene?.phoneChat
+    ? {
+        ...rawDialogScene.phoneChat,
+        initialMessages: rawDialogScene.phoneChat.view && rawDialogScene.phoneChat.view !== "chat"
+          ? rawDialogScene.phoneChat.initialMessages
+          : [
+              ...(rawDialogScene.phoneChat.initialMessages ?? []),
+              ...(phoneChatHistories[phoneChatKey] ?? []),
+            ].slice(-PHONE_CHAT_VISIBLE_HISTORY_LIMIT),
+      }
+    : undefined;
   const dialogScene = rawDialogScene
     ? {
         ...rawDialogScene,
+        ...(effectivePhoneChat ? { phoneChat: effectivePhoneChat } : {}),
         text: aiSceneConfig
           ? (aiGeneratedText ?? "")
           : filterConditionalSceneText(rawDialogScene.text, state),
       }
     : null;
+  const shouldCgTransitionTo = useCallback((nextSceneId: string) => {
+    const nextScene = scenes[nextSceneId];
+    if (!dialogScene || !nextScene) return true;
+    if (!dialogScene.cgMode || !nextScene.cgMode) return true;
+    return dialogScene.background !== nextScene.background;
+  }, [dialogScene]);
+
+  const handleDialogSegmentDone = useCallback((sceneId: string, segmentText: string) => {
+    if (sceneId !== "ch7_return_livingroom") return;
+    if (segmentText.includes("回到家后，父母很识趣地没有找我的麻烦")) {
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "camera_focus_spawn",
+        payload: { spawnId: "spawn_spawn_73", duration: 500 },
+      });
+      return;
+    }
+    if (segmentText.includes("貌似有些……颓废？")) {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "camera_follow_player" });
+      window.setTimeout(() => {
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "set_npc_direction",
+          payload: { npcKey: "npc_mother", direction: "right" },
+        });
+      }, 520);
+    }
+  }, []);
 
   useEffect(() => {
     if (!dialogSceneId || !rawDialogScene || !aiSceneConfig || aiSceneTexts[dialogSceneId]) return;
@@ -301,7 +364,8 @@ export default function App() {
       dialogSceneId,
       aiSceneConfig.mode,
       prompt,
-      aiSceneConfig.requiredLines
+      aiSceneConfig.requiredLines,
+      aiSceneConfig.context
     )
       .then((response) => {
         const script = response.result?.script?.trim();
@@ -311,8 +375,13 @@ export default function App() {
         setAiSceneTexts((previous) => ({ ...previous, [dialogSceneId]: script }));
       })
       .catch((error) => {
-        console.error(`[AI] 场景 ${dialogSceneId} 生成失败，使用安全保底文本`, error);
-        setAiSceneTexts((previous) => ({ ...previous, [dialogSceneId]: aiSceneConfig.fallback }));
+        console.error(`[AI] 场景 ${dialogSceneId} 生成失败`, error);
+        setAiSceneTexts((previous) => ({
+          ...previous,
+          [dialogSceneId]: ENABLE_AI_FALLBACK_TEXT
+            ? aiSceneConfig.fallback
+            : createAiFailureScript(dialogSceneId, error),
+        }));
       })
       .finally(() => {
         setAiSceneLoadingId((current) => current === dialogSceneId ? null : current);
@@ -323,6 +392,8 @@ export default function App() {
     aiSceneRequestsRef.current.clear();
     setAiSceneTexts({});
     setAiSceneLoadingId(null);
+    setCompletedPhoneChats({});
+    setPhoneChatHistories({});
   }
 
   // 同步 GameBridge + 自动存档
@@ -554,6 +625,33 @@ export default function App() {
       return;
     }
 
+    if (choice.id === "ch3_returned_homework" && choice.nextSceneId === "ch3_prank_returned") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_player_path",
+        payload: {
+          path: ["spawn_spawn_276", "spawn_spawn_249", "spawn_spawn_254", "spawn_spawn_253"],
+          direction: "right",
+          standAfter: true,
+          freezeAfter: true,
+          speed: 150,
+        },
+      });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "down" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "left" } });
+        dispatch({ type: "DIALOG_START", sceneId: choice.nextSceneId });
+      }, 3800);
+      return;
+    }
+
+    if (choice.nextSceneId === "ch3_final_answer_warning") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+    }
+
     // 宿舍第二幕：选择睡觉 → 先触发地图淡出，再延迟显示睡觉对话框
     if (choice.id === "dorm_act2_sleep_now") {
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "fade_out_map", payload: { duration: 1500 } });
@@ -571,6 +669,20 @@ export default function App() {
 
     const choiceFlagIds = new Set([
       "ch6_class3_force_through",
+      "ch3_joined_prank",
+      "ch3_returned_homework",
+      "ch3_checked_old_seat_directly",
+      "ch3_checked_old_seat_carefully",
+      "ch3_answered_final_complex",
+      "ch3_answered_final_utilitarian",
+      "ch3_answered_final_resist",
+      "ch3_told_liuyu_family_danger",
+      "ch3_warned_liuyu_danger",
+      "ch3_tested_liuyu_loyalty",
+      "ch3_asked_count_without_help",
+      "ch3_used_mother_as_cover",
+      "ch3_admitted_related_to_liuyu",
+      "ch3_joked_with_liuyu",
       "ch6_class3_call_zhoujunxiu",
       "ch6_class3_claim_teacher",
       "ch6_class3_counter_pull",
@@ -589,6 +701,25 @@ export default function App() {
       "ch6_concealed_teacher_monster",
       "ch6_partial_injury_truth",
       "ch6_described_teacher_monster",
+      "ch7_deleted_good_child",
+      "ch7_deleted_evening_self_study",
+      "ch7_deleted_respect_authority",
+      "ch7_told_mother_thinking",
+      "ch7_tested_mother_memory",
+      "ch7_asked_father_leave",
+      "ch7_comforted_father",
+      "ch7_delayed_family_intervention",
+      "ch7_joined_trial_group",
+      "ch7_group_greeting_meme",
+      "ch7_group_greeting_honest",
+      "ch7_group_greeting_observe",
+      "ch7_group_greeting_check_safety",
+      "ch7_liuyu_private_confront",
+      "ch7_skipped_liuyu_private_chat",
+      "ch7_mirror_enter_careful",
+      "ch7_mirror_enter_recording",
+      "ch7_mirror_enter_direct",
+      "ch7_mirror_checked_time",
       "ch8_asked_door_identity",
       "ch8_checked_door_gap",
       "ch8_checked_mirror_again",
@@ -606,8 +737,39 @@ export default function App() {
       "ch8_explained_collective_pressure",
       "ch8_asked_present_feeling",
     ]);
-    if (choiceFlagIds.has(choice.id)) {
+    if (choice.id.startsWith("ch2_") || choiceFlagIds.has(choice.id)) {
       dispatch({ type: "SET_FLAG", flag: choice.id });
+    }
+    if (choice.id === "ch2_hid_outsider_items") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "change_ground_image", payload: { key: "ground_bedroom" } });
+    }
+    if (choice.id === "ch2_searched_rules_first") {
+      dispatch({ type: "DIALOG_END" });
+      changeMapForScene("bedroom_luggage", "spawn_spawn_36", "ch2_bedroom_initial_search", "yps_frames_stand_front");
+      setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
+      return;
+    }
+    if (choice.nextSceneId === "ch2_breakfast_violation") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+    }
+    if (choice.nextSceneId === "ch2_leave_for_school") {
+      dispatch({ type: "SET_FLAG", flag: "ch2_home_initial_investigation_completed" });
+    }
+    if (choice.id === "ch2_answered_mother_quickly" || choice.id === "ch2_tested_mother_entry") {
+      const targetSceneId = state.flags["ch2_hid_outsider_items"] || state.choiceHistory.includes("ch2_hid_outsider_items")
+        ? "ch2_mother_checks_room"
+        : "ch2_stumble_fail";
+      if (targetSceneId === "ch2_stumble_fail") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_luggage_warning_triggered" });
+        dispatch({ type: "SET_FLAG", flag: "ch2_hid_outsider_items" });
+        setReactFlash("red");
+        setTimeout(() => setReactFlash(null), 800);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      }
+      dispatch({ type: "DIALOG_START", sceneId: targetSceneId });
+      return;
     }
     if (choice.id === "ch6_class3_cut_student") {
       dispatch({ type: "SET_FLAG", flag: "ch6_harmed_class3_student" });
@@ -628,6 +790,27 @@ export default function App() {
       setTimeout(() => {
         dispatch({ type: "DIALOG_START", sceneId: "ch8_door_gap_result" });
       }, 1800);
+      return;
+    }
+
+    if (choice.nextSceneId === "ch7_surface_rule_death") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      return;
+    }
+
+    if (choice.nextSceneId === "ch7_family_dynamic_response") {
+      enterMapScene("livingroom", "spawn_spawn_87", choice.nextSceneId);
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_73", npcKey: "npc_father", scale: 0.75, framesPrefix: "dad_frames", pose: "sit", direction: "left" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_72", npcKey: "npc_mother", scale: 0.75, framesPrefix: "mom_frames", pose: "sit", direction: "left" } });
+      }, 500);
+      return;
+    }
+
+    if (choice.nextSceneId === "ch7_prepare_mirror") {
+      enterMapScene("bathroom", "spawn_spawn_23", choice.nextSceneId);
       return;
     }
 
@@ -725,6 +908,16 @@ export default function App() {
           gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
           return;
         }
+        if (
+          currentScene.onCgEnd === "ch2_free_bedroom" ||
+          currentScene.onCgEnd === "ch2_free_livingroom" ||
+          currentScene.onCgEnd === "ch2_free_bathroom" ||
+          currentScene.onCgEnd === "ch2_free_kitchen"
+        ) {
+          dispatch({ type: "DIALOG_END" });
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          return;
+        }
       }
       if (currentScene?.id === "balcony_night_narrate_2") {
         dispatch({ type: "DIALOG_END" });
@@ -744,6 +937,146 @@ export default function App() {
       dialogScene.phoneChat.blockNextUntilComplete !== false &&
       !completedPhoneChats[dialogScene.id]
     ) {
+      return;
+    }
+
+    if (nextSceneId === "ch2_enter_bedroom") {
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_screen", payload: { duration: 500 } });
+      enterMapScene("bedroom_luggage", "spawn_spawn_36", nextSceneId, "yps_frames_stand_front");
+      return;
+    }
+
+    if (nextSceneId === "ch2_bedroom_priority_choice") {
+      dispatch({ type: "SET_FLAG", flag: "ch2_date_confirmed" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch2_bedroom_initial_search") {
+      const hidItems = state.flags["ch2_hid_outsider_items"] || state.choiceHistory.includes("ch2_hid_outsider_items");
+      changeMapForScene(hidItems ? "bedroom" : "bedroom_luggage", "spawn_spawn_36", nextSceneId, "yps_frames_stand_front");
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+      }, 700);
+      return;
+    }
+
+    if (nextSceneId === "ch2_breakfast") {
+      changeMapForScene("livingroom", "spawn_spawn_71", nextSceneId, "yps_frames_sit_right");
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_72", npcKey: "npc_mother", scale: 0.75, framesPrefix: "mom_frames", pose: "sit", direction: "left" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_73", npcKey: "npc_father", scale: 0.75, framesPrefix: "dad_frames", pose: "sit", direction: "left" } });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+      }, 700);
+      return;
+    }
+
+    if (nextSceneId === "ch2_breakfast_violation") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch2_study_montage") {
+      dispatch({ type: "SET_FLAG", flag: "ch2_warning_skill_discovered" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch2_thought_violation_choice") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      enterMapScene("bedroom", "spawn_spawn_36", nextSceneId, "yps_frames_stand_front");
+      return;
+    }
+
+    if (nextSceneId === "ch2_home_exploration_start") {
+      dispatch({ type: "SET_FLAG", flag: "ch2_thoughts_can_violate" });
+      enterMapScene("livingroom", "spawn_spawn_73", nextSceneId, "yps_frames_stand_back");
+      return;
+    }
+
+    if (nextSceneId === "ch2_bathroom_investigation") {
+      changeMapForScene("bathroom", "spawn_bathroom_door", nextSceneId, "yps_frames_stand_front");
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
+      return;
+    }
+
+    if (nextSceneId === "ch2_kitchen_investigation") {
+      changeMapForScene("kitchen", "spawn_kitchen_door", nextSceneId, "yps_frames_stand_front");
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
+      return;
+    }
+
+    if (nextSceneId === "ch2_home_investigation_end") {
+      enterMapScene("livingroom", "spawn_spawn_76", nextSceneId, "yps_frames_stand_front");
+      return;
+    }
+
+    if (nextSceneId === "ch2_enter_classroom") {
+      changeMapForScene("classroom", "spawn_spawn_156", nextSceneId, "yps_frames_stand_front");
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => {
+        const excludedSeatSpawns = new Set([
+          "spawn_spawn_132",
+          "spawn_spawn_127",
+          "spawn_spawn_117",
+          "spawn_spawn_145",
+          "spawn_spawn_156",
+          "spawn_spawn_258",
+          "spawn_spawn_246",
+          "spawn_spawn_247",
+          "spawn_spawn_248",
+          "spawn_spawn_249",
+          "spawn_spawn_250",
+          "spawn_spawn_251",
+          "spawn_spawn_252",
+          "spawn_spawn_253",
+          "spawn_spawn_254",
+          "spawn_spawn_255",
+          "spawn_spawn_257",
+          "spawn_spawn_276",
+        ]);
+        const randomSeatSpawns = Array.from({ length: 41 }, (_, index) => `spawn_spawn_${115 + index}`)
+          .filter((spawnId) => !excludedSeatSpawns.has(spawnId))
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3);
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "fill_classroom_seats",
+          payload: {
+            start: 115,
+            end: 155,
+            exclude: Array.from(excludedSeatSpawns),
+            includeSpawns: randomSeatSpawns,
+            includeOnly: true,
+            framesPrefixes: ["npc_female1_frames", "npc_male_frames"],
+          },
+        });
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "move_player_path",
+          payload: {
+            path: ["spawn_spawn_253", "spawn_spawn_248", "spawn_spawn_249", "spawn_spawn_276", "spawn_spawn_132"],
+            direction: "back",
+            standAfter: false,
+            freezeAfter: true,
+            speed: 150,
+          },
+        });
+      }, 700);
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "apply_player_state", payload: { playerState: "yps_frames_sit_back" } });
+        dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+      }, 5600);
       return;
     }
 
@@ -989,6 +1322,101 @@ export default function App() {
         gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
         dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
       }, 600);
+      return;
+    }
+
+    // ── 第3章：学校初入 ──
+    if (nextSceneId === "ch3_classroom_entrance") {
+      enterClassroomScene("spawn_spawn_132", nextSceneId, setupCh3Classroom, "yps_frames_sit_back");
+      return;
+    }
+
+    if (nextSceneId === "ch3_homework_prank_start") {
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "move_npc_path",
+          payload: {
+            npcKey: "npc_liuyu",
+            path: ["spawn_spawn_249", "spawn_spawn_250", "spawn_spawn_257"],
+            direction: "down",
+            speed: 170,
+          },
+        });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "up" } });
+      }, 1400);
+      setTimeout(() => {
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "move_npc_path",
+          payload: {
+            npcKey: "npc_zhouqirui",
+            path: ["spawn_spawn_254", "spawn_spawn_250", "spawn_spawn_247"],
+            direction: "up",
+            speed: 155,
+          },
+        });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "down" } });
+      }, 6200);
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "right" } });
+      }, 11000);
+      return;
+    }
+
+    if (nextSceneId === "ch3_after_exam_gate") {
+      dispatch({ type: "SET_FLAG", flag: "ch3_personality_test_completed" });
+      if (dialogScene?.id === "ch3_final_answer_warning") {
+        dispatch({ type: "SET_FLAG", flag: "ch3_final_answer_repaired" });
+      }
+      changeMapForScene("gate_night", "spawn_spawn_176", nextSceneId, "yps_frames_stand_back");
+      dispatch({ type: "DIALOG_END" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_178", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" } });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        gameBridge.sendToPhaser({
+          type: "STORY_EVENT",
+          eventId: "move_player_path",
+          payload: { path: ["spawn_spawn_173"], direction: "back", standAfter: true, freezeAfter: true, speed: 130 },
+        });
+        setTimeout(() => {
+          gameBridge.sendToPhaser({
+            type: "STORY_EVENT",
+            eventId: "move_npc_path",
+            payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_176"], direction: "back", speed: 130 },
+          });
+        }, 1800);
+        setTimeout(() => {
+          gameBridge.sendToPhaser({
+            type: "STORY_EVENT",
+            eventId: "move_npc_path",
+            payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_185"], direction: "back", speed: 130 },
+          });
+        }, 5200);
+        setTimeout(() => dispatch({ type: "DIALOG_START", sceneId: nextSceneId }), 700);
+      }, 700);
+      return;
+    }
+
+    if (nextSceneId === "ch3_suffocation_start") {
+      setReactFlash("red");
+      setTimeout(() => setReactFlash(null), 800);
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (dialogScene?.id === "ch3_suffocation_start") {
+      const branchId = state.flags.ch3_joined_prank ? "ch3_suffocation_resolved" : "ch3_suffocation_death";
+      dispatch({ type: "GO_NEXT", nextSceneId: branchId });
+      return;
+    }
+
+    if (nextSceneId === "ch4_exploration_progress" && dialogScene?.id === "ch3_suffocation_resolved") {
+      dispatch({ type: "SET_FLAG", flag: "ch3_red_note_fragment_seen" });
+      dispatch({ type: "SET_FLAG", flag: "ch3_school_relationship_anchor_found" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
 
@@ -1281,6 +1709,52 @@ export default function App() {
       dispatch({ type: "SET_FLAG", flag: "ch6_active_skill_initializing" });
       dispatch({ type: "SET_FLAG", flag: "ch6_school_rebellion_60" });
       dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch7_bad_child_born") {
+      dispatch({ type: "SET_FLAG", flag: "ch7_deleted_good_child" });
+      dispatch({ type: "SET_FLAG", flag: "ch7_school_bad_child_title" });
+      dispatch({ type: "SET_FLAG", flag: "ch7_school_temporarily_closed" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
+    if (nextSceneId === "ch7_return_livingroom") {
+      enterMapScene("livingroom", "spawn_spawn_79", nextSceneId);
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_73", npcKey: "npc_father", scale: 0.75, framesPrefix: "dad_frames", pose: "sit", direction: "left" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_78", npcKey: "npc_mother", scale: 0.75, framesPrefix: "mom_frames", direction: "left" } });
+      }, 500);
+      return;
+    }
+
+    if (dialogScene?.id === "ch7_return_livingroom" && nextSceneId === "ch7_overhear_parents") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_player_path",
+        payload: {
+          path: ["spawn_spawn_80", "spawn_spawn_81", "spawn_spawn_82", "spawn_spawn_73"],
+          direction: "down",
+          standAfter: true,
+          freezeAfter: true,
+          speed: 150,
+        },
+      });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+      }, 3600);
+      return;
+    }
+
+    if (nextSceneId === "ch7_parent_unemployment_performance") {
+      runFloatingTextSequence("parents", "ch7_overhear_parents_after");
+      return;
+    }
+
+    if (nextSceneId === "ch7_prepare_mirror") {
+      enterMapScene("bathroom", "spawn_spawn_23", nextSceneId);
       return;
     }
 
@@ -1708,6 +2182,178 @@ export default function App() {
       return;
     }
 
+    // ── 第2章：卧室探索触发器 ──
+    if (state.currentMapId === "bedroom" || state.currentMapId === "bedroom_luggage") {
+      const bedroomTriggerMap: Record<string, { sceneId: string; flag?: string }> = {
+        trigger_29: { sceneId: "ch2_bedroom_bookshelf", flag: "ch2_bookshelf_seen" },
+        trigger_30: { sceneId: "ch2_bedroom_bookshelf", flag: "ch2_bookshelf_seen" },
+        trigger_31: { sceneId: "ch2_bedroom_bookshelf", flag: "ch2_bookshelf_seen" },
+        trigger_32: { sceneId: "ch2_bedroom_bed", flag: "ch2_plan_bed_seen" },
+        trigger_37: { sceneId: "ch2_bedroom_leave_blocked", flag: "ch2_plan_leave_seen" },
+        trigger_28: { sceneId: "ch2_bedroom_trash", flag: "ch2_bedroom_trash_seen" },
+        trigger_33: { sceneId: "ch2_bedroom_plant", flag: "ch2_bedroom_plant_seen" },
+        trigger_26: { sceneId: "ch2_bedroom_computer", flag: "ch2_bedroom_computer_seen" },
+      };
+      if (actualSceneId === "trigger_43" || actualSceneId === "trigger_44") {
+        if (!state.flags["ch2_hid_outsider_items"]) {
+          dispatch({ type: "SET_FLAG", flag: "ch2_hid_outsider_items" });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "change_ground_image", payload: { key: "ground_bedroom" } });
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_bedroom_luggage" });
+          return;
+        }
+        return;
+      }
+      if (actualSceneId === "trigger_25") {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "move_player_path", payload: { path: ["spawn_spawn_35"], direction: "back", standAfter: false, freezeAfter: true, speed: 120 } });
+        setTimeout(() => {
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "apply_player_state", payload: { playerState: "yps_frames_sit_back" } });
+        }, 600);
+        const leaveBedroomSeat = () => {
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "player_stand_up" });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "teleport_to_spawn", payload: { spawnId: "spawn_spawn_36" } });
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "apply_player_state", payload: { playerState: "yps_frames_stand_front" } });
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          window.removeEventListener("keydown", leaveBedroomSeat);
+        };
+        setTimeout(() => window.addEventListener("keydown", leaveBedroomSeat, { once: true }), 650);
+        return;
+      }
+      if (actualSceneId === "trigger_27") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_bedroom_rules_found" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_plan_book_read" });
+        return;
+      }
+      const mapped = bedroomTriggerMap[actualSceneId];
+      if (mapped) {
+        if (mapped.flag) dispatch({ type: "SET_FLAG", flag: mapped.flag });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: mapped.sceneId });
+        return;
+      }
+    }
+
+    // ── 第2章：家庭区域触发器 ──
+    if (state.currentMapId === "livingroom") {
+      if (actualSceneId === "trigger_68") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_family_photo_seen" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_family_photo" });
+        return;
+      }
+      if (actualSceneId === "trigger_62") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_family_rules_found" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_family_rules" });
+        return;
+      }
+      if (actualSceneId === "trigger_69") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_livingroom_tv" });
+        return;
+      }
+      if (actualSceneId === "trigger_70") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_livingroom_plant" });
+        return;
+      }
+      if (actualSceneId === "trigger_67") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_livingroom_exit_blocked" });
+        return;
+      }
+      if (actualSceneId === "trigger_63") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        if (state.flags["ch2_family_rules_found"]) {
+          dispatch({ type: "SET_FLAG", flag: "ch2_parents_bedroom_noticed" });
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_parents_bedroom_notice" });
+        } else {
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_family_rules_missing" });
+        }
+        return;
+      }
+      if (actualSceneId === "trigger_66") {
+        if (state.flags["ch2_family_rules_found"]) {
+          dispatch({ type: "CHANGE_MAP", mapId: "bathroom", spawnId: "spawn_bathroom_door", position: { x: 0, y: 0 } });
+          gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "bathroom", spawnId: "spawn_bathroom_door", playerState: "yps_frames_stand_front" });
+          dispatch({ type: "DIALOG_END" });
+          setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
+        } else {
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_family_rules_missing" });
+        }
+        return;
+      }
+      if (actualSceneId === "trigger_65") {
+        if (state.flags["ch2_family_rules_found"]) {
+          dispatch({ type: "CHANGE_MAP", mapId: "kitchen", spawnId: "spawn_kitchen_door", position: { x: 0, y: 0 } });
+          gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "kitchen", spawnId: "spawn_kitchen_door", playerState: "yps_frames_stand_front" });
+          dispatch({ type: "DIALOG_END" });
+          setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
+        } else {
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_family_rules_missing" });
+        }
+        return;
+      }
+    }
+
+    if (state.currentMapId === "bathroom") {
+      if (actualSceneId === "trigger_16") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_bathroom_trash" });
+        return;
+      }
+      if (["trigger_18", "trigger_20", "trigger_21", "trigger_22"].includes(actualSceneId)) {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_bathroom_empty" });
+        return;
+      }
+      if (actualSceneId === "trigger_19") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_bathroom_rules_found" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_bathroom_rules" });
+        return;
+      }
+      if (actualSceneId === "trigger_17") {
+        if (state.flags["ch2_bathroom_rules_found"]) dispatch({ type: "SET_FLAG", flag: "ch2_mirror_entry_suspected" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: state.flags["ch2_bathroom_rules_found"] ? "ch2_bathroom_mirror" : "ch2_bathroom_empty" });
+        return;
+      }
+      if (actualSceneId === "door_livingroom") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_bathroom_leave_blocked" });
+        return;
+      }
+    }
+
+    if (state.currentMapId === "kitchen") {
+      if (actualSceneId === "trigger_18") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_kitchen_rules_found" });
+        dispatch({ type: "SET_FLAG", flag: "ch2_food_rule_loophole_found" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_kitchen_rules" });
+        return;
+      }
+      if (actualSceneId === "door_livingroom") {
+        if (!state.flags["ch2_kitchen_rules_found"]) {
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_kitchen_leave_blocked" });
+          return;
+        }
+        dispatch({ type: "CHANGE_MAP", mapId: "livingroom", spawnId: "spawn_spawn_76", position: { x: 0, y: 0 } });
+        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "livingroom", spawnId: "spawn_spawn_76", playerState: "yps_frames_stand_front" });
+        dispatch({ type: "DIALOG_END" });
+        setTimeout(() => {
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_home_investigation_end" });
+        }, 700);
+        return;
+      }
+    }
+
     // ── 第4章：教室午休探索触发器 ──
     if (state.currentMapId === "classroom") {
       const isCh4Lunch = state.currentSceneId === "" && (
@@ -1906,12 +2552,37 @@ export default function App() {
     setFloatingTexts(prev => prev.filter(item => item.id !== id));
   }, []);
 
-  const runFloatingTextSequence = useCallback(async (sequence: "wishes" | "snowball" | "backlash", nextSceneId: string) => {
+  const runFloatingTextSequence = useCallback(async (sequence: "wishes" | "snowball" | "backlash" | "parents", nextSceneId: string) => {
     setFloatingTextPerformanceActive(true);
     const show = async (item: Omit<FloatingTextItem, "id">, delay: number) => {
       addFloatingText(item);
       await wait(delay);
     };
+
+    if (sequence === "parents") {
+      setFloatingTexts([]);
+      const showSingle = async (text: string, x: string, y: string, delay = 2400, width = "34%") => {
+        const id = addFloatingText({ text, x, y, fontSize: 25, width, variant: "normal" });
+        await wait(delay);
+        removeFloatingText(id);
+        await wait(260);
+      };
+      await showSingle("母亲：你什么时候回来的？之前不是说大概十一点才到家吗？", "58%", "24%", 3000);
+      await showSingle("父亲：没什么事，我就先回来了。", "12%", "36%", 2400);
+      await showSingle("母亲：……你说的休假是骗我的，对么？", "58%", "32%", 3000);
+      await showSingle("外面传来一阵摩擦声，貌似是母亲在父亲身边坐下了。", "50%", "50%", 3000, "42%");
+      await showSingle("母亲：你被裁了？", "58%", "28%", 2200);
+      await showSingle("父亲：……", "12%", "36%", 1800);
+      await showSingle("母亲：好，我知道了。这些年攒下了一些积蓄，够平生读大学。我这边还能再撑一会。", "58%", "30%", 4200);
+      await showSingle("父亲：是我对不起你们……", "12%", "38%", 2600);
+      await showSingle("母亲：别说了。经济不景气，房地产更是……我们这样的寻常百姓又能左右什么？认命吧。", "58%", "34%", 4600);
+      await showSingle("厨房传来哗哗水声。", "50%", "50%", 2200, "34%");
+      await showSingle("母亲：你要是真觉得对不起我们，就主动帮我把家务干了。", "58%", "36%", 3600);
+      setFloatingTexts([]);
+      setFloatingTextPerformanceActive(false);
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
 
     if (sequence === "wishes") {
       setFloatingTexts([]);
@@ -2027,6 +2698,20 @@ export default function App() {
       .filter((spawnId) => !occupiedSpawns.has(spawnId));
     const selected = [...candidates].sort(() => Math.random() - 0.5).slice(0, 3);
     fillClassroomSeats(Array.from(occupiedSpawns), selected, true);
+  }, [fillClassroomSeats]);
+
+  const setupCh3Classroom = useCallback(() => {
+    fillClassroomSeats(["spawn_spawn_132", "spawn_spawn_127", "spawn_spawn_117", "spawn_spawn_145", "spawn_spawn_253", "spawn_spawn_255"]);
+    gameBridge.sendToPhaser({
+      type: "STORY_EVENT",
+      eventId: "spawn_npc",
+      payload: { spawnId: "spawn_spawn_255", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" },
+    });
+    gameBridge.sendToPhaser({
+      type: "STORY_EVENT",
+      eventId: "spawn_npc",
+      payload: { spawnId: "spawn_spawn_253", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames", direction: "front" },
+    });
   }, [fillClassroomSeats]);
 
   const enterClassroomScene = useCallback((spawnId: string, sceneId: string, setup?: () => void, fallbackPlayerState?: string) => {
@@ -2295,13 +2980,25 @@ export default function App() {
         </div>
       )}
 
+      {dialogScene?.cgMode && dialogScene.phoneChat && !dialogScene.background && (
+        <div className="phone-cg-blackout" aria-hidden="true" />
+      )}
+
       {/* ── 手机群聊演出层 ── */}
       {dialogScene?.phoneChat && (
         <PhoneChatOverlay
-          key={dialogScene.id}
           sceneId={dialogScene.id}
           chat={dialogScene.phoneChat}
-          onComplete={() => setCompletedPhoneChats(prev => ({ ...prev, [dialogScene.id]: true }))}
+          onComplete={() => {
+            setCompletedPhoneChats(prev => ({ ...prev, [dialogScene.id]: true }));
+            const chat = scenes[dialogScene.id]?.phoneChat;
+            if (!chat || (chat.view && chat.view !== "chat") || chat.messages.length === 0) return;
+            const key = `${chat.title}::${chat.subtitle ?? ""}`;
+            setPhoneChatHistories(prev => ({
+              ...prev,
+              [key]: [...(prev[key] ?? []), ...chat.messages],
+            }));
+          }}
         />
       )}
 
@@ -2311,8 +3008,9 @@ export default function App() {
           scene={dialogScene}
           onNext={handleNext}
           onChoose={handleChoose}
-          hideUi={floatingTextPerformanceActive || aiSceneIsLoading}
+          hideUi={floatingTextPerformanceActive || aiSceneIsLoading || phoneChatIsBlocking}
           centerImageSrc={dialogScene.id === "ch8_demo_ending" ? demoPortrait?.imageDataUrl : undefined}
+          shouldTransitionTo={shouldCgTransitionTo}
           preserveForPerformance={[
             "ch6_ritual_wishes",
             "ch6_ritual_desire_snowball",
@@ -2327,6 +3025,7 @@ export default function App() {
           onChoose={handleChoose}
           onAIEvent={handleAIEvent}
           onClose={handleCloseDialog}
+          onSegmentDone={handleDialogSegmentDone}
         />
       )}
 

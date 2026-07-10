@@ -1354,6 +1354,44 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": 11,
+          "name": "occlusion_88",
+          "type": "furniture",
+          "x": 555,
+          "y": 541,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 2,
+              "y": 18
+            },
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 261,
+              "y": 1
+            },
+            {
+              "x": 262,
+              "y": 21
+            },
+            {
+              "x": 0,
+              "y": 20
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
         }
       ]
     },
@@ -1554,8 +1592,8 @@
         {
           "id": 200,
           "name": "spawn_spawn_71",
-          "x": 581,
-          "y": 321,
+          "x": 582,
+          "y": 313,
           "width": 32,
           "height": 32
         },
@@ -1563,15 +1601,15 @@
           "id": 201,
           "name": "spawn_spawn_72",
           "x": 728,
-          "y": 322,
+          "y": 281,
           "width": 32,
           "height": 32
         },
         {
           "id": 202,
           "name": "spawn_spawn_73",
-          "x": 728,
-          "y": 247,
+          "x": 729,
+          "y": 208,
           "width": 32,
           "height": 32
         },
@@ -1626,8 +1664,8 @@
         {
           "id": 209,
           "name": "spawn_spawn_78",
-          "x": 1022,
-          "y": 630,
+          "x": 1023,
+          "y": 611,
           "width": 32,
           "height": 32
         },
@@ -1666,16 +1704,8 @@
         {
           "id": 214,
           "name": "spawn_spawn_87",
-          "x": 1053,
-          "y": 477,
-          "width": 32,
-          "height": 32
-        },
-        {
-          "id": 215,
-          "name": "spawn_spawn_88",
-          "x": 1141,
-          "y": 476,
+          "x": 656,
+          "y": 416,
           "width": 32,
           "height": 32
         }
@@ -1697,7 +1727,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 266,
+  "nextobjectid": 265,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

@@ -42,6 +42,14 @@ export const AssetManifest = {
       tilesetKey: "tileset_bedroom",
       tilesetImage: "/assets/maps/bedroom/tileset.png",
     },
+    bedroom_luggage: {
+      mapKey: "map_bedroom_luggage",
+      mapJson: "/assets/maps/bedroom/new_map.json",
+      groundKey: "ground_bedroom_luggage",
+      groundImage: "/assets/maps/bedroom/主角房间(带行李).png",
+      tilesetKey: "tileset_bedroom_luggage",
+      tilesetImage: "/assets/maps/bedroom/tileset.png",
+    },
     bedroom_parents: {
       mapKey: "map_bedroom_parents",
       mapJson: "/assets/maps/bedroom_parents/map.json",
@@ -233,7 +241,7 @@ export const AssetManifest = {
   frames: [
     { key: "yps_frames", run: true, sit: true, stand: true },
     { key: "ly_frames", run: true, sit: true, stand: true, displayScaleMultiplier: 4 },
-    { key: "cyh_frames", run: true, stand: true, displayScaleMultiplier: 4 },
+    { key: "cyh_frames", run: true, stand: true },
     {
       key: "dad_frames",
       run: true,
@@ -281,16 +289,15 @@ export const AssetManifest = {
         sit_front: "frame_010.png", sit_back: "frame_028.png", sit_left: "frame_019.png", sit_right: "frame_022.png",
       },
     },
-    { key: "roommateA_frames", run: true, stand: true, displayScaleMultiplier: 4 },
+    { key: "roommateA_frames", run: true, stand: true },
     {
       key: "roommateB_frames",
       run: true,
       stand: true,
-      displayScaleMultiplier: 4,
       directoryOverrides: { stand_back: "roommateB2_frames_stand_back" },
     },
-    { key: "shop_assistant_female_frames", stand: true, displayScaleMultiplier: 4 },
-    { key: "shop_assistant_male_frames", stand: true, displayScaleMultiplier: 4 },
+    { key: "shop_assistant_female_frames", stand: true },
+    { key: "shop_assistant_male_frames", stand: true },
     {
       key: "teacher_frames",
       run: true,

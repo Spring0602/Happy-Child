@@ -167,6 +167,7 @@ async function callHunyuan(prompt: string, mockType: MockType): Promise<Record<s
           max_tokens: 2400,
         }),
         signal: AbortSignal.timeout(timeoutMs),
+        dispatcher: getProxyAgent(),
       });
 
       if (!response.ok) {

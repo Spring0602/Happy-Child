@@ -8,6 +8,7 @@ interface Props {
   hideUi?: boolean;
   centerImageSrc?: string;
   preserveForPerformance?: boolean;
+  shouldTransitionTo?: (nextSceneId: string) => boolean;
 }
 
 /** 主角说话者名单 */
@@ -91,7 +92,7 @@ function splitDialogSegments(text: string, fallbackSpeaker: string | undefined):
   return segments.length > 0 ? segments : [{ speaker: fallbackSpeaker, text: normalizedText }];
 }
 
-export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImageSrc, preserveForPerformance = false }: Props) {
+export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImageSrc, preserveForPerformance = false, shouldTransitionTo }: Props) {
   const hasChoices = scene.choices && scene.choices.length > 0;
 
   // 稳定化 paragraphs 数组引用，避免每次都触发 useEffect
@@ -159,19 +160,24 @@ export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImage
 
   const goNextWithFade = useCallback(() => {
     if (exiting) return;
-    if (preserveForPerformance) {
+    const nextSceneId = scene.nextSceneId || "";
+    if (preserveForPerformance || shouldTransitionTo?.(nextSceneId) === false) {
       onNext(scene.nextSceneId || "");
       return;
     }
     setExiting(true);
     window.setTimeout(() => onNext(scene.nextSceneId || ""), 360);
-  }, [exiting, onNext, preserveForPerformance, scene.nextSceneId]);
+  }, [exiting, onNext, preserveForPerformance, scene.nextSceneId, shouldTransitionTo]);
 
   const chooseWithFade = useCallback((choice: Choice) => {
     if (exiting) return;
+    if (shouldTransitionTo?.(choice.nextSceneId) === false) {
+      onChoose(choice);
+      return;
+    }
     setExiting(true);
     window.setTimeout(() => onChoose(choice), 360);
-  }, [exiting, onChoose]);
+  }, [exiting, onChoose, shouldTransitionTo]);
 
   // 空格键：快进打字 / 下一段 / 下一页
   const handleSpace = useCallback(() => {
@@ -205,11 +211,17 @@ export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImage
   // 是否显示向下箭头（当前段打字完成 且 还有内容）
   const showArrow = typingDone && !showChoices;
 
+  const overlayClassName = [
+    "cg-overlay",
+    exiting ? "cg-exiting" : "",
+    scene.phoneChat && !scene.background ? "cg-phone-transparent" : "",
+  ].filter(Boolean).join(" ");
+
   return (
-    <div className={`cg-overlay${exiting ? " cg-exiting" : ""}`}>
+    <div className={overlayClassName}>
       {/* 全屏 CG 背景 */}
       <div
-        key={scene.id}
+        key={scene.background || "black"}
         className="cg-background cg-background-fade-in"
         style={scene.background
           ? { backgroundImage: `url(${scene.background})`, backgroundColor: "#000" }

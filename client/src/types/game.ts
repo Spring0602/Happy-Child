@@ -33,6 +33,12 @@ export interface PhoneChat {
   title: string;
   subtitle?: string;
   messages: PhoneChatMessage[];
+  /** 已存在聊天记录，进入场景时直接显示，不重新播放 */
+  initialMessages?: PhoneChatMessage[];
+  /** 手机界面模式：聊天、群成员列表、群公告 */
+  view?: "chat" | "members" | "announcement";
+  members?: string[];
+  announcement?: string;
   /** 手机界面位置，默认居中偏上，避免压到底部对话框 */
   position?: "center" | "left" | "right";
   /** 播放完成前是否阻止进入下一场景，默认 true */

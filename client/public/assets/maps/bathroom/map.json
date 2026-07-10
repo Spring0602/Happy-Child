@@ -326,11 +326,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "????"
             }
           ]
         },
@@ -351,11 +346,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "???"
             }
           ]
         },
@@ -376,11 +366,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -401,19 +386,14 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
         {
           "id": 104,
           "name": "trigger_19",
-          "x": 177,
-          "y": 381,
+          "x": 223,
+          "y": 404,
           "width": 34.15901245768006,
           "height": 36.22925563693343,
           "properties": [
@@ -426,11 +406,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         },
@@ -451,11 +426,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "???"
             }
           ]
         },
@@ -476,11 +446,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "???"
             }
           ]
         },
@@ -501,11 +466,6 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
-            },
-            {
-              "name": "hintText",
-              "type": "string",
-              "value": "??"
             }
           ]
         }

@@ -7,6 +7,7 @@ interface Props {
   onChoose: (choice: Choice) => void;
   onAIEvent: () => void;
   onClose: () => void;
+  onSegmentDone?: (sceneId: string, segmentText: string, segmentIndex: number) => void;
 }
 
 /** 主角说话者名单 */
@@ -89,7 +90,7 @@ function splitDialogSegments(text: string, fallbackSpeaker: string | undefined):
   return segments.length > 0 ? segments : [{ speaker: fallbackSpeaker, text: normalizedText }];
 }
 
-export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: Props) {
+export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose, onSegmentDone }: Props) {
   const hasChoices = scene.choices && scene.choices.length > 0;
   const hasAIEvent = !!scene.aiEvent;
   const chainEnded = !hasChoices && !hasAIEvent && !scene.nextSceneId;
@@ -105,6 +106,7 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
   // ⚠️ scene 切换时重置段落（修复选项后对话框空白的 bug）
   useEffect(() => {
     setCurrentParagraph(0);
+    completedSegmentRef.current = null;
   }, [scene.id]);
 
   // 打字机效果状态
@@ -112,6 +114,7 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
   const [typingDone, setTypingDone] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lenRef = useRef(0);
+  const completedSegmentRef = useRef<string | null>(null);
   const showChoices = !!hasChoices && typingDone && currentParagraph >= totalParagraphs - 1;
 
   // 段落切换时重置打字机
@@ -148,6 +151,14 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose }: P
 
   // 当前段落的完整文本
   const fullText = currentSegment.text || "";
+
+  useEffect(() => {
+    if (!typingDone || !onSegmentDone) return;
+    const key = `${scene.id}:${currentParagraph}:${fullText}`;
+    if (completedSegmentRef.current === key) return;
+    completedSegmentRef.current = key;
+    onSegmentDone(scene.id, fullText, currentParagraph);
+  }, [typingDone, onSegmentDone, scene.id, currentParagraph, fullText]);
 
   // 空格键
   const handleSpace = useCallback(() => {

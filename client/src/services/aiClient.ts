@@ -1,6 +1,9 @@
 import type { GameState } from "../types/game";
 
-const API_BASE = import.meta.env.VITE_AI_SERVER_URL ?? "http://localhost:3001";
+const API_BASE = import.meta.env.VITE_AI_SERVER_URL
+  ?? (typeof window !== "undefined" && window.location.hostname
+    ? `${window.location.protocol}//${window.location.hostname}:3001`
+    : "http://localhost:3001");
 
 async function postJSON<T>(path: string, payload: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -12,7 +15,8 @@ async function postJSON<T>(path: string, payload: unknown): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`AI request failed: ${path}`);
+    const detail = await response.text().catch(() => "");
+    throw new Error(`AI request failed: ${path} (${response.status}) ${detail.slice(0, 300)}`);
   }
 
   return response.json() as Promise<T>;
@@ -37,12 +41,14 @@ export async function generateAiScene(
   sceneId: string,
   mode: "dialogue" | "fragment",
   prompt: string,
-  requiredLines: string[] = []
+  requiredLines: string[] = [],
+  context = ""
 ) {
   return postJSON<{ ok: boolean; result: { script: string } }>("/api/generate-scene", {
     gameState,
     sceneId,
     mode,
+    context,
     prompt,
     requiredLines,
   });

@@ -34,17 +34,18 @@ aiRouter.post("/npc-dialogue", async (req, res) => {
 
 aiRouter.post("/generate-scene", async (req, res) => {
   try {
-    const { gameState, sceneId, mode, prompt, requiredLines } = req.body;
+    const { gameState, sceneId, mode, prompt, context, requiredLines } = req.body;
     if (!gameState || typeof sceneId !== "string" || typeof prompt !== "string") {
       res.status(400).json({ ok: false, message: "invalid scene generation request" });
       return;
     }
+    const normalizedContext = typeof context === "string" ? context : "";
     const normalizedMode = mode === "dialogue" ? "dialogue" : "fragment";
     const normalizedRequiredLines = Array.isArray(requiredLines)
       ? requiredLines.filter((line): line is string => typeof line === "string")
       : [];
     const result = await callLLM(
-      sceneFragmentPrompt(gameState, sceneId, normalizedMode, prompt, normalizedRequiredLines),
+      sceneFragmentPrompt(gameState, sceneId, normalizedMode, normalizedContext, prompt, normalizedRequiredLines),
       "scene_fragment"
     );
     if (typeof result.script === "string") {

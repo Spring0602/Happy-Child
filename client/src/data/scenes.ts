@@ -1,4 +1,5 @@
 import type { Scene } from "../types/game";
+import { ch2Scenes } from "./ch2Scenes";
 
 // ══════════════════════════════════════════════════════════════
 // scenes.ts · 第1章场景树 + 客厅交互场景
@@ -2137,11 +2138,289 @@ export const scenes: Record<string, Scene> = {
     background: "",
     speaker: "系统",
     text: "欢迎参赛者来到\u201C人类进化计划\u201D候场区~",
-    // 第一章完 — 不设 nextSceneId，等待第二章接入
+    nextSceneId: "ch2_game_start",
   },
 
 
+  ...ch2Scenes,
+
   // ══════════════════════════════════════════════
+  // ══════════════════════════════════════════════
+  // 第3章 · 学校初入
+  // ══════════════════════════════════════════════
+
+  ch3_classroom_entrance: {
+    id: "ch3_classroom_entrance",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    playerState: "yps_frames_sit_back",
+    text: "[旁白]距离考试还有十五分钟的时候，教室终于热闹起来。\n\n我放下手中的笔记本，开始默默观察周围的同学。\n\n[旁白]班级里大致分为两个阵营——一部分学生安静地学习，自动屏蔽了周围的一切；另一部分学生尽情发挥他们的幽默细胞，把原本死气沉沉的气氛炒得火热。\n\n我有些不适地皱起了眉。\n\n[主角]（我怎么感觉这个班级就是我曾经高中班级的复刻版？）\n\n[旁白]我甚至都可以完美把高中同学的形象代入他们。\n\n比如，当时我们的班级第一——周骐瑞，高考考去了清华大学。又比如，当时我们班的吉祥物——刘宇，虽然闹腾但脑子非常好使，最后也去了c9。\n\n[主角]（至于我……）",
+    nextSceneId: "ch3_homework_prank_start",
+  },
+
+  ch3_homework_prank_start: {
+    id: "ch3_homework_prank_start",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    playerState: "yps_frames_sit_back",
+    text: "[NPC:周骐瑞]刘宇！你又把我作业藏哪了？\n\n[旁白]思绪应声而断。我朝声源看去，对上一张似曾相识的脸。\n\n[主角]（周骐瑞？不对，他不长这样。）\n\n[旁白]一个灵活的身影在课桌间窜来窜去，不知何时把一本教辅扔到了我的腿上。\n\n[旁白]封面上用油性笔写着“周骐瑞”三个字。\n\n[NPC:刘宇]（笑）诶呀，周骐瑞，你这就冤枉我了。你的作业真不在我这。\n\n[NPC:周骐瑞]我信你个鬼。\n\n[旁白]周骐瑞大步走到刘宇座位旁，毫不客气地翻他的抽屉。刘宇则大大方方地给他让了个位置。\n\n我拿着周骐瑞的作业，不知所措。\n\n我无助地看向刘宇，对方立即会意，朝我挤眉弄眼，并做了一个“你懂的”的嘴形。\n\n[旁白]我瞬间无语。\n\n[主角]（这还真是和我认识的那个刘宇一模一样。）",
+    nextSceneId: "ch3_homework_choice",
+  },
+
+  ch3_homework_choice: {
+    id: "ch3_homework_choice",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    text: "",
+    choices: [
+      { id: "ch3_joined_prank", text: "我十分配合地把周骐瑞的作业扔到了旁边哥们的腿上", nextSceneId: "ch3_prank_joined", effects: { trust: 1, joyPerception: 1 }, tags: ["融入关系", "临场应变", "幽默感"] },
+      { id: "ch3_returned_homework", text: "我想了想还是把作业放回了周骐瑞的座位上", nextSceneId: "ch3_prank_returned", effects: { selfProtection: 1, trust: -1 }, tags: ["规避风险", "诚实", "低融入"] },
+    ],
+  },
+
+  ch3_prank_joined: {
+    id: "ch3_prank_joined",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    text: "[旁白]我十分配合地把周骐瑞的作业扔到了旁边哥们的腿上。随后他又丝滑地把作业丢到了另一个人的腿上。\n\n[旁白]我盯着那本作业，前前后后记了四个人的脸。\n\n[主角]（看来我们几个人和刘宇关系很好。）",
+    nextSceneId: "ch3_prank_laughter",
+  },
+
+  ch3_prank_returned: {
+    id: "ch3_prank_returned",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    text: "[旁白]我犹豫片刻，还是起身把作业递给周骐瑞。\n\n[主角说]在我这里。\n\n[旁白]教室里短暂安静了一瞬。刘宇挑起眉毛，像是第一次发现我也会不按套路出牌。\n\n[NPC:周骐瑞]……谢了。\n\n[旁白]周骐瑞沉默着看向我，没有立刻离开。他的目光带着些许审视的意味，像是察觉到了某种不协调。\n\n[主角]（有什么不对吗？）\n\n[旁白]但我识趣地没有开口询问。\n\n刘宇看着我们，意味深长地笑了起来，拍了拍周骐瑞的肩膀。\n\n[NPC:刘宇]好了，周骐瑞，东西找到了，就别缠着我们可怜的小叶同学了。\n\n[旁白]周骐瑞狠狠剜了他一眼，转身回到座位上。",
+    nextSceneId: "ch3_empty_seat_seen",
+  },
+
+  ch3_prank_laughter: {
+    id: "ch3_prank_laughter",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[NPC:周骐瑞]不在你这里。你藏哪了？\n\n[旁白]刘宇无辜地耸了耸肩。刘宇的四个合伙人把头埋到了桌子以下，个个忍不住偷笑。\n\n此时的场景逐渐和我记忆中的场景重合，让我有一种穿越到几年前的错觉。强烈的感概冲垮了警觉在潜意识中筑起的长堤，让我紧绷了一天的神经忽然放松下来。\n\n[NPC:周骐瑞]你笑什么？\n\n[旁白]周骐瑞的声音拉回我的注意力。我看见他脸上不悦的神情，警戒心立刻重新拉满。\n\n[主角说]你说我？\n\n[NPC:周骐瑞]不说你说谁？你小子别装傻。刘宇是不是把我作业给你了？\n\n[旁白]我居然无意识地笑了。\n\n[主角]（不，不一样。）\n\n[旁白]当时的我，和这两个人都不熟，周骐瑞不可能注意到我在笑他。他会注意到我，是因为现在的“我”是刘宇的朋友之一，一个在我记忆中并不存在的人。\n\n[主角]（那，谁是记忆中的我？）",
+    nextSceneId: "ch3_empty_seat_choice",
+  },
+
+  ch3_empty_seat_choice: {
+    id: "ch3_empty_seat_choice",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]想到这里，我背后一阵恶寒。",
+    choices: [
+      { id: "ch3_checked_old_seat_directly", text: "我迅速将目光锁定到我高三时所坐的位置", nextSceneId: "ch3_empty_seat_seen", effects: { truthDesire: 1, realityJudgment: 1 }, tags: ["直觉判断", "真相欲望", "高警觉"] },
+      { id: "ch3_checked_old_seat_carefully", text: "我委屈道：“真不在我这啊。”，之后悄悄用余光瞥向我高三时所坐的位置", nextSceneId: "ch3_respond_zqr_then_seat", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["伪装", "临场应变", "谨慎"] },
+    ],
+  },
+
+  ch3_empty_seat_seen: {
+    id: "ch3_empty_seat_seen",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我迅速将目光锁定到高三时自己所坐的位置。\n\n[旁白]那里空无一人。\n\n[旁白]我又多看了几眼，确定那里确实没人。\n\n[主角]（怎么会这样？）\n\n[旁白]我加重呼吸，试图让自己冷静下来。",
+    nextSceneId: "ch3_liuyu_intervenes",
+  },
+
+  ch3_respond_zqr_then_seat: {
+    id: "ch3_respond_zqr_then_seat",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[NPC:周骐瑞]是吗？\n\n[旁白]我维持着尴尬的笑，视线却移到后方，落到记忆中自己的座位。\n\n[旁白]那里空无一人。\n\n[主角]（空的。为什么会是空的？）\n\n[旁白]我加重呼吸，试图让自己冷静下来。",
+    nextSceneId: "ch3_liuyu_intervenes",
+  },
+
+  ch3_liuyu_intervenes: {
+    id: "ch3_liuyu_intervenes",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]一只手毫无征兆地搭在我的肩膀上。我猛地回头，条件反射想站起来离开座位。\n\n[旁白]那只手稳稳把我按回座位，又带着安抚意味轻轻捏了捏我的肩膀。",
+    nextSceneId: "ch3_liuyu_check_state",
+  },
+
+  ch3_liuyu_check_state: {
+    id: "ch3_liuyu_check_state",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "【AI片段提示】考试前教室，刘宇察觉主角状态异常，替主角支开周骐瑞。",
+    nextSceneId: "ch3_exam_begins",
+  },
+
+  ch3_exam_begins: {
+    id: "ch3_exam_begins",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]十八点五十五，刘宇作为班长开始分发试卷。\n\n[旁白]然而，本次考试并不是我预想中的综合考试，而是一本十多页的问卷。\n\n[主角]（其他人的答题内容和我一样吗？）\n\n[旁白]大家都埋头答题，落笔的沙沙声不绝于耳。他们的表情没有一点惊讶。\n\n[主角]（晚点再查吧。）\n\n[旁白]我翻开试卷。\n\n[NPC:系统]优秀学生品质测试。\n\n[旁白]接着是几行猩红的字迹。很明显，这是系统安排的答题规则。\n\n[NPC:系统]所有问题请如实回答，否则即刻抹杀。我们一直在看着你。\n\n[旁白]我吞了口唾沫。\n\n[主角]（看着我？都是些什么东西在看着我？）\n\n[旁白]我定了定神，提起笔，开始答题。\n\n[旁白]和往常的测试题目不一样，这套测试并没有采用选择题的模式，而是采用了问答题的模式。据我了解，目前的心理测试均采用选择题模式，有限的选项方便统计分析，而测试的受众均是群体。\n\n[主角]（那么是否可以推出，这套测试是专门为我量身定做的？）\n\n[NPC:系统]Q1：在你的学习生涯中，你对自己学习的目的有思考吗？如果有，那是什么？\n\n[主角说]有思考，且反反复复思考过很多次。因为推翻的假设太多，树立的新认知也太多，无法准确描述它是什么。\n\n[NPC:系统]Q2：班主任告诉你，不要有太多自己的想法，目前脑子里就只想着高考一件事就行。对此，你怎么看？\n\n[主角说]跟他对着干。\n\n[旁白]一连串几十题，都是我在过去人生中早就思考过的问题。答到最后，我甚至有些疲倦。\n\n[旁白]直到最后一题出现。\n\n[NPC:系统]如果向神明献祭一名人类英雄就可以换取人类社会一百年的和平，你会如何选择？\n\n[主角]（这是什么意思？）\n\n[旁白]看起来像是某种预言。莫非在以后的比赛中会设置这样的情景吗？",
+    nextSceneId: "ch3_final_question_choice",
+  },
+
+  ch3_final_question_choice: {
+    id: "ch3_final_question_choice",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我思考了一会，最后写下了——",
+    choices: [
+      { id: "ch3_answered_final_complex", text: "这种问题应该视具体情况而定，不可一概而论", nextSceneId: "ch3_final_answer_safe", effects: { realityJudgment: 2, authorityResistance: 1 }, tags: ["复杂思考", "反功利主义", "现实判断"] },
+      { id: "ch3_answered_final_utilitarian", text: "牺牲一人拯救人类百年和平", nextSceneId: "ch3_final_answer_warning", effects: { selfProtection: 1, realityJudgment: -1 }, tags: ["功利选择", "自我保护", "服从题面"] },
+      { id: "ch3_answered_final_resist", text: "留下那名英雄", nextSceneId: "ch3_final_answer_warning", effects: { authorityResistance: 1, realityJudgment: -1 }, tags: ["直觉反抗", "情感判断"] },
+    ],
+  },
+
+  ch3_final_answer_safe: {
+    id: "ch3_final_answer_safe",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]这种问题应该视具体情况而定，不可一概而论。\n\n[旁白]就问题本身而言，描述还是太苍白了，我是不会轻易做出选择的。且不论系统对“人类英雄”的定义是什么，在整个比赛机制笼罩下的人类社会如果真的安逸地过了100年，那么当比赛卷土重来的时候，损失只会比在危机情况下更惨重。\n\n和对方签署这样委曲求全的协议，不过是苟且偷生，如果人类不主动面对它们、不积极研究它们，掌握主动权，最终只能走向灭绝。\n\n落笔后，试卷和之前一样并没有出现异常。",
+    nextSceneId: "ch3_after_exam_gate",
+  },
+
+  ch3_final_answer_warning: {
+    id: "ch3_final_answer_warning",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我写下答案的瞬间，笔尖忽然停住。\n\n[旁白]一股强烈的不适感从胸口升起，不是违规提醒，更像是人类原始的劣根性在身体深处短暂醒来，化成了实体。\n\n[主角]（不对。这个答案太草率了。）\n\n[旁白]我划掉原句，在旁边补上：\n\n[主角说]但该结论必须建立在信息充分、主体自愿且人类不放弃抵抗的前提下。否则不可接受。\n\n[旁白]不适感缓缓散去。",
+    nextSceneId: "ch3_after_exam_gate",
+  },
+
+  ch3_after_exam_gate: {
+    id: "ch3_after_exam_gate",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    playerState: "yps_frames_stand_back",
+    text: "[旁白]考完试，我跟着人流往校门口走去。\n\n[旁白]我默默听着同学们的谈话，确认他们讨论的是正常试题。\n\n[主角]（也就是说，异常问卷只针对我。）\n\n[旁白]还有一件事需要确认。\n\n[旁白]我回过头，试图在人流中寻找刘宇的身影。没过多久，他就和一群人嘻嘻哈哈地走了过来。\n\n[NPC:刘宇]嘿，叶平生，今天怎么溜这么快？\n\n[主角说]当然是急着回家呗。这狗考试真是把我折磨死了。\n\n[NPC:刘宇]是啊，最后一题的结果我都没来得及算。不过好在没有不会做的题，哈哈。\n\n[旁白]他自然地把胳膊搭在我的肩膀上，刻意把我和别人拉开距离。\n\n[主角]（这哥们真上道，省得我找机会和他私聊了。）\n\n[NPC:刘宇]啧，你别装蒜了。我怎么感觉你今天一惊一乍的？这几天校内也没发生什么特别的事，难不成是你家里出事了？\n\n[主角]（啊对对对，的确出事了，而且出大事了，甚至会危及生命。）",
+    nextSceneId: "ch3_liuyu_private_talk_choice",
+  },
+
+  ch3_liuyu_private_talk_choice: {
+    id: "ch3_liuyu_private_talk_choice",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    text: "[旁白]我顺着他给的梯子往下爬——",
+    choices: [
+      { id: "ch3_told_liuyu_family_danger", text: "嗯……但是我家里的事，你也没办法帮我吧？", nextSceneId: "ch3_liuyu_help_commitment", effects: { trust: 1, selfProtection: 1 }, tags: ["策略求助", "信任试探", "控制信息"] },
+      { id: "ch3_warned_liuyu_danger", text: "这件事很危险，你真的要帮我吗？", nextSceneId: "ch3_liuyu_help_commitment", effects: { realityJudgment: 1, trust: 1 }, tags: ["边界感", "谨慎合作", "现实判断"] },
+      { id: "ch3_tested_liuyu_loyalty", text: "我不想把你拉进这么危险的事情里，你别管我了", nextSceneId: "ch3_liuyu_help_commitment", effects: { selfProtection: 1, trust: -1 }, tags: ["关系试探", "操控", "风险控制"] },
+      { id: "ch3_asked_count_without_help", text: "诶呀也没什么事，你别担心了我自己可以解决", nextSceneId: "ch3_class_count_question", effects: { selfProtection: 1, trust: -1 }, tags: ["独立调查", "低信任", "信息优先"] },
+    ],
+  },
+
+  ch3_liuyu_help_commitment: {
+    id: "ch3_liuyu_help_commitment",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    text: "【AI片段提示】校门口，主角利用家里出事的说法诱导刘宇承诺帮忙。",
+    nextSceneId: "ch3_class_count_question",
+  },
+
+  ch3_class_count_question: {
+    id: "ch3_class_count_question",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    text: "[旁白]我们沉默了一会。等尴尬的气氛散去了，我终于问出最开始想问的问题。\n\n[主角说]对了，刘宇。\n\n[NPC:刘宇]咋？\n\n[主角说]我们班有几个人啊？\n\n[NPC:刘宇]41个人啊。\n\n[旁白]他用看傻子的眼神看着我。\n\n[主角]（在我的记忆中，我们班只有40个人。加上先前看到的那个空位，结合来看，那个空位属于多出来的同学，也就是——我。）\n\n[旁白]我顿时毛骨悚然。\n\n[旁白]【条件：!ch3_asked_count_without_help】\n\n[NPC:刘宇]你怎么又露出这种表情了？该不会这和你说的那件事有关吧？\n\n[旁白]【条件：ch3_asked_count_without_help】\n\n[NPC:刘宇]你怎么又露出这种表情了？叶平生，你今天到底怎么回事？",
+    nextSceneId: "ch3_gate_explanation_choice",
+  },
+
+  ch3_gate_explanation_choice: {
+    id: "ch3_gate_explanation_choice",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    text: "",
+    choices: [
+      { id: "ch3_used_mother_as_cover", text: "借母亲出现转移话题，说自己只是看到她有点紧张", nextSceneId: "ch3_mother_pickup", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["临场伪装", "保护盟友", "现实判断"] },
+      { id: "ch3_admitted_related_to_liuyu", text: "承认和家里的事有关，但现在不能说", nextSceneId: "ch3_mother_pickup", effects: { trust: 1, selfProtection: 1 }, tags: ["有限坦诚", "信任维持", "边界感"] },
+      { id: "ch3_joked_with_liuyu", text: "反问刘宇为什么这么敏锐，用玩笑盖过去", nextSceneId: "ch3_mother_pickup", effects: { trust: 1, joyPerception: 1 }, tags: ["幽默化解", "关系经营", "控制信息"] },
+    ],
+  },
+
+  ch3_mother_pickup: {
+    id: "ch3_mother_pickup",
+    chapter: "第3章 · 学校初入",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]【条件：ch3_used_mother_as_cover】\n\n[主角说]不是。我只是看到我妈了。\n\n[旁白]【条件：ch3_admitted_related_to_liuyu】\n\n[主角说]有关。但现在不能说。至少不能在这里说。\n\n[旁白]【条件：ch3_joked_with_liuyu】\n\n[主角说]你这观察力，不去当侦探可惜了。\n\n[旁白]校门口，我刚好看到了母亲正靠在车门上等我。\n\n[主角说]我该走了。\n\n[NPC:刘宇]好吧，那我先走了。有事一定要联系我，不准一个人硬撑。\n\n[主角说]好了，知道了。你比我妈还啰嗦。\n\n[旁白]和刘宇告别后，我钻进母亲的车里。",
+    nextSceneId: "ch3_car_home",
+  },
+
+  ch3_car_home: {
+    id: "ch3_car_home",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/家/夜晚车上.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]一路上，我笑着和母亲攀谈，试图营造轻松愉快的气氛。\n\n[主角]（规则明确说我们是幸福的一家。为家人提供足够的情绪价值，也许同样是必要行动。）\n\n[主角]（另外，我需要和他们拉近距离，以获得进入父母房间的许可。）\n\n[旁白]回到家，我先问候父亲，才钻进自己的房间分析一天下来的线索。",
+    nextSceneId: "ch3_night_analysis",
+  },
+
+  ch3_night_analysis: {
+    id: "ch3_night_analysis",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/家/书桌.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角]（如果没用技能，我今天应该已经死了两次。）\n\n[旁白]晚上去学校考试探索时间有限，我目前并没有在教室附近发现类似学校规则的纸张，明天还须仔细勘察。\n\n[旁白]早上吃的饭菜对我的身体还未产生不良影响，但保险起见，我在车上还是找了个理由让母亲同意我在学校吃早餐。而想要调查空座位的事，我先需要一张花名册，这件事可以交给刘宇去办。\n\n接下来，就是每天必须执行的计划表。\n\n从母亲早上的行为来看，她每天早上都要检查我是否写了当日计划、房间是否整洁。\n\n不过，我有个疑问。\n\n[主角]（但我真的有权制定当日计划吗？如果可以，我岂不是可以随意篡改规则？）\n\n[旁白]我翻开计划本，确认了猜想。\n\n[旁白]参赛者没有权限书写规则。计划表会自动更新。\n\n[旁白]明天的计划和今天基本一致，着重写着当天的自主学习计划。\n\n[主角]（我的内心是真的很抗拒。这些东西我是真的不想再学一遍了。）\n\n[旁白]但是更吸引我注意的是，在今天的计划表下方出现了一行红笔批注。\n\n[NPC:我]我真的好累。\n\n[NPC:我]我一点也不快乐，讨好别人一点也不快乐，学习一点也不快乐，和爸妈待在一起一点也不快乐，和冷冰冰的同学一起学习一点也不快乐。\n\n[NPC:我]我快撑不住了。\n\n[主角]（不，等一下。）\n\n[NPC:系统]技能“违规提醒”强烈发动中。",
+    nextSceneId: "ch3_suffocation_start",
+  },
+
+  ch3_suffocation_start: {
+    id: "ch3_suffocation_start",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/意识/与“我”对话.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]突然有一只无形的打手扼住了我的咽喉，并且力道在逐渐收紧。\n\n我抓紧脖子瘫倒在地，试图大口呼吸，却只能做出干呕的动作。肺部的氧气迅速减少，窒息感快要把我拍死在这里。\n\n[主角]（不！快想想快乐的事！）\n\n[主角]（偶尔讨好别人也挺开心的不是吗？看到他们露出满意的微笑，自己也会被那种氛围感染吧？）\n\n[NPC:我]别自欺欺人了。\n\n[主角]（你看，解出一道高难度数学题很有成就感对吧？数学规律可以具象化于世界的方方面面，多神奇啊。学习能让你对这个世界了解得越来越多，挖掘出更多的美好。）\n\n[NPC:我]我已经很久没有成就感了……学的东西越多，只会让我越绝望。\n\n[主角]（可你爸妈还是爱你的啊。）\n\n[NPC:我]他们爱我吗？他们只是把自己期望的样子投射到我身上而已。他们只爱自己。\n\n[主角]（想想你的同学。）\n\n[NPC:我]不用想了，他们更不会关心我。",
+    nextSceneId: "ch3_suffocation_resolved",
+  },
+
+  ch3_suffocation_resolved: {
+    id: "ch3_suffocation_resolved",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/意识/与“我”对话.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角]（不……今天，今天你在学校遇到了谁？）\n\n[NPC:我]……！\n\n[主角]（刘宇不是很快就察觉到你的异常了吗？他还告诉你有事一定要找他帮忙。而且你今天，发自内心的笑了一次，不是吗？周骐瑞找作业的样子，你是真心觉得有趣。）\n\n[旁白]脑内的声音沉默了。\n\n[旁白]脖子上的力量骤然消失。我趴在床沿上，拼命呼吸新鲜空气。\n\n[主角]（太险了。再晚一点我就死了。）\n\n[NPC:我]你说服我了。\n\n[NPC:我]但是，明天就不一定了。",
+    nextSceneId: "ch4_exploration_progress",
+  },
+
+  ch3_suffocation_death: {
+    id: "ch3_suffocation_death",
+    chapter: "第3章 · 学校初入",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我忽然感到前所未有的愤怒和委屈。明明我自己在这个随时会面对死亡风险的副本里如此狼狈地活着，居然还要给你这个身在福中不知福的人当树洞。\n\n[主角]（明明最需要树洞的人事我好吗？）\n\n[旁白]这个念头出现的瞬间，扼住咽喉的力量骤然加重。\n\n[旁白]我试图挣扎，却连指尖都抬不起来。计划本摊在地上，红字像活物一样缓慢蔓延。\n\n[NPC:我]看吧。\n\n[NPC:我]你甚至都没有办法证明自己快乐。\n\n[旁白]最后一点空气从肺里挤出去。视野黑下去之前，我忽然明白，这个副本最残忍的地方不是逼人微笑。\n\n[旁白]而是它会让一个人亲口否定自己活下去的理由。\n\n我死了。",
+    nextSceneId: "title_screen",
+  },
+
   // 第4章 · 规则发现（跳过第2、3章时从 ch4_exploration_progress 进入）
   // ══════════════════════════════════════════════
 
@@ -3392,7 +3671,7 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/CG/祭祀/厕所奇遇.png",
     cgMode: true,
     speaker: "旁白",
-    text: "[NPC:男生]你、你别告诉老师。\n\n[旁白]他慌乱地抹了把脸，像是终于意识到这里也并不安全。\n\n[NPC:男生]可我真的不想回去。\n\n[旁白]我看了一眼自己仍在渗血的裤腿，只能压低声音提醒他去洗把脸，别让人看出异常。男生沉默地点点头，低声道了句谢，随后低头离开。",
+    text: "[NPC:男生]你、你别告诉老师。\n\n[旁白]他慌乱地抹了把脸，像是终于意识到这里也并不安全。\n\n[NPC:男生]可我真的不想回去。\n\n[主角说]先洗把脸，别让其他人看出异常。我也必须走了。\n\n[NPC:男生]……谢谢。我、我知道了。\n\n[旁白]男生慢慢点头，拧开水龙头洗了把脸，低着头从另一侧离开厕所。",
     nextSceneId: "ch6_weekly_exam",
   },
 
@@ -3532,11 +3811,661 @@ export const scenes: Record<string, Scene> = {
 
   ch7_rule_skill_initialize: {
     id: "ch7_rule_skill_initialize",
-    chapter: "第7章 · 暂缺",
+    chapter: "第7章 · 坏孩子诞生",
     background: "/assets/CG/祭祀/仪式.png",
     cgMode: true,
     speaker: "旁白",
-    text: "第七章剧情暂由后续版本补完。\n\n学校区域在混乱后进入修复期，而家庭中的镜面异常仍在继续。",
+    text: "[旁白]猩红数字从试卷上脱离，像尖锐的刀刃刺入我的四肢。\n\n[主角说]呃！\n\n[旁白]我还没看清，那些数字就深深地扎入了我的身体里。极致的疼痛从四肢传来，我的眼前黑了几秒，差点疼晕过去。\n\n[NPC:系统]70%。\n\n[主角]（快一点啊系统，我真的要死了。）\n\n[旁白]下唇被咬出了血，每一轮攻击都在逼近我的躯干。\n\n[NPC:系统]100%。",
+    nextSceneId: "ch7_rule_skill_panel",
+  },
+
+  ch7_rule_skill_panel: {
+    id: "ch7_rule_skill_panel",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/祭祀/技能.png",
+    cgMode: true,
+    speaker: "系统",
+    text: "[NPC:系统]主动技能：篡改规则。\n\n[NPC:系统]等级：lv.1。\n\n[NPC:系统]权限：仅删除权。单个任务中只能对一条规则使用，可级联（即相关内容可追溯到根本规则），单个副本中只能使用一次。\n\n[NPC:系统]触发条件：在指定区域叛逆值达到50%。\n\n[NPC:系统]使用方法：念出需要删除的规则。\n\n[主角]（天杀的我的嘴被堵住了啊！）\n\n[旁白]我忍住疼痛，艰难地用舌头将那些纸团从嘴里顶出来。学生们见状，又开始拾起纸将它们揉成团。",
+    nextSceneId: "ch7_delete_rule_struggle",
+  },
+
+  ch7_delete_rule_struggle: {
+    id: "ch7_delete_rule_struggle",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/祭祀/仪式.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角]（我需要抓住这次机会删除一条能给我带来最高回报效益的规则——）",
+    choices: [
+      { id: "ch7_deleted_good_child", text: "删除“成为好孩子”", nextSceneId: "ch7_bad_child_born", effects: { authorityResistance: 2, realityJudgment: 2 }, tags: ["建设性反抗", "根本规则推理", "果断"] },
+      { id: "ch7_deleted_evening_self_study", text: "删除“禁止无故旷掉晚自习”", nextSceneId: "ch7_surface_rule_death", effects: { selfProtection: -2, realityJudgment: -2 }, tags: ["表层规则误判", "现实压力", "逃避痛苦"] },
+      { id: "ch7_deleted_respect_authority", text: "删除“尊师敬长”", nextSceneId: "ch7_surface_rule_death", effects: { authorityResistance: 1, realityJudgment: -2 }, tags: ["表层规则误判", "权威反抗", "冲动"] },
+    ],
+  },
+
+  ch7_surface_rule_death: {
+    id: "ch7_surface_rule_death",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/祭祀/仪式.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]我要删除……咳……那条规则——\n\n[旁白]新的纸团再次堵住我的嘴，但这一次，我的声音依旧被系统捕捉到了。\n\n[NPC:系统]规则删除请求已确认。\n\n[NPC:系统]目标规则属于学校区域表层行为规范。\n\n[NPC:系统]已删除该规则。\n\n[旁白]一瞬间，缠绕在我身上的数字停顿了半拍。\n\n[主角]（成功了？）\n\n[旁白]下一秒，它们重新收紧，甚至比刚才更加凶狠地刺入血肉。\n\n[主角说]啊——！\n\n[NPC:系统]检测到参赛者仍处于违规状态。\n\n[NPC:系统]当前至少存在两项规则冲突。已删除规则仅解除其中一项。\n\n[NPC:系统]被动技能“违规提醒”已在本轮追杀中触发，无法再次生效。\n\n[主角]（不对……我删掉的只是表层规则。）\n\n[旁白]疼痛撕开意识，我终于意识到自己犯了一个致命错误。\\n\\n真正让学校区域瘫痪的，不是某条具体禁令，而是所有惩罚与追杀共同指向的根本身份——“成为好孩子”。\\n\\n只要我仍然被判定为“坏孩子”，杀戮仪式就不会停止。\n\n[旁白]那些红色数字不再避开要害。它们像收到最终命令一样，同时贯穿我的胸口、咽喉和眼眶。\n\n[NPC:系统]追杀进程继续。\n\n[NPC:系统]参赛者生命体征快速下降。\n\n[主角]（原来……机会真的只有一次。）\n\n[旁白]教室里响起整齐而轻微的叹息声。有人把纸团重新摊平，有人低头整理试卷，仿佛刚才发生的一切只是晚自习中一段微不足道的插曲。\\n\\n我的身体被数字钉在原地，血液顺着课桌边缘滴落。视野最后残留的，是黑板上那行端正到刺眼的标语。\n\n[NPC:系统]参赛者死亡。\n\n[旁白]我死了。",
+    nextSceneId: "title_screen",
+  },
+
+  ch7_bad_child_born: {
+    id: "ch7_bad_child_born",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/祭祀/仪式.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]我要删除……咳……“好孩子”——\n\n[旁白]新的纸团再次堵住我的嘴，但声音已经被系统捕捉。\n\n[NPC:系统]已删除规则“成为好孩子”（学校区域）。\n\n[NPC:系统]其余区域对应规则，将在该区域叛逆值达到50%后自动删除。\n\n[NPC:系统]恭喜您在学校区域获得“坏孩子”称号。\n\n[NPC:系统]由于根本身份转变，学校规则进行紧急修复。新规则稍后将发送至您的邮箱，请注意查看。\n\n[NPC:系统]追杀进程强制停止。\n\n[NPC:系统]学校区域暂时关闭。\n\n[旁白]束缚四肢的力量消失。大量失血与过度疼痛终于夺走意识。\n\n[NPC:刘宇]我就说，他没事嘛。",
+    nextSceneId: "ch7_wake_in_car",
+  },
+
+  ch7_wake_in_car: {
+    id: "ch7_wake_in_car",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/家/夜晚车上.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]再次睁眼时，我正坐在母亲的车里。\n\n[NPC:母亲]平生啊，我看了你昨天的理综成绩，还不错，比上次有进步。\n\n[旁白]我立即检查四肢。皮肤光洁平整，没有留下任何伤痕。\n\n[主角]（学校暂时关闭后，它造成的伤害也消失了。但学校重新开放时呢？）\n\n[NPC:母亲]你爸说上个月工作忙，经常出差，这个月想多陪我们几天，所以申请了一周年假。\n\n[主角]（NPC们看不到伤口。刘宇引导我同时触发两条规则，看似背刺，结果却让我激活了主动技能。）\n\n[主角]（但他不可能知道我一定能活下来。他赌的是我确实拥有自己声称的保命能力。）\n\n[主角]（这家伙打的一手好算盘啊。）\n\n[旁白]叛逆值似乎和我违反的规则数量和本质程度相关，同时要提升叛逆值也伴随着巨大的风险。现在家庭区域的叛逆值还没达到50%，我要把握好这个度。\n\n[NPC:母亲]平生？平生！你在听妈妈讲话吗？",
+    nextSceneId: "ch7_car_response_choice",
+  },
+
+  ch7_car_response_choice: {
+    id: "ch7_car_response_choice",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/家/夜晚车上.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我怔了一瞬，连忙答道——",
+    choices: [
+      { id: "ch7_told_mother_thinking", text: "抱歉，妈。今天考试有道题没做出来，我还在思考", nextSceneId: "ch7_rebellion_analysis", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["维持伪装", "自我保护", "现实判断"] },
+      { id: "ch7_tested_mother_memory", text: "昨晚做了噩梦，梦见自己被全校追杀，我有些被吓到了，到现在都心有余悸", nextSceneId: "ch7_mother_memory_response", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["谨慎试探", "家庭调查", "风险控制"] },
+      { id: "ch7_asked_father_leave", text: "抱歉，妈——话说，爸怎么心血来潮申请年假了", nextSceneId: "ch7_mother_memory_response", effects: { empathy: 1, truthDesire: 1 }, tags: ["关注家庭", "主动询问", "敏锐"] },
+    ],
+  },
+
+  ch7_rebellion_analysis: {
+    id: "ch7_rebellion_analysis",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/家/夜晚车上.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[NPC:母亲]好好好，妈妈就不打扰你思考了。\n\n[旁白]叛逆值似乎和我违反的规则数量和本质程度相关，同时要提升叛逆值也伴随着巨大的风险。现在家庭区域的叛逆值还没达到50%，我要把握好这个度。",
+    nextSceneId: "ch7_return_livingroom",
+  },
+
+  ch7_mother_memory_response: {
+    id: "ch7_mother_memory_response",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/家/夜晚车上.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "【AI片段提示】生成一段包含母亲对话、主角内心和旁白的小场景。固定事实：母亲不记得学校追杀与学校区域关闭；母亲相信父亲正在休年假，或选择相信这一说法；母亲最关心主角的学习状态；家庭区域叛逆值尚未达到50%，主角不能在这里暴露规则真相。动态表现：若主角提噩梦，母亲安慰后将话题引回学习与休息；若主角问父亲，母亲短暂迟疑，仍称父亲只是休假；若主角此前经常维持乖巧形象，母亲更容易相信主角。结尾必须自然落到主角判断“家庭区域叛逆值还没达到50%，我要把握好这个度”。不得主动透露父亲失业，不得解释副本规则。",
+    nextSceneId: "ch7_return_livingroom",
+  },
+
+  ch7_return_livingroom: {
+    id: "ch7_return_livingroom",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/livingroom/客厅.png",
+    playerState: "yps_frames_stand_left",
+    speaker: "旁白",
+    text: "[旁白]回到家后，父母很识趣地没有找我的麻烦。在他们眼中，我的高考永远排在第一位。\n\n[旁白]父亲昨天这个时候还没回来，可今天却已经坐在木桌前了。\\n\\n我心生奇怪，忍不住多看了他几眼。\n\n[主角]（貌似有些……颓废？）\n\n[NPC:母亲]平生，你先去学习吧。一会妈妈给你送水果过来。\n\n[主角说]好。\n\n[旁白]我乖乖向房间走去。",
+    nextSceneId: "ch7_overhear_parents",
+  },
+
+  ch7_overhear_parents: {
+    id: "ch7_overhear_parents",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]回到房间，我关上门后将耳朵贴在门上，偷听他们的对话。",
+    nextSceneId: "ch7_parent_unemployment_performance",
+  },
+
+  ch7_overhear_parents_after: {
+    id: "ch7_overhear_parents_after",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角]（这个副本还真是恶趣味。）",
+    nextSceneId: "ch7_family_response_choice",
+  },
+
+  ch7_family_response_choice: {
+    id: "ch7_family_response_choice",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]深吸了一口气，",
+    choices: [
+      { id: "ch7_comforted_father", text: "我走出房间，告诉父亲失业并不是他的个人失败", nextSceneId: "ch7_family_dynamic_response", effects: { empathy: 2, authorityResistance: 1 }, tags: ["主动沟通", "共情", "挑战家庭沉默"] },
+      { id: "ch7_delayed_family_intervention", text: "我冷笑几声，最后选择保持沉默。我这个时候介入实质上并不能改变什么", nextSceneId: "ch7_study_pressure", effects: { realityJudgment: 1, selfProtection: 1 }, tags: ["延迟行动", "风险判断", "克制"] },
+    ],
+  },
+
+  ch7_family_dynamic_response: {
+    id: "ch7_family_dynamic_response",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/livingroom/客厅.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "【AI片段提示】根据玩家表达方式与此前家庭行为轨迹，生成一段包含父亲、母亲、主角对话和旁白的小场景。固定事实：父亲确实失业，并感到愧疚；母亲担忧家庭经济与主角教育支出；本次沟通不能立刻改变父母根本观念，也不能使家庭区域叛逆值达到50%。动态表现：高共情时父亲短暂接受安慰、母亲仍焦虑但减少对父亲的指责；高现实判断时父母愿意听取支出规划，但坚持不能影响主角学习；高反抗或指责时母亲认为主角不该操心大人的事，关系紧张；若主角此前一直表现乖巧，父母会因他的主动介入而惊讶。结尾必须回到“主角意识到今晚不是下手改变父母观念的时机”。",
+    nextSceneId: "ch7_study_pressure",
+  },
+
+  ch7_study_pressure: {
+    id: "ch7_study_pressure",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/家/书桌.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我坐回书桌，按计划表拿出今天额外学习的资料。\\n\\n难度变态的题目比比皆是，大学里学的东西都比这好学多了。因为内卷而年年拔高难度也就算了，做题做得头昏脑胀想半天想不出来也就算了，更让我难以忍受的是，如今的我已经很清楚地认识到大部分努力只是为了支撑虚伪的“溢价”罢了。\\n\\n本质问题没有解决，大部分人都是这缓兵之计的牺牲品。\n\n[主角]（学习知识固然有很多好处，但这种在内卷环境下变得愈加离谱的应试教育怎么可能教给学生终身受益的东西？）\n\n[旁白]窒息感再次袭来。我骂了句脏话，强行止住抱怨。\n\n[主角]（不想写。）\n\n[主角]（我能违反一下规则吗？顺便积累一下叛逆值。）\n\n[旁白]我重新查看房间规则：\n\n[旁白]我们是幸福快乐的一家，我是美好社会中遵纪守法的好公民。\\n\\n我的房间井井有条，我从来不迟到，我的作业不会迟交，我的成绩总是优异，我总是帮父母做家务。\\n\\n我是个自律的人，严格遵守计划表。\\n\\n没提到“好孩子”的前提。\n\n[主角]（那我哪怕用技能删去了家庭区域好孩子的身份也还要遵守这些规则喽？）\n\n[主角]（邮件中提到副本没有具体规则，可能对应的是刘宇所说的我无法找到学校的规则。可在家庭区域中是存在具体规则的。）\n\n[旁白]学校和家有什么区别吗？\\n\\n人数限制是个很大的区别。而且，一个家基本上由父母中的一方或双方说了算，而学校，很难说是由校长说了算，背后还有站得更高眼睛更花的人。\\n\\n在家庭区域内，如果我触发了主动技能，不仅无法修改这些具体的规则，还有可能被父母严格管教。到时候，针对我的规则可能会更多，这对调查很不利。\n\n[主角]（短短几天，从根本上改变父母的观念也不太可能。）\n\n[旁白]我烦躁地转了转手中的笔。\n\n[主角]（难道就真的只能在这些烦人的规则下进行调查吗？这样的话，进入厕所镜子探索这件事会变得很麻烦。罢了，我先试着改变一点他们的观念试试。）\n\n[旁白]确定了计划，我心里有了底，专心写题。\\n\\n途中，母亲端着水果进入房间。她伸手摸过桌面，皱起眉头。\n\n[NPC:母亲]桌子有点脏了。\n\n[旁白]我立刻起身拿抹布清理，险些再次触发违规。\n\n[主角]（她今天情绪很差，不是我下手的好时机。）",
+    nextSceneId: "ch7_trial_signup",
+  },
+
+  ch7_trial_signup: {
+    id: "ch7_trial_signup",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]写完题时已经凌晨，我伸了个懒腰，从包中取出试胆活动宣传册，用自带手机扫描二维码。\n\n[NPC:系统]当前群聊限额6人，是否确认加入？",
+    choices: [
+      { id: "ch7_joined_trial_group", text: "确认加入", nextSceneId: "ch7_trial_group_joined", effects: { truthDesire: 1, trust: 1 }, tags: ["主动探索", "承担风险", "合作意愿"] },
+    ],
+  },
+
+  ch7_trial_group_joined: {
+    id: "ch7_trial_group_joined",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "系统", text: "你已加入群聊。", align: "center", system: true },
+      ],
+    },
+    nextSceneId: "ch7_trial_group_members",
+  },
+
+  ch7_trial_group_members: {
+    id: "ch7_trial_group_members",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]群聊里还剩最后一个名额，而我正是第六个人。\n\n[主角]（学校区域修复时，这些NPC们会受到什么影响？）\n\n[旁白]我点开群聊主页，查看里面的成员。\n\n[旁白]成员列表依次是：程潇潇、贺诗梵、刘宇、周骐瑞、周隽秀。\n\n[主角]（周隽秀？她怎么也来？）\n\n[主角]（是了，我之前就觉得她找王老师的动机应该不是谈心这么简单。）\n\n[主角]（加入这个群聊的人，想必实力不差。）\n\n[旁白]群主是周骐瑞。\n\n[主角]（不行啊刘宇哥。）\n\n[旁白]我心中咋舌。",
+    phoneChat: {
+      title: "群聊成员",
+      subtitle: "试胆活动群 · 6人",
+      view: "members",
+      members: ["程潇潇", "贺诗梵", "刘宇", "周骐瑞", "周隽秀", "叶平生"],
+      messages: [],
+    },
+    nextSceneId: "ch7_group_greeting_choice",
+  },
+
+  ch7_group_greeting_choice: {
+    id: "ch7_group_greeting_choice",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "叶平生",
+    text: "[主角]（我该发点什么呢？）",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    choices: [
+      { id: "ch7_group_greeting_meme", text: "为了试探一下他们的反应，我在群里甩了一个魔丸表情包。", nextSceneId: "ch7_group_greeting_meme", effects: { trust: 1, realityJudgment: 1 }, tags: ["幽默试探", "社交观察", "轻松"] },
+      { id: "ch7_group_greeting_honest", text: "我直接发了一段自我介绍，并感谢周隽秀白天提供进入许可", nextSceneId: "ch7_group_greeting_honest", effects: { trust: 2, empathy: 1 }, tags: ["坦诚社交", "表达感谢", "主动连接"] },
+      { id: "ch7_group_greeting_observe", text: "先潜水，观察成员关系", nextSceneId: "ch7_group_greeting_observe", effects: { selfProtection: 1, truthDesire: 1 }, tags: ["谨慎观察", "信息收集", "低暴露"] },
+      { id: "ch7_group_greeting_check_safety", text: "我发了条消息询问学校关闭后所有人是否安全", nextSceneId: "ch7_group_greeting_check_safety", effects: { empathy: 1, trust: 1 }, tags: ["关心同伴", "直接试探", "合作倾向"] },
+    ],
+  },
+
+  ch7_group_greeting_meme: {
+    id: "ch7_group_greeting_meme",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]为了试探一下他们的反应，我在群里甩了一个魔丸表情包。\n\n[旁白]下一秒，刘宇冒泡。\n\n[主角]（你小子，这么快就冒泡，当真我不找你算账吗？）\n\n[主角]（不过这样看来，他没什么大碍。）",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "叶平生", text: "【Hi~】", align: "right" },
+        { sender: "刘宇", text: "Hi~", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_group_common_chat",
+  },
+
+  ch7_group_greeting_honest: {
+    id: "ch7_group_greeting_honest",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [{ sender: "叶平生", text: "大家好，我是叶平生。@周隽秀 今天谢谢你给我进入画室的许可。", align: "right" }],
+    },
+    nextSceneId: "ch7_group_common_chat",
+  },
+
+  ch7_group_greeting_observe: {
+    id: "ch7_group_greeting_observe",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我盯着屏幕等了几秒，群里终于有人开口了。\n\n[主角]（你小子，这么快就冒泡，当真我不找你算账吗？）\n\n[主角]（不过这样看来，他没什么大碍。）",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [{ sender: "刘宇", text: "Hi~小叶同学。", align: "left" }],
+    },
+    nextSceneId: "ch7_group_common_chat",
+  },
+
+  ch7_group_greeting_check_safety: {
+    id: "ch7_group_greeting_check_safety",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]……",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "叶平生", text: "学校关闭之后，你们都还安全吗？", align: "right" },
+        { sender: "刘宇", text: "怎么，这么担心我们？", align: "left" },
+        { sender: "周骐瑞", text: "没事。", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_group_common_chat",
+  },
+
+  ch7_group_common_chat: {
+    id: "ch7_group_common_chat",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "周隽秀", text: "是你？今天谢谢你帮我送画。", align: "left" },
+        { sender: "叶平生", text: "顺手的事。", align: "right" },
+      ],
+    },
+    nextSceneId: "ch7_group_zhoujunxiu_thought",
+  },
+
+  ch7_group_zhoujunxiu_thought: {
+    id: "ch7_group_zhoujunxiu_thought",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角]（看样子周隽秀对我被困在三班教室的事完全没印象啊。要么就是在和我演。）",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    nextSceneId: "ch7_group_heshifan_welcome",
+  },
+
+  ch7_group_heshifan_welcome: {
+    id: "ch7_group_heshifan_welcome",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [{ sender: "贺诗梵", text: "一起游园的小友？欢迎欢迎。", align: "left" }],
+    },
+    nextSceneId: "ch7_group_silence",
+  },
+
+  ch7_group_silence: {
+    id: "ch7_group_silence",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]群聊里沉默了一会。",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    nextSceneId: "ch7_group_owner_prompt",
+  },
+
+  ch7_group_owner_prompt: {
+    id: "ch7_group_owner_prompt",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "刘宇", text: "@周骐瑞 群主还健在吗？打个招呼啊，说一下注意事项啥的。", align: "left" },
+        { sender: "周骐瑞", text: "群公告里不是有？", align: "left" },
+        { sender: "刘宇", text: "你那群公告是给人看的吗？", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_group_open_announcement",
+  },
+
+  ch7_group_open_announcement: {
+    id: "ch7_group_open_announcement",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我点开群公告。",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    nextSceneId: "ch7_group_announcement",
+  },
+
+  ch7_group_announcement: {
+    id: "ch7_group_announcement",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "群公告",
+      subtitle: "试胆活动群",
+      view: "announcement",
+      announcement: "看宣传册。",
+      messages: [],
+    },
+    nextSceneId: "ch7_group_announcement_reaction",
+  },
+
+  ch7_group_announcement_reaction: {
+    id: "ch7_group_announcement_reaction",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角说]……\n\n[旁白]我打开宣传册。\n\n除了宣传标语和夸张的恐怖背景，唯一有用的是人数限制、报名方式、开展时间和集合地点。\n\n[主角]（没漏掉啥，都看过了。）",
+    phoneChat: {
+      title: "群公告",
+      subtitle: "试胆活动群",
+      view: "announcement",
+      announcement: "看宣传册。",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    nextSceneId: "ch7_group_supply_reminder",
+  },
+
+  ch7_group_supply_reminder: {
+    id: "ch7_group_supply_reminder",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "周骐瑞", text: "@叶平生 记得带上防身用品。", align: "left" },
+        { sender: "程潇潇", text: "食物水什么的不用带了，用不上。", align: "left" },
+        { sender: "叶平生", text: "好。", align: "right" },
+      ],
+    },
+    nextSceneId: "ch7_group_school_repair_thought",
+  },
+
+  ch7_group_school_repair_thought: {
+    id: "ch7_group_school_repair_thought",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]学校修复期间，我应该不会违反任何学校区域的规则，这也意味着，这段时间我可以肆意对校内NPC进行调查。不用当谜语人，不用打回旋镖，开门见山即可。\n\n可惜，我没有王老师的联系方式。",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    nextSceneId: "ch7_group_ask_relationship",
+  },
+
+  ch7_group_ask_relationship: {
+    id: "ch7_group_ask_relationship",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "叶平生", text: "你们都认识？", align: "right" },
+        { sender: "贺诗梵", text: "萍水相逢也是缘，我本与诸位素不相识，但一场灾祸让我们殊途同归，一遇相见恨晚啊。这位小友若想对这世道窥探一二，可与我隔空畅谈。", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_group_heshifan_thought",
+  },
+
+  ch7_group_heshifan_thought: {
+    id: "ch7_group_heshifan_thought",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[主角]（这人怎么回事？怎么说话神神叨叨的，这不是一个正常的NPC吧？）",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    nextSceneId: "ch7_group_cheng_liuyu_reply",
+  },
+
+  ch7_group_cheng_liuyu_reply: {
+    id: "ch7_group_cheng_liuyu_reply",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "程潇潇", text: "不用管他。他这人在诗词方面有点魔怔。", align: "left" },
+        { sender: "刘宇", text: "算认识吧。", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_private_liuyu_choice",
+  },
+
+  ch7_private_liuyu_choice: {
+    id: "ch7_private_liuyu_choice",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我看向手机屏幕，",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [],
+      blockNextUntilComplete: false,
+    },
+    choices: [
+      { id: "ch7_liuyu_private_confront", text: "发了条消息：【今晚这事，聊聊？@刘宇】", nextSceneId: "ch7_liuyu_private_group_switch", effects: { truthDesire: 1, authorityResistance: 1 }, tags: ["直接质询", "关系试探"] },
+      { id: "ch7_skipped_liuyu_private_chat", text: "叹了口气，不想再跟他们说些什么了，放下手机，前往厕所洗漱", nextSceneId: "ch7_prepare_mirror", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["延迟判断", "自我保护", "独立分析"] },
+    ],
+  },
+
+  ch7_liuyu_private_group_switch: {
+    id: "ch7_liuyu_private_group_switch",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "",
+    phoneChat: {
+      title: "试胆活动群",
+      subtitle: "6人",
+      messages: [
+        { sender: "叶平生", text: "今晚这事，聊聊？@刘宇", align: "right" },
+        { sender: "刘宇", text: "单独提审我？行。", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_liuyu_private_chat",
+  },
+
+  ch7_liuyu_private_chat: {
+    id: "ch7_liuyu_private_chat",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]刘宇忽然不知道该怎么狡辩了。\n\n[旁白]我眉头皱起。\\n\\n这话说的，倒是和王老师的谜语挺像。这应该和我本人的特质有关。\n\n[旁白]能力强的NPC也有要遵守的规则，好吧。\\n\\n我在学校违规时，刘宇和周骐瑞跟其他学生一样，仿佛被什么东西蛊惑了，失去了神志。看来这是系统的强制效果。\n\n[主角]（那先这样吧。）\n\n[旁白]我放下手机，前往厕所洗漱。",
+    phoneChat: {
+      title: "刘宇",
+      subtitle: "私聊",
+      messages: [
+        { sender: "刘宇", text: "怎么，捞到好处了吧。", align: "left" },
+        { sender: "叶平生", text: "得了便宜还卖乖。你差点把我害死。", align: "right" },
+        { sender: "刘宇", text: "你有可以改变规则的技能。这可是你亲口说的。既然你有技能保命，我这怎么叫害呢？", align: "left" },
+        { sender: "刘宇", text: "何况最大受益者是你啊。", align: "left" },
+        { sender: "叶平生", text: "谁受益最大还有待商榷。你们在副本里打工这么久恐怕都对它的本质了如指掌了吧。", align: "right" },
+        { sender: "刘宇", text: "这可不一定。只能说，我有点经验。不过我劝你还是不要想着这件事了，任务给的故事都没探索完呢，你还是先保住自己那条小命吧。", align: "left" },
+        { sender: "叶平生", text: "别装了哥。你们五个很明显是旧识了好吧，什么叫“有点经验”？我没来的时候你们肯定也在给系统打工吧。", align: "right" },
+        { sender: "叶平生", text: "都是被系统强行拉来，谁都不想做这苦差事，我懂。我们参赛者又何尝不是如此呢？更何况，在我看来，这个副本在细枝末节的地方还需要打磨，能经得起推敲的也只有主干部分。而这主干部分又离不开故事的本质，我只要掌握了本质，就很有可能大幅提升探索度。", align: "right" },
+        { sender: "刘宇", text: "你觉得这个副本是豆腐渣工程？xswl。", align: "left" },
+        { sender: "叶平生", text: "怎么？不是？", align: "right" },
+        { sender: "刘宇", text: "你猜。", align: "left" },
+        { sender: "叶平生", text: "……", align: "right" },
+        { sender: "刘宇", text: "其他内容不好说。但我可以确定的是，你已经知道故事的本质了，甚至早在你参赛之前，你就知道了。", align: "left" },
+        { sender: "叶平生", text: "好，那我先不想这事。那你是不是应该说明一下你们五个是怎么认识的？", align: "right" },
+        { sender: "刘宇", text: "诶呦我的祖宗，我求你别问了。你这才是真在害我啊，我们五个就同事而已。", align: "left" },
+      ],
+    },
+    nextSceneId: "ch7_prepare_mirror",
+  },
+
+  ch7_prepare_mirror: {
+    id: "ch7_prepare_mirror",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[旁白]正刷着牙，我抬眼看向镜中的自己。\\n\\n面色蜡黄，眼下乌青，眼皮更是半闭不闭。\n\n[主角]（苦啊。）\n\n[旁白]我打了个哈欠，重新回忆家庭规则中的措辞：\n\n[NPC:系统]非紧急情况，不要把手伸进镜子里。\n\n[主角]（规则只禁止把“手”伸进去。其他部位呢？）\n\n[主角]（王老师所说的“镜中尸骸”，会不会就在另一侧？）",
+    nextSceneId: "ch7_mirror_entry_choice",
+  },
+
+  ch7_mirror_entry_choice: {
+    id: "ch7_mirror_entry_choice",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "",
+    choices: [
+      { id: "ch7_mirror_enter_careful", text: "先用头发和额头试探镜面，再逐渐伸入头部", nextSceneId: "ch7_enter_mirror_careful", effects: { selfProtection: 1, truthDesire: 1 }, tags: ["谨慎探索", "规则漏洞", "风险控制"] },
+      { id: "ch7_mirror_enter_recording", text: "用手机录像对准镜子，再将头伸进去", nextSceneId: "ch7_enter_mirror_recording", effects: { truthDesire: 1, realityJudgment: 1 }, tags: ["记录证据", "调查准备", "谨慎"] },
+      { id: "ch7_mirror_enter_direct", text: "直接把头伸进镜面，避免在规则判定前犹豫", nextSceneId: "ch7_enter_mirror_direct", effects: { truthDesire: 2, selfProtection: -1 }, tags: ["果断探索", "冒险", "真相欲望"] },
+      { id: "ch7_mirror_checked_time", text: "暂不进入，先确认当前时间与母亲查房规律", nextSceneId: "ch7_enter_mirror_timed", effects: { realityJudgment: 1, selfProtection: 1 }, tags: ["风险评估", "时间管理", "家庭规则意识"] },
+    ],
+  },
+
+  ch7_enter_mirror_careful: {
+    id: "ch7_enter_mirror_careful",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[旁白]我先让发梢触碰镜面，又缓慢将额头抵上去。没有传来玻璃的硬度，只有冰冷空气从另一侧拂过皮肤。\\n\\n我深吸一口气，直接将头探向镜面。预想中的撞击没有出现，冰冷空气瞬间包裹住脸庞。",
+    nextSceneId: "ch7_mirror_space",
+  },
+
+  ch7_enter_mirror_recording: {
+    id: "ch7_enter_mirror_recording",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[旁白]我把手机固定在盥洗池旁，开启录像。屏幕中的镜面依然正常，好像只有我的身体能够触碰到空间的入口。\\n\\n我深吸一口气，直接将头探向镜面。预想中的撞击没有出现，冰冷空气瞬间包裹住脸庞。",
+    nextSceneId: "ch7_mirror_space",
+  },
+
+  ch7_enter_mirror_direct: {
+    id: "ch7_enter_mirror_direct",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[旁白]我深吸一口气，直接将头探向镜面。预想中的撞击没有出现，冰冷空气瞬间包裹住脸庞。",
+    nextSceneId: "ch7_mirror_space",
+  },
+
+  ch7_enter_mirror_timed: {
+    id: "ch7_enter_mirror_timed",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/maps/bathroom/卫生间.png",
+    playerState: "yps_frames_stand_back",
+    speaker: "旁白",
+    text: "[旁白]距离母亲凌晨一点查房还有一段时间。我确认自己拥有撤退窗口，随后将额头抵向镜面。\\n\\n预想中的撞击没有出现，冰冷空气瞬间包裹住脸庞。",
+    nextSceneId: "ch7_mirror_space",
+  },
+
+  ch7_mirror_space: {
+    id: "ch7_mirror_space",
+    chapter: "第7章 · 坏孩子诞生",
+    background: "/assets/CG/浴室/镜子.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]四下一片漆黑，视野里什么也没有。冷风从深处吹来，携带着淡淡的血腥味。\n\n[主角]（有风。这里肯定不是普通室内空间。）\n\n[旁白]一阵脚步声从黑暗中响起。\n\n[旁白]哒……\n\n[旁白]脚步由远及近，不紧不慢。我盯着声音传来的方向，感觉风变得更冷了，顺着脊椎直逼大脑。\n\n[旁白]脚步声突然消失。\n\n[旁白]我不由得屏住呼吸。\\n\\n黑暗中似乎出现了一个人形轮廓。它缓慢转过身体，骨骼发出嘎吱嘎吱的声音，像是在观察镜子另一侧的我。\n\n[旁白]血腥味变得更浓了。\n\n[主角]（它身上……到底沾了多少血？）",
     nextSceneId: "ch8_mirror_figure_disappears",
   },
 
