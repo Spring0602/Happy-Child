@@ -45,10 +45,7 @@ export function SettingsPanel({ onClose }: Props) {
 
           {/* BGM 音量 */}
           <div className="settings-row">
-            <label className="settings-label">
-              背景音乐
-              <span className="settings-hint">（开发中）</span>
-            </label>
+            <label className="settings-label">背景音乐</label>
             <div className="settings-slider-wrap">
               <input
                 type="range"

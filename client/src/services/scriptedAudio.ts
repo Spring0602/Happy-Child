@@ -44,11 +44,36 @@ const sceneSounds: Record<string, ScheduledSound[]> = {
   ch3_respond_zqr_then_seat: [{ name: "tinnitus" }],
   ch3_final_answer_warning: [{ name: "tinnitus", delayMs: 200 }],
   ch3_class_count_question: [{ name: "tinnitus", delayMs: 9600 }],
-  ch3_night_analysis: [{ name: "paper_rustle", delayMs: 12000 }],
+  ch3_night_analysis: [
+    { name: "paper_rustle", delayMs: 12000 },
+    { name: "warning_bell", delayMs: 30000 },
+  ],
   ch3_suffocation_start: [{ name: "tinnitus", delayMs: 250 }],
   ch4_roster_ask_student: [{ name: "tinnitus" }],
   ch4_roster_observe: [{ name: "tinnitus" }],
-  ch5_class3_face_closeup: [{ name: "tinnitus" }],
+  ch4_lunch_attack_death: [
+    { name: "warning_bell", delayMs: 5800 },
+    { name: "horror_sting", delayMs: 12800 },
+  ],
+  ch5_wang_pressure: [{ name: "warning_bell", delayMs: 900 }],
+  ch5_class3_face_closeup: [
+    { name: "tinnitus" },
+    { name: "warning_bell", delayMs: 2400 },
+  ],
+  ch5_gallery_materials_warning: [{ name: "warning_bell", delayMs: 3200 }],
+  ch6_class3_exposure: [
+    { name: "tinnitus", delayMs: 200 },
+    { name: "warning_bell", delayMs: 7200 },
+  ],
+  ch6_corridor_return: [{ name: "warning_bell", delayMs: 100 }],
+  ch6_corridor_timeout_death: [
+    { name: "warning_bell", delayMs: 100 },
+    { name: "horror_sting", delayMs: 6200 },
+  ],
+  ch6_root_rule_trigger: [
+    { name: "warning_bell", delayMs: 11200 },
+    { name: "horror_sting", delayMs: 17600 },
+  ],
   ch6_class3_door_locked: [{ name: "impact", delayMs: 2200 }],
   ch6_class3_counter_standoff: [{ name: "school_bell", delayMs: 10500 }],
   ch6_class3_cut_standoff: [{ name: "school_bell", delayMs: 10500 }],
@@ -120,6 +145,7 @@ const sceneSounds: Record<string, ScheduledSound[]> = {
     { name: "door_knock" },
     { name: "door_knock_heavy", delayMs: 5200 },
   ],
+  ch8_inner_voice_returns: [{ name: "warning_bell", delayMs: 3400 }],
 };
 
 let audioContext: AudioContext | null = null;

@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { GameState } from "../types/game";
 import { getAllSaves, loadSlot, type SaveSlot } from "../engine/save";
 import { SettingsPanel } from "./SettingsPanel";
+import { playBgm, stopBgm } from "../services/bgm";
+
+const TITLE_BGM = "/assets/audio/bgm/大气磅礴.mp3";
 
 interface Props {
   onNewGame: () => void;
@@ -15,6 +18,11 @@ export function StartMenu({ onNewGame, onStartChapter4, onLoadGame, onShowPortra
   const [showLoadPanel, setShowLoadPanel] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [saves, setSaves] = useState<SaveSlot[]>([]);
+
+  useEffect(() => {
+    playBgm(TITLE_BGM, { loop: true, restart: true, fadeMs: 900 });
+    return () => stopBgm({ fadeMs: 600, reset: true });
+  }, []);
 
   function openLoadPanel() {
     setSaves(getAllSaves());
