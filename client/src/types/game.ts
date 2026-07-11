@@ -45,6 +45,13 @@ export interface PhoneChat {
   blockNextUntilComplete?: boolean;
 }
 
+export interface InfoPanel {
+  title: string;
+  subtitle?: string;
+  lines: string[];
+  hint?: string;
+}
+
 export interface Scene {
   id: string;
   chapter: string;
@@ -63,6 +70,8 @@ export interface Scene {
   playerState?: string;
   /** 手机群聊演出层：用于模拟真实手机消息逐条弹出 */
   phoneChat?: PhoneChat;
+  /** 系统信息窗口：用于技能/副本说明等非对话框信息展示 */
+  infoPanel?: InfoPanel;
 }
 
 export interface CharacterCard {

@@ -15,7 +15,64 @@ export const ch2Scenes: Record<string, Scene> = {
     chapter: CHAPTER,
     background: "/assets/maps/waiting/进入界面.png",
     speaker: "旁白",
-    text: "[旁白]四周数字如星辰般闪烁，星云在黑暗中缓慢摇曳。\n\n我漂浮在这片小型宇宙中，却感受不到失重，甚至能够正常呼吸。\n\n[NPC:系统]欢迎参赛者来到\"人类进化计划\"候场区。\n\n[NPC:系统]初赛开始之前，参赛者需进行技能抽取。现在进行技能抽取……\n\n[旁白]一道金光从脚下升起，像蛇一样攀援而上，直至将我完全包裹。\n\n奇异力量在体内迸发，仿佛某种沉睡已久的本能被唤醒。\n\n[NPC:系统]根据您的特质，系统为您生成了最适合您的技能——权威抵制。\n\n[NPC:系统]使用方法与附加技能，需要您自行探索。\n\n[NPC:系统]恭喜您获得隐藏身份——规则破坏者。\n\n[主角]（技能名这么抽象，用法探索难度显然很大。）\n\n[NPC:系统]副本一正在进行初始化……\n\n[主角说]诶等一下，我要怎么激活这个技能？\n\n[NPC:系统]20%，21%……\n\n[主角说]hello，小系统？\n\n[NPC:系统]30%……\n\n[旁白]系统自顾自地加载进程，完全没有理会我。\n\n[主角]（看来是不能从系统这里套取情报了。）\n\n[NPC:系统]初始化完成。请参赛者阅读副本一相关信息。\n\n[NPC:系统]副本一：快乐小孩。\n\n[NPC:系统]性质：单人角色扮演类副本。\n\n[NPC:系统]内容简介：你是个讨人喜欢的快乐小孩。孩子们喜欢你，大人们也喜欢你。不断超越自己、追求卓越，是你一生的追求。\n\n[NPC:系统]探索度达成条件：探索至少三处重要场所，了解本地区人物关系与根本规则。\n\n[NPC:系统]成就达成条件：洞察真相，证明你的快乐。\n\n[NPC:系统]通关奖励：根据场地内稳定的紊乱磁场强度与范围综合判断。\n\n[NPC:系统]注意：逾期未通关或违反规则，均会遭到杀身之祸。\n\n[主角]（小孩、讨喜、快乐、追求、真相。这是这个副本给出的关键词。）\n\n[主角]（倒是这个魔幻的词怎么又出现了？）\n\n[主角]（稳定的紊乱磁场。我和林芷萱都推测这个词是人类展现出来的某种未知特性，但在副本一的介绍中又用来修饰地区。词本身和它的使用场景都一样矛盾重重。）\n\n[主角]（我需要尽快搞清楚这是个什么东西，否则到初赛后期会错失很多奖励，甚至违反规则的几率都会增加不少。）\n\n[NPC:系统]副本一已启动。",
+    text: "[旁白]四周数字如星辰般闪烁，星云在黑暗中缓慢摇曳。\n\n我漂浮在这片小型宇宙中，却感受不到失重，甚至能够正常呼吸。\n\n[NPC:系统]欢迎参赛者来到\"人类进化计划\"候场区。\n\n[NPC:系统]初赛开始之前，参赛者需进行技能抽取。现在进行技能抽取……\n\n[旁白]一道金光从脚下升起，像蛇一样攀援而上，直至将我完全包裹。\n\n奇异力量在体内迸发，仿佛某种沉睡已久的本能被唤醒。\n\n[NPC:系统]根据您的特质，系统为您生成了最适合您的技能——权威抵制。",
+    nextSceneId: "ch2_skill_info_panel",
+  },
+
+  ch2_skill_info_panel: {
+    id: "ch2_skill_info_panel",
+    chapter: CHAPTER,
+    background: "/assets/maps/waiting/进入界面.png",
+    speaker: "系统",
+    text: "[NPC:系统]技能名称：权威抵制。\n\n[NPC:系统]使用方法与附加技能，需要您自行探索。\n\n[NPC:系统]恭喜您获得隐藏身份——规则破坏者。",
+    infoPanel: {
+      title: "技能抽取完成",
+      subtitle: "人类进化计划 · 初赛权限",
+      lines: [
+        "技能名称：权威抵制",
+        "使用方法：需要参赛者自行探索",
+        "附加技能：需要参赛者自行探索",
+        "隐藏身份：规则破坏者",
+      ],
+    },
+    nextSceneId: "ch2_after_skill_info",
+  },
+
+  ch2_after_skill_info: {
+    id: "ch2_after_skill_info",
+    chapter: CHAPTER,
+    background: "/assets/maps/waiting/进入界面.png",
+    speaker: "旁白",
+    text: "[主角]（技能名这么抽象，用法探索难度显然很大。）\n\n[NPC:系统]副本一正在进行初始化……\n\n[主角说]诶等一下，我要怎么激活这个技能？\n\n[NPC:系统]20%，21%……\n\n[主角说]hello，小系统？\n\n[NPC:系统]30%……\n\n[旁白]系统自顾自地加载进程，完全没有理会我。\n\n[主角]（看来是不能从系统这里套取情报了。）\n\n[NPC:系统]初始化完成。请参赛者阅读副本一相关信息。",
+    nextSceneId: "ch2_dungeon_info_panel",
+  },
+
+  ch2_dungeon_info_panel: {
+    id: "ch2_dungeon_info_panel",
+    chapter: CHAPTER,
+    background: "/assets/maps/waiting/进入界面.png",
+    speaker: "系统",
+    text: "[NPC:系统]副本一：快乐小孩。\n\n[NPC:系统]性质：单人角色扮演类副本。\n\n[NPC:系统]内容简介：你是个讨人喜欢的快乐小孩。孩子们喜欢你，大人们也喜欢你。不断超越自己、追求卓越，是你一生的追求。\n\n[NPC:系统]通关要求：在副本内存活一周，或达成任一成就。\n\n[NPC:系统]成就达成条件：洞察真相，证明你的快乐。\n\n[NPC:系统]通关奖励：根据场地内稳定的紊乱磁场强度与范围综合判断。\n\n[NPC:系统]注意：逾期未通关或违反规则，均会遭到杀身之祸。",
+    infoPanel: {
+      title: "副本一：快乐小孩",
+      subtitle: "单人角色扮演类副本",
+      lines: [
+        "内容简介：你是个讨人喜欢的快乐小孩。孩子们喜欢你，大人们也喜欢你。不断超越自己、追求卓越，是你一生的追求。",
+        "通关要求：在副本内存活一周，或达成任一成就。",
+        "成就达成条件：洞察真相，证明你的快乐。",
+        "通关奖励：根据场地内稳定的紊乱磁场强度与范围综合判断。",
+        "注意：逾期未通关或违反规则，均会遭到杀身之祸。",
+      ],
+    },
+    nextSceneId: "ch2_after_dungeon_info",
+  },
+
+  ch2_after_dungeon_info: {
+    id: "ch2_after_dungeon_info",
+    chapter: CHAPTER,
+    background: "/assets/maps/waiting/进入界面.png",
+    speaker: "旁白",
+    text: "[主角]（小孩、讨喜、快乐、追求、真相。这是这个副本给出的关键词。）\n\n[主角]（倒是这个魔幻的词怎么又出现了？）\n\n[主角]（稳定的紊乱磁场。我和林芷萱都推测这个词是人类展现出来的某种未知特性，但在副本一的介绍中又用来修饰地区。词本身和它的使用场景都一样矛盾重重。）\n\n[主角]（我需要尽快搞清楚这是个什么东西，否则到初赛后期会错失很多奖励，甚至违反规则的几率都会增加不少。）\n\n[NPC:系统]副本一已启动。",
     nextSceneId: "ch2_enter_bedroom",
   },
 
@@ -62,6 +119,7 @@ export const ch2Scenes: Record<string, Scene> = {
   },
 
   ch2_bedroom_luggage: { id: "ch2_bedroom_luggage", chapter: CHAPTER, background: bedroomWithLuggage, speaker: "旁白", text: "邮件里写“没有具体规则”，但谁知道什么时候会触发规则呢？像这种本不属于副本内还会暴露我身份的物证，最好还是别让任何人发现。" },
+  ch2_plan_book_intro: { id: "ch2_plan_book_intro", chapter: CHAPTER, background: bedroom, speaker: "旁白", text: "[旁白]桌上有一本封面温馨的笔记本，与周围教辅相比鲜活得过分。", nextSceneId: "ch2_plan_book_read" },
   ch2_bedroom_bookshelf: { id: "ch2_bedroom_bookshelf", chapter: CHAPTER, background: bedroom, speaker: "旁白", text: "[旁白]书架上塞满了教辅资料，从《五年高考三年模拟》到各类竞赛题集，几乎找不到一本课外书。\n\n[主角]（妈呀这过的什么压抑生活啊。）" },
   ch2_bedroom_bed: { id: "ch2_bedroom_bed", chapter: CHAPTER, background: bedroom, speaker: "叶平生", text: "（睡啥睡啊你一天就知道睡睡睡。）" },
   ch2_bedroom_leave_blocked: { id: "ch2_bedroom_leave_blocked", chapter: CHAPTER, background: bedroom, speaker: "叶平生", text: "（我还没找到规则。）" },
@@ -75,7 +133,7 @@ export const ch2Scenes: Record<string, Scene> = {
     background: deskCg,
     cgMode: true,
     speaker: "旁白",
-    text: "[旁白]桌上有一本封面温馨的笔记本，与周围教辅相比鲜活得过分。\n\n[旁白]计划本扉页写着\"我\"的人生蓝图。\n\n这东西应该就是规则了吧？我又环视一圈，确认周围没有更像日记本的书本之后，就快速浏览起来。\n\n[主角]（\"我\"对自己还真狠啊。写这么多规则干什么？巴不得去送人头吗？）\n\n[旁白]（考上C9。三十岁结婚生子，娶一个贤惠温柔的妻子。三十五岁实现财富自由，买车买房。）\n\n这似乎是“我”前半生的理想。\n\n[旁白]（作为好孩子，我要关爱亲人，我要成为爸妈的骄傲。我要得到老师同学的青睐，我要努力学习，我要帮老师排忧解难，我要乐于助人。我要变得更强一些、再强一些，成为别人的依靠，让我的周围充满幸福。）\n\n[旁白]我有些疑惑。\n\n[主角]（这部分内容或许可以理解为隐晦的规则，但是如此抽象又理想主义的规则，会使践行难度大大增加。）\n\n[主角]（算了，多想无益。走一步看一步吧。）\n\n[旁白]翻过一页，我总算找到了看起来正经的规则，这扭曲红字绝对不是“我”的字迹。\n\n[旁白]（我们是幸福快乐的一家。）\n\n[旁白]（我是美好社会中遵纪守法的好公民。）\n\n[旁白]（我的房间井井有条。我从来不迟到。我的作业不会迟交。我的成绩总是优异。）\n\n[旁白]（我总是帮父母做家务。我是个自律的人，严格遵守计划表。）\n\n[主角]（这规则看起来真令人不爽。）\n\n[旁白]我把笔记本翻到最新一页。\n\n[旁白]（2023年11月18日计划表。）\n\n[旁白]（07:00起床。19:00进校考试。01:00睡觉。）\n\n[旁白]（数学：计时考试一次，并订正答案。）\n\n[旁白]（物理：整理错题本，分模块加强刷题。）\n\n[旁白]（生物：复习选修二后两章内容。）\n\n[旁白]（考试结束回家后订正试卷。）\n\n[主角说]……？\n\n[主角]（不是，这哥们不用写作业？）\n\n[旁白]我又把计划表往前翻了翻，对自己肃然起敬。\n\n[主角]（居然用昨天一天就把所有周末作业做完了，不愧是我。我太感谢我了。）\n\n[旁白]而且桌上那张数学试卷已经写了一半。\n\n[旁白]我被吓了一跳。\n\n房门被敲响，接着门外传来了女人的声音，\n\n[NPC:母亲]平生！都七点十分了，还没起床？",
+    text: "[旁白]计划本扉页写着\"我\"的人生蓝图。\n\n这东西应该就是规则了吧？我又环视一圈，确认周围没有更像日记本的书本之后，就快速浏览起来。\n\n[主角]（\"我\"对自己还真狠啊。写这么多规则干什么？巴不得去送人头吗？）\n\n[旁白]（考上C9。三十岁结婚生子，娶一个贤惠温柔的妻子。三十五岁实现财富自由，买车买房。）\n\n这似乎是“我”前半生的理想。\n\n[旁白]（作为好孩子，我要关爱亲人，我要成为爸妈的骄傲。我要得到老师同学的青睐，我要努力学习，我要帮老师排忧解难，我要乐于助人。我要变得更强一些、再强一些，成为别人的依靠，让我的周围充满幸福。）\n\n[旁白]我有些疑惑。\n\n[主角]（这部分内容或许可以理解为隐晦的规则，但是如此抽象又理想主义的规则，会使践行难度大大增加。）\n\n[主角]（算了，多想无益。走一步看一步吧。）\n\n[旁白]翻过一页，我总算找到了看起来正经的规则，这扭曲红字绝对不是“我”的字迹。\n\n[旁白]（我们是幸福快乐的一家。）\n\n[旁白]（我是美好社会中遵纪守法的好公民。）\n\n[旁白]（我的房间井井有条。我从来不迟到。我的作业不会迟交。我的成绩总是优异。）\n\n[旁白]（我总是帮父母做家务。我是个自律的人，严格遵守计划表。）\n\n[主角]（这规则看起来真令人不爽。）\n\n[旁白]我把笔记本翻到最新一页。\n\n[旁白]（2023年11月18日计划表。）\n\n[旁白]（07:00起床。19:00进校考试。01:00睡觉。）\n\n[旁白]（数学：计时考试一次，并订正答案。）\n\n[旁白]（物理：整理错题本，分模块加强刷题。）\n\n[旁白]（生物：复习选修二后两章内容。）\n\n[旁白]（考试结束回家后订正试卷。）\n\n[主角说]……？\n\n[主角]（不是，这哥们不用写作业？）\n\n[旁白]我又把计划表往前翻了翻，对自己肃然起敬。\n\n[主角]（居然用昨天一天就把所有周末作业做完了，不愧是我。我太感谢我了。）\n\n[旁白]而且桌上那张数学试卷已经写了一半。\n\n[旁白]我被吓了一跳。\n\n房门被敲响，接着门外传来了女人的声音，\n\n[NPC:母亲]平生！都七点十分了，还没起床？",
     nextSceneId: "ch2_mother_door_choice",
   },
 
@@ -123,9 +181,9 @@ export const ch2Scenes: Record<string, Scene> = {
     text: "",
     choices: [
       { id: "ch2_ate_small_breakfast", text: "呃……不是，妈妈的手艺一向很好，只是我今天早上胃有点不舒服。", nextSceneId: "ch2_breakfast_violation", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["风险控制", "谨慎试验", "临场应变"], needAIAnalysis: true },
-      { id: "ch2_ate_full_breakfast", text: "压下疑虑，先正常吃一部分早餐", nextSceneId: "ch2_breakfast_violation", effects: { trust: 1, selfProtection: -1 }, tags: ["维持家庭表象", "风险试验"], needAIAnalysis: true },
-      { id: "ch2_questioned_breakfast", text: "粥里的食材是在哪买的？", nextSceneId: "ch2_breakfast_violation", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["食物试探", "谨慎询问"], needAIAnalysis: true },
-      { id: "ch2_delayed_breakfast", text: "先沉默观察父母反应", nextSceneId: "ch2_breakfast_violation", effects: { truthDesire: 1, realityJudgment: -1 }, tags: ["观察", "高风险"], needAIAnalysis: true },
+      { id: "ch2_ate_full_breakfast", text: "妈妈做的饭最好吃了，我现在就吃", nextSceneId: "ch2_breakfast_violation", effects: { trust: 1, selfProtection: -1 }, tags: ["维持关系", "服从", "承担未知风险"], needAIAnalysis: true },
+      { id: "ch2_questioned_breakfast", text: "粥里的食材是在哪买的？", nextSceneId: "ch2_breakfast_violation", effects: { truthDesire: 1, selfProtection: 1 }, tags: ["直接试探", "真相欲望", "高风险"], needAIAnalysis: true },
+      { id: "ch2_delayed_breakfast", text: "今天晚上有理综考试，我有点焦虑，没什么胃口", nextSceneId: "ch2_breakfast_violation", effects: { selfProtection: 1, realityJudgment: 1 }, tags: ["情境伪装", "自我保护", "机敏"], needAIAnalysis: true },
     ],
   },
 
@@ -134,7 +192,7 @@ export const ch2Scenes: Record<string, Scene> = {
     chapter: CHAPTER,
     background: livingroom,
     speaker: "旁白",
-    text: "[旁白]【条件：ch2_ate_small_breakfast】\n[主角说]呃……不是，妈妈的手艺一向很好，只是我今天早上胃有点不舒服。\n\n[NPC:父亲]你昨天在学校吃什么了？\n\n[旁白]我接着瞎编，\n\n[主角说]晚上吃了黄焖鸡。\n\n[NPC:父亲]你们学校食品安全到底怎么做的？学生吃坏肚子，还怎么好好学习？\n\n[旁白]气氛骤然变得微妙。我尬笑了一声，紧接着觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]没事的爸爸，应该不是学校的问题。昨天我晚自习学得太专注，忘了穿外套，估计是着凉了。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（看来扉页上的内容也是规则。）\n\n[旁白]【条件：ch2_ate_full_breakfast】\n[旁白]我压下疑虑，开始吃粥。味道正常，但无法确定长期食用是否有问题。\n\n[NPC:母亲]这才对。早饭不吃好，怎么有精神学习？\n\n[旁白]但我总觉得吃了不太妙。吃了一半之后，我放下了碗，捂住肚子开始演戏。\n\n[主角说]妈，我感觉吃了肚子有点疼。\n\n[NPC:母亲]啊，怎么会呢？我平常都在同一家买肉菜，吃了这么久都没事，怎么今天突然就肚子疼了？\n\n[NPC:父亲]你别是为了晚上考试翘掉才在你妈面前装病。\n\n[旁白]气氛骤然变得微妙。我正打算解释，却觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]我会去考试的爸爸。应该是因为这些天太累了，我免疫力有些下降。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（好险。）\n\n[旁白]【条件：ch2_questioned_breakfast】\n[主角说]粥里的食材是在哪买的？\n\n[NPC:母亲]和平时一样。你怎么忽然问这个？\n\n[主角]（看来在他们的认知中，食物没有任何异常。）\n\n[主角说]没什么。只是昨天在学校吃完黄焖鸡以后，胃有点不舒服，我怕吃了伤胃的东西。\n\n[NPC:父亲]你们学校食品安全到底怎么做的？学生吃坏肚子，还怎么好好学习？\n\n[旁白]气氛骤然变得微妙。我尬笑了一声，紧接着觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]没事的爸爸，应该不是学校的问题。昨天我晚自习学得太专注，忘了穿外套，估计是着凉了。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（看来扉页上的内容也是规则。）\n\n[旁白]【条件：ch2_delayed_breakfast】\n[主角说]呃……不是，妈妈的手艺一向很好，只是我今天早上胃有点不舒服。\n\n[NPC:父亲]你昨天在学校吃什么了？\n\n[旁白]我接着瞎编，\n\n[主角说]晚上吃了黄焖鸡。\n\n[NPC:父亲]你们学校食品安全到底怎么做的？学生吃坏肚子，还怎么好好学习？\n\n[旁白]气氛骤然变得微妙。我尬笑了一声，紧接着觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]没事的爸爸，应该不是学校的问题。昨天我晚自习学得太专注，忘了穿外套，估计是着凉了。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（看来扉页上的内容也是规则。）",
+    text: "[旁白]【条件：ch2_ate_small_breakfast】\n[主角说]呃……不是，妈妈的手艺一向很好，只是我今天早上胃有点不舒服。\n\n[NPC:父亲]你昨天在学校吃什么了？\n\n[旁白]我接着瞎编，\n\n[主角说]晚上吃了黄焖鸡。\n\n[NPC:父亲]你们学校食品安全到底怎么做的？学生吃坏肚子，还怎么好好学习？\n\n[旁白]气氛骤然变得微妙。我尬笑了一声，紧接着觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]没事的爸爸，应该不是学校的问题。昨天我晚自习学得太专注，忘了穿外套，估计是着凉了。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（看来扉页上的内容也是规则。）\n\n[旁白]【条件：ch2_ate_full_breakfast】\n[旁白]我压下疑虑，开始吃粥。味道正常，但无法确定长期食用是否有问题。\n\n[NPC:母亲]这才对。早饭不吃好，怎么有精神学习？\n\n[旁白]但我总觉得吃了不太妙。吃了一半之后，我放下了碗，捂住肚子开始演戏。\n\n[主角说]妈，我感觉吃了肚子有点疼。\n\n[NPC:母亲]啊，怎么会呢？我平常都在同一家买肉菜，吃了这么久都没事，怎么今天突然就肚子疼了？\n\n[NPC:父亲]你别是为了把晚上的考试翘掉才在你妈面前装病。\n\n[旁白]气氛骤然变得微妙。我正打算解释，却觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]我会去考试的爸爸。应该是因为这些天太累了，我免疫力有些下降。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（好险。）\n\n[旁白]【条件：ch2_questioned_breakfast】\n[主角说]粥里的食材是在哪买的？\n\n[NPC:母亲]和平时一样。你怎么忽然问这个？\n\n[主角]（看来在他们的认知中，食物没有任何异常。）\n\n[主角说]没什么。只是昨天在学校吃完黄焖鸡以后，胃有点不舒服，我怕吃了伤胃的东西。\n\n[NPC:父亲]你们学校食品安全到底怎么做的？学生吃坏肚子，还怎么好好学习？\n\n[旁白]气氛骤然变得微妙。我尬笑了一声，紧接着觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]没事的爸爸，应该不是学校的问题。昨天我晚自习学得太专注，忘了穿外套，估计是着凉了。\n\n[NPC:父亲]唉，你这孩子。\n\n[主角说]我长记性了，今天一定会照顾好自己的。\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n[主角]（看来扉页上的内容也是规则。）\n\n[旁白]【条件：ch2_delayed_breakfast】\n[NPC:父亲]一个考试能把你焦虑成这样？你别是为了把晚上的考试翘掉才在你妈面前装病。\n\n[旁白]气氛骤然变得微妙。我正打算解释，却觉得有些呼吸困难。\n\n[主角]（怎么回事？）\n\n[旁白]我屏住呼吸，尽量不让父母发现异常。\n\n[NPC:系统]技能\"违规提醒\"正在发动。\n\n[主角]（\"违规提醒\"……这是我的衍生技能？被动激活了？）\n\n[主角]（不管怎样——必须赶紧打个圆场。）\n\n[主角说]我不是这个意思，我会去考试的。\n\n[NPC:父亲]唉，现在的孩子，怎么这么点苦都吃不得。\n\n[主角说]……\n\n[旁白]父亲目光柔和下来，窒息感随之消失。\n\n但那些话却让我听得十分心寒。\n\n[主角]（“我”每天就是在这种环境下苟且偷生的吗？）",
     nextSceneId: "ch2_breakfast_resolved",
   },
 
@@ -153,7 +211,8 @@ export const ch2Scenes: Record<string, Scene> = {
   ch2_thought_violation_choice: {
     id: "ch2_thought_violation_choice",
     chapter: CHAPTER,
-    background: bedroom,
+    background: deskCg,
+    cgMode: true,
     speaker: "旁白",
     playerState: "yps_frames_stand_front",
     text: "",
@@ -164,7 +223,7 @@ export const ch2Scenes: Record<string, Scene> = {
     ],
   },
 
-  ch2_thought_warning_resolved: { id: "ch2_thought_warning_resolved", chapter: CHAPTER, background: "", cgMode: true, speaker: "旁白", text: "[旁白]窒息感逐渐减轻。我整个人瘫在书桌上大口吸气，喉咙里发出破风箱般的声音。\n\n[主角]（原来想法本身也可能违规。）\n\n[主角]（这个副本真正危险的地方，不只是行为规则，而是它要求我把自己调整成“快乐小孩”。）", nextSceneId: "ch2_home_exploration_start" },
+  ch2_thought_warning_resolved: { id: "ch2_thought_warning_resolved", chapter: CHAPTER, background: deskCg, cgMode: true, speaker: "旁白", text: "[旁白]窒息感逐渐减轻。我整个人瘫在书桌上大口吸气，喉咙里发出破风箱般的声音。\n\n[主角]（对啊，这个比赛本来就不想让人活。现在，先活下去再说。）\n\n[旁白]我及时停止了胡思乱想，赶紧开始调查，免得想多了又触犯规则。", nextSceneId: "ch2_home_exploration_start" },
 
   ch2_home_exploration_start: { id: "ch2_home_exploration_start", chapter: CHAPTER, background: livingroom, speaker: "叶平生", playerState: "yps_frames_stand_back", text: "[主角]（先调查活动频率最高的客厅，再检查卫生间与厨房。）\n\n[旁白]桌面除了花瓶什么都没有，地板干净得几乎不用穿拖鞋。\n\n[主角]（这个家对整洁有异常执着。以后行动必须注意不留下痕迹。）", onCgEnd: "ch2_free_livingroom" },
   ch2_family_photo: { id: "ch2_family_photo", chapter: CHAPTER, background: livingroom, speaker: "旁白", text: "[旁白]全家福里，我们一家三口对着镜头礼貌微笑，仪态端庄得有些诡异。\n\n[主角]（三个人都像在假笑。我的直觉不会错。）\n\n[主角]（他们现在真的幸福吗？）\n\n[主角]（不过，要是他们不幸福，我应该在进入副本的瞬间就违规了。）\n\n[主角]（所以——至少在规则层面，他们很幸福。）\n\n[旁白]我冷笑了一声。" },
@@ -172,6 +231,8 @@ export const ch2Scenes: Record<string, Scene> = {
   ch2_livingroom_tv: { id: "ch2_livingroom_tv", chapter: CHAPTER, background: livingroom, speaker: "旁白", text: "电视落了些灰，感觉好久没用了。" },
   ch2_livingroom_plant: { id: "ch2_livingroom_plant", chapter: CHAPTER, background: livingroom, speaker: "旁白", text: "[旁白]盆景的花盆里，一朵枯萎的花正静静地等待着春天。\n\n[主角]（这花真可怜。）" },
   ch2_livingroom_exit_blocked: { id: "ch2_livingroom_exit_blocked", chapter: CHAPTER, background: livingroom, speaker: "叶平生", text: "（出门干嘛？）" },
+  ch2_livingroom_room_done: { id: "ch2_livingroom_room_done", chapter: CHAPTER, background: livingroom, speaker: "叶平生", text: "（房间没什么可调查的了。）" },
+  ch2_kitchen_before_bathroom_blocked: { id: "ch2_kitchen_before_bathroom_blocked", chapter: CHAPTER, background: livingroom, speaker: "叶平生", text: "（先去调查卫生间吧。）" },
   ch2_parents_bedroom_notice: { id: "ch2_parents_bedroom_notice", chapter: CHAPTER, background: livingroom, speaker: "旁白", text: "[旁白]父母卧室的门关着。按规则，进入家庭成员个人房间必须敲门。\n\n[主角]（现在父母都不在家。但贸然进入还是太早了。先记下这里，之后找机会调查。）\n\n[主角]（按规则——父亲如果在厨房要进去帮他。厨房规则暗示了父母的角色分工，也值得注意。）" },
   ch2_family_rules_missing: { id: "ch2_family_rules_missing", chapter: CHAPTER, background: livingroom, speaker: "叶平生", text: "（客厅的规则还没找到。）" },
 

@@ -14,6 +14,10 @@ export interface SaveSlot {
   state: GameState;
   timestamp: string;
   preview: string;
+  /** 存档时所在章节名，如"第3章 · 学校初入" */
+  chapter?: string;
+  /** 存档时所在地图 ID */
+  mapId?: string;
   version?: number;
   checksum?: string;
 }
@@ -67,6 +71,8 @@ function normalizeSlot(value: unknown): SaveSlot | null {
     state: cloneState(slot.state),
     timestamp: typeof slot.timestamp === "string" ? slot.timestamp : "未知时间",
     preview: typeof slot.preview === "string" ? slot.preview : "",
+    chapter: typeof slot.chapter === "string" ? slot.chapter : undefined,
+    mapId: typeof slot.mapId === "string" ? slot.mapId : undefined,
     version: typeof slot.version === "number" ? slot.version : 1,
     checksum: slot.checksum,
   };
@@ -118,7 +124,7 @@ export function getAllSaves(): SaveSlot[] {
   return [];
 }
 
-export function saveToSlot(slot: number, state: GameState, preview: string): void {
+export function saveToSlot(slot: number, state: GameState, preview: string, chapter?: string, mapId?: string): void {
   if (!Number.isInteger(slot) || slot < 0 || slot >= MAX_SLOTS) {
     throw new Error(`无效存档槽位: ${slot}`);
   }
@@ -129,6 +135,8 @@ export function saveToSlot(slot: number, state: GameState, preview: string): voi
     state: snapshot,
     timestamp: new Date().toLocaleString("zh-CN"),
     preview: preview.slice(0, 30),
+    chapter,
+    mapId: mapId || state.currentMapId,
     version: SAVE_VERSION,
     checksum: checksum(snapshot),
   });

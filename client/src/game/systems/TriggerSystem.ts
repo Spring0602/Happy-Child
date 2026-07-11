@@ -64,7 +64,14 @@ export class TriggerSystem {
         this.player.y >= body.y &&
         this.player.y <= body.y + body.height;
 
-      if (!inZone) continue;
+      // 玩家离开区域后重置触发状态，允许下次进入再次触发
+      if (!inZone) {
+        trigger.triggered = false;
+        continue;
+      }
+
+      // 已触发且玩家仍在区域内：跳过（防止每帧重复触发）
+      if (trigger.triggered) continue;
 
       // walk 类型：自动触发
       // interact 类型：需要 E 键（由 InteractionSystem 处理）

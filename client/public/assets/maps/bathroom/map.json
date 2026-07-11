@@ -102,10 +102,10 @@
         {
           "id": 11,
           "name": "collision_14",
-          "x": 123,
-          "y": 318,
+          "x": 124,
+          "y": 308,
           "width": 27.542735093425335,
-          "height": 26.093117456929292
+          "height": 39
         },
         {
           "id": 12,
@@ -114,6 +114,14 @@
           "y": 354,
           "width": 78.27935237078779,
           "height": 63.783176005827045
+        },
+        {
+          "id": 13,
+          "name": "collision_27",
+          "x": 125,
+          "y": 317,
+          "width": 25,
+          "height": 49.233185019633765
         }
       ]
     },
@@ -326,14 +334,19 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E返回客厅"
             }
           ]
         },
         {
           "id": 101,
           "name": "trigger_16",
-          "x": 121,
-          "y": 315,
+          "x": 123,
+          "y": 316,
           "width": 44.510228353946786,
           "height": 30.018526099173414,
           "properties": [
@@ -346,6 +359,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E垃圾桶"
             }
           ]
         },
@@ -366,6 +384,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E观察镜子"
             }
           ]
         },
@@ -386,6 +409,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E浴室"
             }
           ]
         },
@@ -393,7 +421,7 @@
           "id": 104,
           "name": "trigger_19",
           "x": 223,
-          "y": 404,
+          "y": 368,
           "width": 34.15901245768006,
           "height": 36.22925563693343,
           "properties": [
@@ -406,6 +434,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E查看墙上规则"
             }
           ]
         },
@@ -426,6 +459,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E盥洗池"
             }
           ]
         },
@@ -446,6 +484,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E盥洗池"
             }
           ]
         },
@@ -466,6 +509,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E浴缸"
             }
           ]
         }

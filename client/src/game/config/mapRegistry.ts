@@ -1,5 +1,7 @@
 import type { MapEntry } from "../types/gameMap";
 
+const CLASSROOM_MAP_VERSION = "20260711_spawn255";
+
 export const MapRegistry: Record<string, MapEntry> = {
   livingroom: {
     mapKey: "map_livingroom",
@@ -55,7 +57,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     tilesetKey: "tileset_bedroom",
     tilesetImage: "/assets/maps/bedroom/tileset.png",
     tilesetNameInTiled: "dummy",
-    defaultSpawn: "spawn_bedroom_door",
+    defaultSpawn: "spawn_spawn_38",
     width: 960,
     height: 640,
     tileWidth: 32,
@@ -214,15 +216,15 @@ export const MapRegistry: Record<string, MapEntry> = {
     tilesetKey: "tileset_bedroom_luggage",
     tilesetImage: "/assets/maps/bedroom/tileset.png",
     tilesetNameInTiled: "dummy",
-    defaultSpawn: "spawn_spawn_36",
+    defaultSpawn: "spawn_spawn_38",
     width: 960,
     height: 640,
     tileWidth: 32,
     tileHeight: 32,
   },
   classroom: {
-    mapKey: "map_classroom",
-    mapJson: "/assets/maps/classroom/map.json",
+    mapKey: `map_classroom_${CLASSROOM_MAP_VERSION}`,
+    mapJson: `/assets/maps/classroom/map.json?v=${CLASSROOM_MAP_VERSION}`,
     groundKey: "ground_classroom",
     groundImage: "/assets/maps/classroom/教室.png",
     tilesetKey: "tileset_classroom",

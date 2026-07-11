@@ -2165,7 +2165,37 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/classroom/教室.png",
     speaker: "旁白",
     playerState: "yps_frames_sit_back",
-    text: "[NPC:周骐瑞]刘宇！你又把我作业藏哪了？\n\n[旁白]思绪应声而断。我朝声源看去，对上一张似曾相识的脸。\n\n[主角]（周骐瑞？不对，他不长这样。）\n\n[旁白]一个灵活的身影在课桌间窜来窜去，不知何时把一本教辅扔到了我的腿上。\n\n[旁白]封面上用油性笔写着“周骐瑞”三个字。\n\n[NPC:刘宇]（笑）诶呀，周骐瑞，你这就冤枉我了。你的作业真不在我这。\n\n[NPC:周骐瑞]我信你个鬼。\n\n[旁白]周骐瑞大步走到刘宇座位旁，毫不客气地翻他的抽屉。刘宇则大大方方地给他让了个位置。\n\n我拿着周骐瑞的作业，不知所措。\n\n我无助地看向刘宇，对方立即会意，朝我挤眉弄眼，并做了一个“你懂的”的嘴形。\n\n[旁白]我瞬间无语。\n\n[主角]（这还真是和我认识的那个刘宇一模一样。）",
+    text: "[NPC:周骐瑞]刘宇！你又把我作业藏哪了？\n\n[旁白]思绪应声而断。我朝声源看去，对上一张似曾相识的脸。\n\n[主角]（周骐瑞？不对，他不长这样。）",
+    nextSceneId: "ch3_homework_prank_liuyu_move",
+  },
+
+  ch3_homework_prank_liuyu_dialog: {
+    id: "ch3_homework_prank_liuyu_dialog",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    playerState: "yps_frames_sit_back",
+    text: "[旁白]一个灵活的身影在课桌间窜来窜去，不知何时把一本教辅扔到了我的腿上。\n\n[旁白]封面上用油性笔写着“周骐瑞”三个字。\n\n[NPC:刘宇]（笑）诶呀，周骐瑞，你这就冤枉我了。你的作业真不在我这。\n\n[NPC:周骐瑞]我信你个鬼。",
+    nextSceneId: "ch3_homework_prank_zqr_move",
+  },
+
+  ch3_homework_prank_zqr_dialog: {
+    id: "ch3_homework_prank_zqr_dialog",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    playerState: "yps_frames_sit_back",
+    text: "[旁白]周骐瑞大步走到刘宇座位旁，毫不客气地翻他的抽屉。刘宇则大大方方地给他让了个位置。\n\n我拿着周骐瑞的作业，不知所措。\n\n我无助地看向刘宇，对方立即会意，朝我挤眉弄眼，并做了一个“你懂的”的嘴形。",
+    nextSceneId: "ch3_homework_prank_liuyu_hint",
+  },
+
+  ch3_homework_prank_hint_dialog: {
+    id: "ch3_homework_prank_hint_dialog",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/classroom/教室.png",
+    speaker: "旁白",
+    playerState: "yps_frames_sit_back",
+    text: "[旁白]我瞬间无语。\n\n[主角]（这还真是和我认识的那个刘宇一模一样。）",
     nextSceneId: "ch3_homework_choice",
   },
 
@@ -2195,8 +2225,18 @@ export const scenes: Record<string, Scene> = {
     chapter: "第3章 · 学校初入",
     background: "/assets/maps/classroom/教室.png",
     speaker: "旁白",
-    text: "[旁白]我犹豫片刻，还是起身把作业递给周骐瑞。\n\n[主角说]在我这里。\n\n[旁白]教室里短暂安静了一瞬。刘宇挑起眉毛，像是第一次发现我也会不按套路出牌。\n\n[NPC:周骐瑞]……谢了。\n\n[旁白]周骐瑞沉默着看向我，没有立刻离开。他的目光带着些许审视的意味，像是察觉到了某种不协调。\n\n[主角]（有什么不对吗？）\n\n[旁白]但我识趣地没有开口询问。\n\n刘宇看着我们，意味深长地笑了起来，拍了拍周骐瑞的肩膀。\n\n[NPC:刘宇]好了，周骐瑞，东西找到了，就别缠着我们可怜的小叶同学了。\n\n[旁白]周骐瑞狠狠剜了他一眼，转身回到座位上。",
-    nextSceneId: "ch3_empty_seat_seen",
+    text: "[旁白]我想了想还是把作业放回了周骐瑞的座位上。\n\n[主角说]在我这里。\n\n[旁白]教室里短暂安静了一瞬。刘宇挑起眉毛，像是第一次发现我也会不按套路出牌。\n\n[NPC:周骐瑞]……谢了。\n\n[旁白]周骐瑞沉默着看向我，没有立刻离开。他的目光带着些许审视的意味，像是察觉到了某种不协调。\n\n[主角]（有什么不对吗？）\n\n[旁白]但我识趣地没有开口询问。\n\n刘宇看着我们，意味深长地笑了起来，拍了拍周骐瑞的肩膀。\n\n[NPC:刘宇]好了，周骐瑞，东西找到了，就别缠着我们可怜的小叶同学了。\n\n[旁白]周骐瑞狠狠剜了他一眼，转身回到座位上。",
+    nextSceneId: "ch3_returned_homework_empty_seat",
+  },
+
+  ch3_returned_homework_empty_seat: {
+    id: "ch3_returned_homework_empty_seat",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/CG/教室/教室夜晚.png",
+    cgMode: true,
+    speaker: "旁白",
+    text: "[旁白]我回到自己的座位上，脑海里却还停留在刘宇和周骐瑞刚才看我的眼神里。\n\n[主角]（他们为什么那样看我？是我表现得很奇怪吗？）\n\n[主角]（可我高中时和他们本身就不熟，倒是刘宇把作业传给我的行为很奇怪。）\n\n[主角]（莫非在他们眼中我应该和他们关系很好吗？那其他人又和我是什么关系？）\n\n[旁白]诸多猜测让我有些不安。我下意识回头看向后方。\n\n[旁白]那里空着一个座位，桌面上却干干净净，一尘不染，似乎仍然经常使用。\n\n[主角]（空座位？）\n\n[旁白]我盯着那个位置看了几秒，忽然意识到，那正是我高三时坐过的位置。\n\n[主角]（等等，为什么会是那里？）\n\n[旁白]一股寒意沿着脊背窜上来。可还没等我想清楚这是怎么回事，考试开始的动静就打断了我的思绪。\n\n[主角]（先冷静。这个问题考试之后再想吧。）",
+    nextSceneId: "ch3_exam_begins",
   },
 
   ch3_prank_laughter: {
@@ -2312,7 +2352,37 @@ export const scenes: Record<string, Scene> = {
     background: "/assets/maps/gate/校门夜晚.png",
     speaker: "旁白",
     playerState: "yps_frames_stand_back",
-    text: "[旁白]考完试，我跟着人流往校门口走去。\n\n[旁白]我默默听着同学们的谈话，确认他们讨论的是正常试题。\n\n[主角]（也就是说，异常问卷只针对我。）\n\n[旁白]还有一件事需要确认。\n\n[旁白]我回过头，试图在人流中寻找刘宇的身影。没过多久，他就和一群人嘻嘻哈哈地走了过来。\n\n[NPC:刘宇]嘿，叶平生，今天怎么溜这么快？\n\n[主角说]当然是急着回家呗。这狗考试真是把我折磨死了。\n\n[NPC:刘宇]是啊，最后一题的结果我都没来得及算。不过好在没有不会做的题，哈哈。\n\n[旁白]他自然地把胳膊搭在我的肩膀上，刻意把我和别人拉开距离。\n\n[主角]（这哥们真上道，省得我找机会和他私聊了。）\n\n[NPC:刘宇]啧，你别装蒜了。我怎么感觉你今天一惊一乍的？这几天校内也没发生什么特别的事，难不成是你家里出事了？\n\n[主角]（啊对对对，的确出事了，而且出大事了，甚至会危及生命。）",
+    text: "[旁白]考完试，我跟着人流往校门口走去。\n\n[旁白]我默默听着同学们的谈话，确认他们讨论的是正常试题。\n\n[主角]（也就是说，异常问卷只针对我。）\n\n[旁白]还有一件事需要确认。",
+    nextSceneId: "ch3_after_exam_turn_back",
+  },
+
+  ch3_after_exam_find_liuyu: {
+    id: "ch3_after_exam_find_liuyu",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    playerState: "yps_frames_stand_front",
+    text: "[旁白]我回过头，试图在人流中寻找刘宇的身影。没过多久，他就和一群人嘻嘻哈哈地走了过来。",
+    nextSceneId: "ch3_after_exam_liuyu_approach",
+  },
+
+  ch3_after_exam_greeting: {
+    id: "ch3_after_exam_greeting",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    playerState: "yps_frames_stand_front",
+    text: "[NPC:刘宇]嘿，叶平生，今天怎么溜这么快？\n\n[主角说]当然是急着回家呗。这狗考试真是把我折磨死了。",
+    nextSceneId: "ch3_after_exam_liuyu_pull_aside",
+  },
+
+  ch3_after_exam_private_start: {
+    id: "ch3_after_exam_private_start",
+    chapter: "第3章 · 学校初入",
+    background: "/assets/maps/gate/校门夜晚.png",
+    speaker: "旁白",
+    playerState: "yps_frames_stand_front",
+    text: "[NPC:刘宇]是啊，最后一题的结果我都没来得及算。不过好在没有不会做的题，哈哈。\n\n[旁白]他自然地把胳膊搭在我的肩膀上，刻意把我和别人拉开距离。\n\n[主角]（这哥们真上道，省得我找机会和他私聊了。）\n\n[NPC:刘宇]啧，你别装蒜了。我怎么感觉你今天一惊一乍的？这几天校内也没发生什么特别的事，难不成是你家里出事了？\n\n[主角]（啊对对对，的确出事了，而且出大事了，甚至会危及生命。）",
     nextSceneId: "ch3_liuyu_private_talk_choice",
   },
 

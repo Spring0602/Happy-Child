@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { GameState } from "../types/game";
 import { getAllSaves, loadSlot, type SaveSlot } from "../engine/save";
+import { SettingsPanel } from "./SettingsPanel";
 
 interface Props {
   onNewGame: () => void;
@@ -12,6 +13,7 @@ interface Props {
 
 export function StartMenu({ onNewGame, onStartChapter4, onLoadGame, onShowPortrait, onExit }: Props) {
   const [showLoadPanel, setShowLoadPanel] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [saves, setSaves] = useState<SaveSlot[]>([]);
 
   function openLoadPanel() {
@@ -24,6 +26,10 @@ export function StartMenu({ onNewGame, onStartChapter4, onLoadGame, onShowPortra
     if (state) {
       onLoadGame(state);
     }
+  }
+
+  if (showSettings) {
+    return <SettingsPanel onClose={() => setShowSettings(false)} />;
   }
 
   return (
@@ -47,16 +53,14 @@ export function StartMenu({ onNewGame, onStartChapter4, onLoadGame, onShowPortra
             <button className="start-btn" onClick={onNewGame}>
               新的游戏
             </button>
-            {onStartChapter4 && (
-              <button className="start-btn" onClick={onStartChapter4}>
-                从第四章开始
-              </button>
-            )}
             <button className="start-btn" onClick={openLoadPanel}>
               继续游戏
             </button>
             <button className="start-btn" onClick={onShowPortrait}>
               人格画像
+            </button>
+            <button className="start-btn" onClick={() => setShowSettings(true)}>
+              设置
             </button>
             <button className="start-btn exit-btn" onClick={onExit}>
               退出游戏

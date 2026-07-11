@@ -3,15 +3,19 @@ type SoundName =
   | "book_drop"
   | "door_knock"
   | "door_knock_heavy"
+  | "dungeon_transition"
   | "footsteps_slow"
   | "horror_sting"
   | "impact"
   | "message_ping"
   | "paper_rustle"
+  | "rain"
   | "rule_pierce"
   | "school_bell"
+  | "skill_extract"
   | "tinnitus"
-  | "water_running";
+  | "water_running"
+  | "warning_bell";
 
 type ScheduledSound = {
   name: SoundName;
@@ -21,18 +25,17 @@ type ScheduledSound = {
 const sceneSounds: Record<string, ScheduledSound[]> = {
   dorm_act3_alarm: [{ name: "alarm_clock" }],
   ch2_game_start: [
-    { name: "rule_pierce", delayMs: 1200 },
     { name: "tinnitus", delayMs: 22000 },
   ],
   ch2_plan_book_read: [{ name: "door_knock", delayMs: 26000 }],
   ch2_stumble_fail: [
-    { name: "tinnitus", delayMs: 100 },
+    { name: "warning_bell", delayMs: 100 },
     { name: "horror_sting", delayMs: 700 },
   ],
-  ch2_breakfast_violation: [{ name: "tinnitus", delayMs: 6000 }],
+  ch2_breakfast_violation: [{ name: "warning_bell", delayMs: 6000 }],
   ch2_study_montage: [
     { name: "paper_rustle", delayMs: 1200 },
-    { name: "tinnitus", delayMs: 7800 },
+    { name: "warning_bell", delayMs: 7800 },
     { name: "horror_sting", delayMs: 12000 },
   ],
   ch2_bathroom_knocking: [{ name: "door_knock" }],
@@ -120,12 +123,30 @@ const sceneSounds: Record<string, ScheduledSound[]> = {
 };
 
 let audioContext: AudioContext | null = null;
+/** sfx 总音量 GainNode，所有合成音效经此节点输出 */
+let sfxMasterGain: GainNode | null = null;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
-  audioContext ??= new AudioContext();
+  if (!audioContext) {
+    audioContext = new AudioContext();
+    // 创建 sfx 总音量节点并注册到 audioSettings
+    sfxMasterGain = audioContext.createGain();
+    sfxMasterGain.connect(audioContext.destination);
+    // 延迟导入避免循环依赖
+    import("./audioSettings").then(({ registerSfxGainNode }) => {
+      if (sfxMasterGain) registerSfxGainNode(sfxMasterGain);
+    });
+  }
   void audioContext.resume();
   return audioContext;
+}
+
+/** 获取音效目标节点（总音量 GainNode 或直接 destination） */
+function getSfxDestination(): AudioNode {
+  const ctx = getAudioContext();
+  if (!ctx) throw new Error("no audio context");
+  return sfxMasterGain ?? ctx.destination;
 }
 
 export function unlockScriptedAudio() {
@@ -141,7 +162,7 @@ function tone(context: AudioContext, frequency: number, duration: number, volume
   gain.gain.setValueAtTime(0.0001, start);
   gain.gain.exponentialRampToValueAtTime(volume, start + 0.015);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  oscillator.connect(gain).connect(context.destination);
+  oscillator.connect(gain).connect(getSfxDestination());
   oscillator.start(start);
   oscillator.stop(start + duration + 0.03);
 }
@@ -157,7 +178,7 @@ function noise(context: AudioContext, duration: number, volume = 0.18, offset = 
   const gain = context.createGain();
   source.buffer = buffer;
   gain.gain.value = volume;
-  source.connect(gain).connect(context.destination);
+  source.connect(gain).connect(getSfxDestination());
   source.start(context.currentTime + offset);
 }
 
@@ -176,6 +197,28 @@ function playSynthSound(name: SoundName) {
     [0, 0.38, 0.76].forEach((offset) => {
       tone(context, name === "school_bell" ? 880 : 1040, 0.3, 0.18, "sine", offset);
       tone(context, name === "school_bell" ? 660 : 820, 0.3, 0.1, "sine", offset);
+    });
+    return;
+  }
+  if (name === "skill_extract") {
+    [0, 0.12, 0.24, 0.38].forEach((offset, index) => {
+      tone(context, 660 + index * 220, 0.42, 0.08, "sine", offset);
+      tone(context, 990 + index * 260, 0.34, 0.055, "triangle", offset + 0.04);
+    });
+    noise(context, 0.9, 0.035, 0.1);
+    return;
+  }
+  if (name === "dungeon_transition") {
+    tone(context, 72, 0.55, 0.28, "sawtooth");
+    tone(context, 1180, 0.18, 0.18, "square", 0.04);
+    tone(context, 1860, 0.16, 0.12, "square", 0.14);
+    noise(context, 0.62, 0.24, 0.08);
+    return;
+  }
+  if (name === "warning_bell") {
+    [0, 0.32, 0.64].forEach((offset) => {
+      tone(context, 1380, 0.18, 0.13, "square", offset);
+      tone(context, 520, 0.2, 0.08, "sawtooth", offset);
     });
     return;
   }
@@ -217,9 +260,69 @@ function playSynthSound(name: SoundName) {
   noise(context, 0.24, 0.28);
 }
 
+// ── 雨声循环：用 AudioContext 生成连续白噪声模拟雨声 ────────────────────────
+let rainLoopNode: AudioBufferSourceNode | null = null;
+let rainGainNode: GainNode | null = null;
+
+function startRainLoop() {
+  const context = getAudioContext();
+  if (!context || rainLoopNode) return;
+
+  // 生成 3s 的白噪声缓冲区，loopback 无缝循环
+  const sampleRate = context.sampleRate;
+  const bufferLength = sampleRate * 3;
+  const buffer = context.createBuffer(1, bufferLength, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferLength; i++) {
+    data[i] = (Math.random() * 2 - 1) * 0.18;
+  }
+
+  // 低通滤波器使噪声更柔和（模拟雨声）
+  const filter = context.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.value = 1800;
+
+  rainGainNode = context.createGain();
+  rainGainNode.gain.setValueAtTime(0, context.currentTime);
+  rainGainNode.gain.linearRampToValueAtTime(0.35, context.currentTime + 1.5);
+
+  rainLoopNode = context.createBufferSource();
+  rainLoopNode.buffer = buffer;
+  rainLoopNode.loop = true;
+  rainLoopNode.connect(filter).connect(rainGainNode).connect(getSfxDestination());
+  rainLoopNode.start();
+}
+
+function stopRainLoop(fadeMs = 1200) {
+  const context = getAudioContext();
+  if (!context || !rainLoopNode || !rainGainNode) return;
+  const endTime = context.currentTime + fadeMs / 1000;
+  rainGainNode.gain.linearRampToValueAtTime(0, endTime);
+  const nodeRef = rainLoopNode;
+  window.setTimeout(() => {
+    try { nodeRef.stop(); } catch { /* already stopped */ }
+    rainLoopNode = null;
+    rainGainNode = null;
+  }, fadeMs + 100);
+}
+
+export function playOneShotSound(name: SoundName) {
+  playSynthSound(name);
+}
+
 export function playSceneSounds(sceneId: string): () => void {
   const timers = (sceneSounds[sceneId] ?? []).map(({ name, delayMs = 0 }) =>
     window.setTimeout(() => playSynthSound(name), delayMs),
   );
   return () => timers.forEach((timer) => window.clearTimeout(timer));
+}
+
+/** 开始循环播放雨声（进入阳台时调用） */
+export function startRainAmbience() {
+  startRainLoop();
+}
+
+/** 停止雨声循环（淡出后停止，离开阳台时调用） */
+export function stopRainAmbience() {
+  stopRainLoop();
 }

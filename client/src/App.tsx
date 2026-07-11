@@ -16,9 +16,10 @@ import { StartMenu } from "./components/StartMenu";
 import { GameMenu } from "./components/GameMenu";
 import { Backlog, type DialogLogEntry } from "./components/Backlog";
 import { PersonalityPortrait } from "./components/PersonalityPortrait";
+import { NotebookPanel } from "./components/NotebookPanel";
 import { PhoneChatOverlay } from "./components/PhoneChatOverlay";
 import { gameBridge } from "./game/bridge/GameBridge";
-import { playSceneSounds, unlockScriptedAudio } from "./services/scriptedAudio";
+import { playOneShotSound, playSceneSounds, startRainAmbience, stopRainAmbience, unlockScriptedAudio } from "./services/scriptedAudio";
 import { MapRegistry } from "./game/config/mapRegistry";
 import {
   analyzeChoice,
@@ -29,12 +30,13 @@ import {
   judgeEnding,
   type GeneratedPersonalityPortrait,
 } from "./services/aiClient";
-import type { AITrace, Choice, GameState, PhoneChatMessage } from "./types/game";
+import type { AITrace, Choice, GameState, InfoPanel, PhoneChatMessage } from "./types/game";
 import "./styles/global.css";
 
 type GamePhase = "menu" | "playing";
 const ENABLE_AI_FALLBACK_TEXT = import.meta.env.VITE_AI_ALLOW_FALLBACK === "true";
 const PHONE_CHAT_VISIBLE_HISTORY_LIMIT = 8;
+type ScreenEffect = "golden_light" | "shatter_screen";
 
 type FloatingTextItem = {
   id: string;
@@ -61,6 +63,7 @@ function filterConditionalSceneText(text: string, state: GameState): string {
   if (matches.length === 0) return text;
 
   let result = "";
+  let matchedAnyCondition = false;
   if ((matches[0].index ?? 0) > 0) {
     result += text.slice(0, matches[0].index);
   }
@@ -69,11 +72,12 @@ function filterConditionalSceneText(text: string, state: GameState): string {
     const contentStart = (match.index ?? 0) + match[0].length;
     const contentEnd = index + 1 < matches.length ? matches[index + 1].index ?? text.length : text.length;
     if (conditionMatches(match[1], state)) {
+      matchedAnyCondition = true;
       result += text.slice(contentStart, contentEnd);
     }
   });
 
-  return result.trim() || text.replace(markerPattern, "").trim();
+  return matchedAnyCondition ? result.trim() : text.replace(markerPattern, "").trim();
 }
 
 function createAiFailureScript(sceneId: string, error: unknown) {
@@ -87,8 +91,40 @@ function createAiFailureScript(sceneId: string, error: unknown) {
   ].join("\n\n");
 }
 
+function SystemInfoOverlay({ panel, closing }: { panel: InfoPanel; closing?: boolean }) {
+  return (
+    <div className={`system-info-stage${closing ? " closing" : ""}`}>
+      <div className="system-info-panel">
+        <div className="system-info-title">{panel.title}</div>
+        {panel.subtitle && <div className="system-info-subtitle">{panel.subtitle}</div>}
+        <div className="system-info-lines">
+          {panel.lines.map((line, index) => (
+            <div className="system-info-line" key={`${line}-${index}`}>{line}</div>
+          ))}
+        </div>
+        <div className="system-info-hint">{panel.hint ?? "随系统播报同步显示"}</div>
+      </div>
+    </div>
+  );
+}
+
 function inferSpawnIdForScene(sceneId: string, mapId: string): string {
   const sceneSpawnMap: Record<string, string> = {
+    ch3_classroom_entrance: "spawn_spawn_132",
+    ch3_homework_prank_start: "spawn_spawn_132",
+    ch3_homework_prank_liuyu_dialog: "spawn_spawn_132",
+    ch3_homework_prank_zqr_dialog: "spawn_spawn_132",
+    ch3_homework_prank_hint_dialog: "spawn_spawn_132",
+    ch3_homework_choice: "spawn_spawn_132",
+    ch3_prank_joined: "spawn_spawn_132",
+    ch3_prank_returned: "spawn_spawn_253",
+    ch3_after_exam_gate: "spawn_spawn_173",
+    ch3_after_exam_find_liuyu: "spawn_spawn_173",
+    ch3_after_exam_greeting: "spawn_spawn_173",
+    ch3_after_exam_private_start: "spawn_spawn_173",
+    ch3_liuyu_private_talk_choice: "spawn_spawn_173",
+    ch3_liuyu_help_commitment: "spawn_spawn_173",
+    ch3_class_count_question: "spawn_spawn_173",
     ch4_find_brochure: "spawn_spawn_145",
     ch4_morning_classroom: "spawn_spawn_132",
     ch4_morning_liuyu_sits: "spawn_spawn_132",
@@ -180,6 +216,33 @@ function restoreMorningClassroomSeats() {
   restoreClassroomSeats(Array.from(occupiedSpawns), candidates.slice(0, 3), true);
 }
 
+function spawnGatePassers(options?: { exclude?: string[]; count?: number; keyPrefix?: string }) {
+  const excludedSpawns = new Set(options?.exclude ?? []);
+  const gateSpawnCandidates = Array.from(
+    { length: 22 },
+    (_, index) => `spawn_spawn_${164 + index}`,
+  ).filter((spawnId) => !excludedSpawns.has(spawnId));
+  const selectedSpawns = [...gateSpawnCandidates]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, options?.count ?? 5);
+  const directions = ["front", "back", "left", "right"];
+  const keyPrefix = options?.keyPrefix ?? "npc_gate_passerby";
+
+  selectedSpawns.forEach((spawnId, index) => {
+    gameBridge.sendToPhaser({
+      type: "STORY_EVENT",
+      eventId: "spawn_npc",
+      payload: {
+        spawnId,
+        npcKey: `${keyPrefix}_${index}`,
+        scale: 0.75,
+        framesPrefix: index % 2 === 0 ? "npc_female1_frames" : "npc_male_frames",
+        direction: directions[Math.floor(Math.random() * directions.length)],
+      },
+    });
+  });
+}
+
 function restoreLessonClassroom(teacherKey = "npc_teacher_li", teacherFrames = "teacher_frames") {
   restoreClassroomSeats(["spawn_spawn_132", "spawn_spawn_127", "spawn_spawn_117"]);
   gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_258", npcKey: teacherKey, scale: 0.75, framesPrefix: teacherFrames } });
@@ -194,9 +257,55 @@ function restoreLunchClassroom() {
   gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames", pose: "sit", direction: "back" } });
 }
 
+function restoreCh3Classroom() {
+  restoreClassroomSeats(["spawn_spawn_132", "spawn_spawn_127", "spawn_spawn_117", "spawn_spawn_145", "spawn_spawn_253", "spawn_spawn_255"]);
+  gameBridge.sendToPhaser({
+    type: "STORY_EVENT",
+    eventId: "spawn_npc",
+    payload: { spawnId: "spawn_spawn_255", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" },
+  });
+  gameBridge.sendToPhaser({
+    type: "STORY_EVENT",
+    eventId: "spawn_npc",
+    payload: { spawnId: "spawn_spawn_253", nearSpawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames", direction: "front" },
+  });
+}
+
+function restoreCh3GateNight(sceneId: string) {
+  spawnGatePassers({
+    exclude: [
+      "spawn_spawn_185",
+      "spawn_spawn_174",
+      "spawn_spawn_175",
+      "spawn_spawn_176",
+      "spawn_spawn_171",
+      "spawn_spawn_172",
+      "spawn_spawn_173",
+      "spawn_spawn_178",
+    ],
+    count: 5,
+    keyPrefix: "npc_ch3_gate_passerby_restore",
+  });
+
+  const liuyuSpawn = ["ch3_after_exam_gate", "ch3_after_exam_find_liuyu"].includes(sceneId)
+    ? "spawn_spawn_178"
+    : sceneId === "ch3_after_exam_greeting"
+      ? "spawn_spawn_176"
+      : "spawn_spawn_185";
+  gameBridge.sendToPhaser({
+    type: "STORY_EVENT",
+    eventId: "spawn_npc",
+    payload: { spawnId: liuyuSpawn, npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" },
+  });
+}
+
 function restoreDynamicMapActors(loaded: GameState) {
   setTimeout(() => {
     if (loaded.currentMapId === "classroom") {
+      if (loaded.currentSceneId.startsWith("ch3_")) {
+        restoreCh3Classroom();
+        return;
+      }
       if (["ch4_find_brochure", "ch4_morning_classroom", "ch4_morning_liuyu_sits", "ch4_roster_test_liuyu"].includes(loaded.currentSceneId)) {
         restoreMorningClassroomSeats();
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_127", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", pose: "sit", direction: "back" } });
@@ -222,6 +331,11 @@ function restoreDynamicMapActors(loaded: GameState) {
         : "spawn_spawn_166";
       const direction = liuyuSpawn === "spawn_spawn_164" ? "right" : "front";
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: liuyuSpawn, npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction } });
+      return;
+    }
+
+    if (loaded.currentMapId === "gate_night" && loaded.currentSceneId.startsWith("ch3_")) {
+      restoreCh3GateNight(loaded.currentSceneId);
       return;
     }
 
@@ -265,9 +379,10 @@ export default function App() {
   const [showAITrace, setShowAITrace] = useState(false);
   const [eyeOpening, setEyeOpening] = useState(false);
   const [reactFlash, setReactFlash] = useState<"red" | null>(null);
+  const [screenEffect, setScreenEffect] = useState<ScreenEffect | null>(null);
   const [showBacklog, setShowBacklog] = useState(false);
   const [showPortraitPanel, setShowPortraitPanel] = useState(false);
-  const [showNotebookToast, setShowNotebookToast] = useState(false);
+  const [showNotebookPanel, setShowNotebookPanel] = useState(false);
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
   const [floatingTextPerformanceActive, setFloatingTextPerformanceActive] = useState(false);
   const [completedPhoneChats, setCompletedPhoneChats] = useState<Record<string, boolean>>({});
@@ -279,6 +394,7 @@ export default function App() {
   const [finalSaveRequired, setFinalSaveRequired] = useState(false);
   const [aiSceneTexts, setAiSceneTexts] = useState<Record<string, string>>({});
   const [aiSceneLoadingId, setAiSceneLoadingId] = useState<string | null>(null);
+  const [closingInfoPanelSceneId, setClosingInfoPanelSceneId] = useState<string | null>(null);
   const aiSceneRequestsRef = useRef<Set<string>>(new Set());
   const prevSceneIdRef = useRef<string>("");
   const corridorDeathTimerRef = useRef<number | null>(null);
@@ -328,6 +444,12 @@ export default function App() {
   }, [dialogScene]);
 
   const handleDialogSegmentDone = useCallback((sceneId: string, segmentText: string) => {
+    if (sceneId === "ch2_game_start" && segmentText.includes("现在进行技能抽取")) {
+      playOneShotSound("skill_extract");
+      setScreenEffect("golden_light");
+      window.setTimeout(() => setScreenEffect((current) => current === "golden_light" ? null : current), 3600);
+      return;
+    }
     if (sceneId !== "ch7_return_livingroom") return;
     if (segmentText.includes("回到家后，父母很识趣地没有找我的麻烦")) {
       gameBridge.sendToPhaser({
@@ -347,6 +469,14 @@ export default function App() {
         });
       }, 520);
     }
+  }, []);
+
+  const handleInfoPanelNext = useCallback((sceneId: string, nextSceneId: string) => {
+    setClosingInfoPanelSceneId(sceneId);
+    window.setTimeout(() => {
+      setClosingInfoPanelSceneId((current) => current === sceneId ? null : current);
+      handleNext(nextSceneId);
+    }, 360);
   }, []);
 
   useEffect(() => {
@@ -459,26 +589,23 @@ export default function App() {
           setShowPortraitPanel(false);
           return;
         }
+        if (showNotebookPanel) {
+          setShowNotebookPanel(false);
+          return;
+        }
         setGameMenuOpen(prev => !prev);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [gamePhase, showBacklog, showPortraitPanel, finalSaveRequired]);
+  }, [gamePhase, showBacklog, showPortraitPanel, showNotebookPanel, finalSaveRequired]);
 
-  // 监听关闭 AI Trace / 笔记本提示
+  // 监听关闭 AI Trace
   useEffect(() => {
     const onClose = () => setShowAITrace(false);
     window.addEventListener("close-ai-trace", onClose);
     return () => window.removeEventListener("close-ai-trace", onClose);
   }, []);
-
-  // 笔记本占位提示自动关闭
-  useEffect(() => {
-    if (!showNotebookToast) return;
-    const t = setTimeout(() => setShowNotebookToast(false), 2500);
-    return () => clearTimeout(t);
-  }, [showNotebookToast]);
 
   function addAITrace(type: AITrace["type"], result: unknown) {
     dispatch({
@@ -631,18 +758,23 @@ export default function App() {
         type: "STORY_EVENT",
         eventId: "move_player_path",
         payload: {
-          path: ["spawn_spawn_276", "spawn_spawn_249", "spawn_spawn_254", "spawn_spawn_253"],
-          direction: "right",
+          path: ["spawn_spawn_276", "spawn_spawn_249", "spawn_spawn_254", { spawnId: "spawn_spawn_253", nearSpawnId: "spawn_spawn_117" }],
           standAfter: true,
           freezeAfter: true,
           speed: 150,
+          completedEventId: "ch3_player_returned_homework",
         },
       });
-      setTimeout(() => {
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "down" } });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "left" } });
+      const onPlayerReturnedHomework = (event: Event) => {
+        const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+        if (detail?.eventId !== "ch3_player_returned_homework") return;
+        window.removeEventListener("map-story-event-complete", onPlayerReturnedHomework);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_player_towards", payload: { targetNpcKey: "npc_zhouqirui" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_zhouqirui", targetPlayer: true } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_liuyu", targetPlayer: true } });
         dispatch({ type: "DIALOG_START", sceneId: choice.nextSceneId });
-      }, 3800);
+      };
+      window.addEventListener("map-story-event-complete", onPlayerReturnedHomework);
       return;
     }
 
@@ -741,11 +873,11 @@ export default function App() {
       dispatch({ type: "SET_FLAG", flag: choice.id });
     }
     if (choice.id === "ch2_hid_outsider_items") {
-      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "change_ground_image", payload: { key: "ground_bedroom" } });
+      changeMapForScene("bedroom", "spawn_spawn_38", choice.nextSceneId, "yps_frames_stand_front");
     }
     if (choice.id === "ch2_searched_rules_first") {
       dispatch({ type: "DIALOG_END" });
-      changeMapForScene("bedroom_luggage", "spawn_spawn_36", "ch2_bedroom_initial_search", "yps_frames_stand_front");
+      changeMapForScene("bedroom_luggage", "spawn_spawn_38", "ch2_bedroom_initial_search", "yps_frames_stand_front");
       setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
       return;
     }
@@ -842,6 +974,21 @@ export default function App() {
         return;
       }
       if (currentScene?.onCgEnd) {
+        if (currentScene.onCgEnd === "enter_balcony") {
+          dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77", position: { x: 0, y: 0 } });
+          gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77" });
+          setTimeout(() => {
+            gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_start" });
+            startRainAmbience();
+            gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+            setTimeout(() => {
+              gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+              dispatch({ type: "DIALOG_START", sceneId: "balcony_night_narrate_1" });
+            }, 2000);
+          }, 600);
+          dispatch({ type: "DIALOG_END" });
+          return;
+        }
         if (currentScene.onCgEnd === "enter_dormitory_playable") {
           dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_chair", position: { x: 0, y: 0 } });
           gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_sit_chair" });
@@ -861,6 +1008,7 @@ export default function App() {
         }
         if (currentScene.onCgEnd === "return_dormitory") {
           gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_stop" });
+          stopRainAmbience();
           dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_spawn_52", position: { x: 0, y: 0 } });
           gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_spawn_52" });
           setTimeout(() => {
@@ -941,20 +1089,25 @@ export default function App() {
     }
 
     if (nextSceneId === "ch2_enter_bedroom") {
+      setScreenEffect("shatter_screen");
+      playOneShotSound("dungeon_transition");
+      window.setTimeout(() => setScreenEffect((current) => current === "shatter_screen" ? null : current), 900);
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_screen", payload: { duration: 500 } });
-      enterMapScene("bedroom_luggage", "spawn_spawn_36", nextSceneId, "yps_frames_stand_front");
+      enterMapScene("bedroom_luggage", "spawn_spawn_38", nextSceneId, "yps_frames_stand_front");
       return;
     }
 
     if (nextSceneId === "ch2_bedroom_priority_choice") {
       dispatch({ type: "SET_FLAG", flag: "ch2_date_confirmed" });
+      const hidItems = state.flags["ch2_hid_outsider_items"] || state.choiceHistory.includes("ch2_hid_outsider_items");
+      changeMapForScene(hidItems ? "bedroom" : "bedroom_luggage", "spawn_spawn_38", nextSceneId, "yps_frames_stand_front");
       dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
 
     if (nextSceneId === "ch2_bedroom_initial_search") {
       const hidItems = state.flags["ch2_hid_outsider_items"] || state.choiceHistory.includes("ch2_hid_outsider_items");
-      changeMapForScene(hidItems ? "bedroom" : "bedroom_luggage", "spawn_spawn_36", nextSceneId, "yps_frames_stand_front");
+      changeMapForScene(hidItems ? "bedroom" : "bedroom_luggage", "spawn_spawn_38", nextSceneId, "yps_frames_stand_front");
       dispatch({ type: "DIALOG_END" });
       setTimeout(() => {
         gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
@@ -988,17 +1141,23 @@ export default function App() {
       return;
     }
 
+    if (nextSceneId === "ch2_mother_door_choice") {
+      dispatch({ type: "SET_FLAG", flag: "ch2_bedroom_rules_found" });
+      dispatch({ type: "GO_NEXT", nextSceneId });
+      return;
+    }
+
     if (nextSceneId === "ch2_thought_violation_choice") {
       setReactFlash("red");
       setTimeout(() => setReactFlash(null), 800);
       gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_red", payload: { duration: 800 } });
-      enterMapScene("bedroom", "spawn_spawn_36", nextSceneId, "yps_frames_stand_front");
+      dispatch({ type: "GO_NEXT", nextSceneId });
       return;
     }
 
     if (nextSceneId === "ch2_home_exploration_start") {
       dispatch({ type: "SET_FLAG", flag: "ch2_thoughts_can_violate" });
-      enterMapScene("livingroom", "spawn_spawn_73", nextSceneId, "yps_frames_stand_back");
+      enterMapScene("livingroom", "spawn_bedroom", nextSceneId, "yps_frames_stand_back");
       return;
     }
 
@@ -1070,13 +1229,18 @@ export default function App() {
             standAfter: false,
             freezeAfter: true,
             speed: 150,
+            completedEventId: "ch2_enter_classroom_player_seated",
           },
         });
       }, 700);
-      setTimeout(() => {
+      const onClassroomPlayerSeated = (event: Event) => {
+        const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+        if (detail?.eventId !== "ch2_enter_classroom_player_seated") return;
+        window.removeEventListener("map-story-event-complete", onClassroomPlayerSeated);
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "apply_player_state", payload: { playerState: "yps_frames_sit_back" } });
         dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
-      }, 5600);
+      };
+      window.addEventListener("map-story-event-complete", onClassroomPlayerSeated);
       return;
     }
 
@@ -1101,6 +1265,7 @@ export default function App() {
         gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77" });
         setTimeout(() => {
           gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_start" });
+          startRainAmbience();
           gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
           setTimeout(() => {
             gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
@@ -1331,37 +1496,66 @@ export default function App() {
       return;
     }
 
+    if (nextSceneId === "ch3_homework_prank_liuyu_move") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: {
+          npcKey: "npc_liuyu",
+          path: ["spawn_spawn_249", "spawn_spawn_250", "spawn_spawn_257"],
+          speed: 170,
+          completedEventId: "ch3_liuyu_faces_zqr",
+        },
+      });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_zhouqirui", targetNpcKey: "npc_liuyu" } });
+      const onLiuyuNearZqr = (event: Event) => {
+        const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+        if (detail?.eventId !== "ch3_liuyu_faces_zqr") return;
+        window.removeEventListener("map-story-event-complete", onLiuyuNearZqr);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_liuyu", targetNpcKey: "npc_zhouqirui" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_zhouqirui", targetNpcKey: "npc_liuyu" } });
+        dispatch({ type: "DIALOG_START", sceneId: "ch3_homework_prank_liuyu_dialog" });
+      };
+      window.addEventListener("map-story-event-complete", onLiuyuNearZqr);
+      return;
+    }
+
+    if (nextSceneId === "ch3_homework_prank_zqr_move") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: {
+          npcKey: "npc_zhouqirui",
+          path: ["spawn_spawn_254", "spawn_spawn_250", "spawn_spawn_247"],
+          speed: 155,
+          completedEventId: "ch3_zqr_faces_liuyu",
+        },
+      });
+      const onZqrNearLiuyu = (event: Event) => {
+        const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+        if (detail?.eventId !== "ch3_zqr_faces_liuyu") return;
+        window.removeEventListener("map-story-event-complete", onZqrNearLiuyu);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_zhouqirui", targetNpcKey: "npc_liuyu" } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_liuyu", targetNpcKey: "npc_zhouqirui" } });
+        dispatch({ type: "DIALOG_START", sceneId: "ch3_homework_prank_zqr_dialog" });
+      };
+      window.addEventListener("map-story-event-complete", onZqrNearLiuyu);
+      return;
+    }
+
+    if (nextSceneId === "ch3_homework_prank_liuyu_hint") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_liuyu", targetPlayer: true } });
+      setTimeout(() => {
+        dispatch({ type: "DIALOG_START", sceneId: "ch3_homework_prank_hint_dialog" });
+      }, 180);
+      return;
+    }
+
     if (nextSceneId === "ch3_homework_prank_start") {
       dispatch({ type: "GO_NEXT", nextSceneId });
-      setTimeout(() => {
-        gameBridge.sendToPhaser({
-          type: "STORY_EVENT",
-          eventId: "move_npc_path",
-          payload: {
-            npcKey: "npc_liuyu",
-            path: ["spawn_spawn_249", "spawn_spawn_250", "spawn_spawn_257"],
-            direction: "down",
-            speed: 170,
-          },
-        });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_zhouqirui", direction: "up" } });
-      }, 1400);
-      setTimeout(() => {
-        gameBridge.sendToPhaser({
-          type: "STORY_EVENT",
-          eventId: "move_npc_path",
-          payload: {
-            npcKey: "npc_zhouqirui",
-            path: ["spawn_spawn_254", "spawn_spawn_250", "spawn_spawn_247"],
-            direction: "up",
-            speed: 155,
-          },
-        });
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "down" } });
-      }, 6200);
-      setTimeout(() => {
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_npc_direction", payload: { npcKey: "npc_liuyu", direction: "right" } });
-      }, 11000);
       return;
     }
 
@@ -1373,29 +1567,79 @@ export default function App() {
       changeMapForScene("gate_night", "spawn_spawn_176", nextSceneId, "yps_frames_stand_back");
       dispatch({ type: "DIALOG_END" });
       setTimeout(() => {
-        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_178", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" } });
         gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        spawnGatePassers({
+          exclude: [
+            "spawn_spawn_185",
+            "spawn_spawn_174",
+            "spawn_spawn_175",
+            "spawn_spawn_176",
+            "spawn_spawn_171",
+            "spawn_spawn_172",
+            "spawn_spawn_173",
+            "spawn_spawn_178",
+          ],
+          count: 5,
+          keyPrefix: "npc_ch3_gate_passerby",
+        });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "spawn_npc", payload: { spawnId: "spawn_spawn_178", npcKey: "npc_liuyu", scale: 0.75, framesPrefix: "ly_frames", direction: "back" } });
+        const onOpeningWalkComplete = (event: Event) => {
+          const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+          if (detail?.eventId !== "ch3_after_exam_opening_walk") return;
+          window.removeEventListener("map-story-event-complete", onOpeningWalkComplete);
+          dispatch({ type: "DIALOG_START", sceneId: nextSceneId });
+        };
+        window.addEventListener("map-story-event-complete", onOpeningWalkComplete);
         gameBridge.sendToPhaser({
           type: "STORY_EVENT",
           eventId: "move_player_path",
-          payload: { path: ["spawn_spawn_173"], direction: "back", standAfter: true, freezeAfter: true, speed: 130 },
+          payload: { path: ["spawn_spawn_173"], direction: "back", standAfter: true, freezeAfter: true, speed: 130, completedEventId: "ch3_after_exam_opening_walk" },
         });
-        setTimeout(() => {
-          gameBridge.sendToPhaser({
-            type: "STORY_EVENT",
-            eventId: "move_npc_path",
-            payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_176"], direction: "back", speed: 130 },
-          });
-        }, 1800);
-        setTimeout(() => {
-          gameBridge.sendToPhaser({
-            type: "STORY_EVENT",
-            eventId: "move_npc_path",
-            payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_185"], direction: "back", speed: 130 },
-          });
-        }, 5200);
-        setTimeout(() => dispatch({ type: "DIALOG_START", sceneId: nextSceneId }), 700);
       }, 700);
+      return;
+    }
+
+    if (nextSceneId === "ch3_after_exam_turn_back") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "set_player_anim", payload: { direction: "down" } });
+      setTimeout(() => dispatch({ type: "DIALOG_START", sceneId: "ch3_after_exam_find_liuyu" }), 180);
+      return;
+    }
+
+    if (nextSceneId === "ch3_after_exam_liuyu_approach") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_176"], direction: "back", speed: 130, completedEventId: "ch3_after_exam_liuyu_approached" },
+      });
+      const onLiuyuApproached = (event: Event) => {
+        const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+        if (detail?.eventId !== "ch3_after_exam_liuyu_approached") return;
+        window.removeEventListener("map-story-event-complete", onLiuyuApproached);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_player_towards", payload: { targetNpcKey: "npc_liuyu" } });
+        dispatch({ type: "DIALOG_START", sceneId: "ch3_after_exam_greeting" });
+      };
+      window.addEventListener("map-story-event-complete", onLiuyuApproached);
+      return;
+    }
+
+    if (nextSceneId === "ch3_after_exam_liuyu_pull_aside") {
+      dispatch({ type: "DIALOG_END" });
+      gameBridge.sendToPhaser({
+        type: "STORY_EVENT",
+        eventId: "move_npc_path",
+        payload: { npcKey: "npc_liuyu", path: ["spawn_spawn_185"], direction: "back", speed: 130, completedEventId: "ch3_after_exam_liuyu_pulled_aside" },
+      });
+      const onLiuyuPulledAside = (event: Event) => {
+        const detail = (event as CustomEvent<{ eventId?: string }>).detail;
+        if (detail?.eventId !== "ch3_after_exam_liuyu_pulled_aside") return;
+        window.removeEventListener("map-story-event-complete", onLiuyuPulledAside);
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_npc_towards", payload: { npcKey: "npc_liuyu", targetPlayer: true } });
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "face_player_towards", payload: { targetNpcKey: "npc_liuyu" } });
+        dispatch({ type: "DIALOG_START", sceneId: "ch3_after_exam_private_start" });
+      };
+      window.addEventListener("map-story-event-complete", onLiuyuPulledAside);
       return;
     }
 
@@ -2049,6 +2293,21 @@ export default function App() {
     }
 
     if (currentScene?.onCgEnd) {
+      if (currentScene.onCgEnd === "enter_balcony") {
+        dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77", position: { x: 0, y: 0 } });
+        gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77" });
+        setTimeout(() => {
+          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_start" });
+          startRainAmbience();
+          gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          setTimeout(() => {
+            gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+            dispatch({ type: "DIALOG_START", sceneId: "balcony_night_narrate_1" });
+          }, 2000);
+        }, 600);
+        dispatch({ type: "DIALOG_END" });
+        return;
+      }
       if (currentScene.onCgEnd === "dorm_enter_explore") {
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "flash_screen", payload: { duration: 200 } });
         setTimeout(() => {
@@ -2061,6 +2320,7 @@ export default function App() {
       }
       if (currentScene.onCgEnd === "return_dormitory") {
         gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_stop" });
+        stopRainAmbience();
         dispatch({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_spawn_52", position: { x: 0, y: 0 } });
         gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "dormitory", spawnId: "spawn_spawn_52" });
         setTimeout(() => {
@@ -2133,6 +2393,22 @@ export default function App() {
       }
     }
 
+    if (actualSceneId === "dorm_go_balcony") {
+      dispatch({ type: "DIALOG_END" });
+      dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77", position: { x: 0, y: 0 } });
+      gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77" });
+      setTimeout(() => {
+        gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_start" });
+        startRainAmbience();
+        gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+        setTimeout(() => {
+          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          dispatch({ type: "DIALOG_START", sceneId: "balcony_night_narrate_1" });
+        }, 2000);
+      }, 600);
+      return;
+    }
+
     // ── 7.1 校园小卖部：阶段重定向 ──
     const shopSchoolCheckoutPhase = state.flags["shop_school_checkout_phase"];
     const shopSchoolLeavePhase = state.flags["shop_school_leave_phase"];
@@ -2197,8 +2473,7 @@ export default function App() {
       if (actualSceneId === "trigger_43" || actualSceneId === "trigger_44") {
         if (!state.flags["ch2_hid_outsider_items"]) {
           dispatch({ type: "SET_FLAG", flag: "ch2_hid_outsider_items" });
-          gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "change_ground_image", payload: { key: "ground_bedroom" } });
-          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+          switchBedroomLuggageToCleanPreservingPlayer();
           dispatch({ type: "DIALOG_START", sceneId: "ch2_bedroom_luggage" });
           return;
         }
@@ -2220,9 +2495,8 @@ export default function App() {
         return;
       }
       if (actualSceneId === "trigger_27") {
-        dispatch({ type: "SET_FLAG", flag: "ch2_bedroom_rules_found" });
         gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
-        dispatch({ type: "DIALOG_START", sceneId: "ch2_plan_book_read" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_plan_book_intro" });
         return;
       }
       const mapped = bedroomTriggerMap[actualSceneId];
@@ -2236,6 +2510,12 @@ export default function App() {
 
     // ── 第2章：家庭区域触发器 ──
     if (state.currentMapId === "livingroom") {
+      if (actualSceneId === "trigger_64") {
+        dispatch({ type: "SET_FLAG", flag: "ch2_livingroom_cleanliness_seen" });
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch2_livingroom_room_done" });
+        return;
+      }
       if (actualSceneId === "trigger_68") {
         dispatch({ type: "SET_FLAG", flag: "ch2_family_photo_seen" });
         gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
@@ -2286,13 +2566,10 @@ export default function App() {
         return;
       }
       if (actualSceneId === "trigger_65") {
+        gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
         if (state.flags["ch2_family_rules_found"]) {
-          dispatch({ type: "CHANGE_MAP", mapId: "kitchen", spawnId: "spawn_kitchen_door", position: { x: 0, y: 0 } });
-          gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "kitchen", spawnId: "spawn_kitchen_door", playerState: "yps_frames_stand_front" });
-          dispatch({ type: "DIALOG_END" });
-          setTimeout(() => gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" }), 700);
+          dispatch({ type: "DIALOG_START", sceneId: "ch2_kitchen_before_bathroom_blocked" });
         } else {
-          gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
           dispatch({ type: "DIALOG_START", sceneId: "ch2_family_rules_missing" });
         }
         return;
@@ -2467,20 +2744,22 @@ export default function App() {
     const scene = scenes[actualSceneId];
     if (scene?.onCgEnd) {
       if (scene.onCgEnd === "enter_balcony") {
+        dispatch({ type: "DIALOG_END" });
         dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77", position: { x: 0, y: 0 } });
         gameBridge.sendToPhaser({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77" });
         setTimeout(() => {
           gameBridge.sendToPhaser({ type: "STORY_EVENT", eventId: "rain_start" });
+          startRainAmbience();
           gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
           setTimeout(() => {
             gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
             dispatch({ type: "DIALOG_START", sceneId: "balcony_night_narrate_1" });
           }, 2000);
         }, 600);
-        dispatch({ type: "DIALOG_END" });
         return;
       }
     }
+
     dispatch({ type: "DIALOG_START", sceneId: actualSceneId });
   }, [state.flags, state.currentMapId, state.currentSceneId, state.choiceHistory]);
 
@@ -2488,6 +2767,8 @@ export default function App() {
   const dialogPreview = dialogScene
     ? `[${dialogScene.speaker || "旁白"}] ${dialogScene.text.slice(0, 20)}`
     : "";
+  // 当前章节名（用于存档槽显示）
+  const currentChapter = dialogScene?.chapter ?? "";
 
   const wait = (ms: number) => new Promise(resolve => window.setTimeout(resolve, ms));
 
@@ -2532,6 +2813,29 @@ export default function App() {
       ...(playerState ? { playerState } : {}),
     });
   }, [getScenePlayerState]);
+
+  const switchBedroomLuggageToCleanPreservingPlayer = useCallback(() => {
+    const runtime = gameBridge.captureMapRuntime();
+    const preservedRuntime = runtime
+      ? {
+          ...runtime,
+          mapId: "bedroom" as const,
+          player: { ...runtime.player, frozen: true },
+        }
+      : undefined;
+    dispatch({
+      type: "CHANGE_MAP",
+      mapId: "bedroom",
+      spawnId: "spawn_spawn_38",
+      position: runtime ? { x: runtime.player.x, y: runtime.player.y } : { x: 0, y: 0 },
+    });
+    gameBridge.sendToPhaser({
+      type: "CHANGE_MAP",
+      mapId: "bedroom",
+      spawnId: "spawn_spawn_38",
+      ...(preservedRuntime ? { runtimeSnapshot: preservedRuntime } : { playerState: "yps_frames_stand_front" }),
+    });
+  }, []);
 
   const enterMapScene = useCallback((mapId: string, spawnId: string, sceneId: string, fallbackPlayerState?: string) => {
     changeMapForScene(mapId, spawnId, sceneId, fallbackPlayerState);
@@ -2710,7 +3014,7 @@ export default function App() {
     gameBridge.sendToPhaser({
       type: "STORY_EVENT",
       eventId: "spawn_npc",
-      payload: { spawnId: "spawn_spawn_253", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames", direction: "front" },
+      payload: { spawnId: "spawn_spawn_253", nearSpawnId: "spawn_spawn_117", npcKey: "npc_zhouqirui", scale: 0.75, framesPrefix: "zqr_frames", direction: "front" },
     });
   }, [fillClassroomSeats]);
 
@@ -2905,7 +3209,7 @@ export default function App() {
     <div style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden" }}>
       {/* ── 右上角菜单按钮（直接打开游戏菜单） ── */}
       <div className="menu-button" onClick={() => setGameMenuOpen(true)}>
-        <img src="/assets/ui/菜单图形.png" alt="菜单" className="menu-icon-img" />
+        菜单
       </div>
 
       {/* ── Phaser 地图（始终可见） ── */}
@@ -2920,6 +3224,7 @@ export default function App() {
 
       {/* ── React 闪屏层 ── */}
       {reactFlash && <div className={`react-flash-overlay ${reactFlash}`} />}
+      {screenEffect && <div className={`scripted-screen-effect ${screenEffect}`} />}
 
       {demoPortraitGenerating && (
         <div className="demo-portrait-generating">
@@ -3018,10 +3323,18 @@ export default function App() {
           ].includes(dialogScene.id)}
         />
       )}
+      {dialogScene?.infoPanel && (
+        <SystemInfoOverlay
+          panel={dialogScene.infoPanel}
+          closing={closingInfoPanelSceneId === dialogScene.id}
+        />
+      )}
       {dialogScene && !floatingTextPerformanceActive && !aiSceneIsLoading && !dialogScene.cgMode && (
         <DialogOverlay
           scene={dialogScene}
-          onNext={handleNext}
+          onNext={(nextSceneId) => dialogScene.infoPanel
+            ? handleInfoPanelNext(dialogScene.id, nextSceneId)
+            : handleNext(nextSceneId)}
           onChoose={handleChoose}
           onAIEvent={handleAIEvent}
           onClose={handleCloseDialog}
@@ -3043,8 +3356,9 @@ export default function App() {
           onRestart={handleRestart}
           onExitToTitle={handleExitToTitle}
           onShowBacklog={() => setShowBacklog(true)}
-          onShowNotebook={() => setShowNotebookToast(true)}
+          onShowNotebook={() => setShowNotebookPanel(true)}
           dialogPreview={dialogPreview}
+          currentChapter={currentChapter}
           initialPage={finalSaveRequired ? "save" : "main"}
           forceSave={finalSaveRequired}
           onSaveComplete={finalSaveRequired ? () => {
@@ -3068,11 +3382,8 @@ export default function App() {
         <PersonalityPortrait onClose={() => setShowPortraitPanel(false)} />
       )}
 
-      {/* ── 笔记本占位提示 ── */}
-      {showNotebookToast && (
-        <div className="notebook-toast">
-          <p>📓 笔记本功能开发中，敬请期待~</p>
-        </div>
+      {showNotebookPanel && (
+        <NotebookPanel state={state} onClose={() => setShowNotebookPanel(false)} />
       )}
     </div>
   );

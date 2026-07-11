@@ -51,6 +51,10 @@ export class MapScene extends Phaser.Scene {
   create() {
     console.log(`[MapScene] 🚀 create() 被调用, mapId=${this.currentMapId}`);
     try {
+      // 注册 Phaser sound manager 到音量控制系统
+      import("../../services/audioSettings").then(({ registerPhaserSoundManager }) => {
+        registerPhaserSoundManager(this.sound as unknown as { volume: number });
+      });
       this.loadMap(this.currentMapId);
       gameBridge.setMapRuntimeProvider(() => this.captureRuntimeSnapshot());
 
@@ -241,9 +245,6 @@ export class MapScene extends Phaser.Scene {
         const zone = this.add.zone(cx, cy, w, h);
         this.physics.add.existing(zone, true);
         this.collisionGroup.add(zone);
-        // 可视化调试：半透明红色框显示碰撞区域
-        const debugRect = this.add.rectangle(cx, cy, w, h, 0xff0000, 0.25);
-        debugRect.setDepth(9999);
       }
     }
 
@@ -474,8 +475,6 @@ export class MapScene extends Phaser.Scene {
 
         // interact/door 类型 → 注册到 InteractionSystem（E 键交互）
         if (triggerType === "interact" || triggerType === "door") {
-          // 阳台门不注册为可交互（只有窗户 trigger_window 能去阳台）
-          if (obj.name === "trigger_balcony_door") continue;
           // 硬编码：特定 trigger 的坐下行为（避免修改 map.json）
           const isChair = obj.name === "trigger_chair";
           this.interactionSys?.registerInteractable({
@@ -667,13 +666,10 @@ export class MapScene extends Phaser.Scene {
         // 传送到指定出生点
         const spawnId = payload?.spawnId as string;
         if (!spawnId) break;
-        const spawnLayer = this.map.getObjectLayer("player_spawn");
-        if (spawnLayer) {
-          const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
-          if (spawn) {
-            this.player.x = spawn.x! + (spawn.width ?? 32) / 2;
-            this.player.y = spawn.y! + (spawn.height ?? 32) / 2;
-          }
+        const point = this.getSpawnCenter(spawnId, payload?.nearSpawnId as string | undefined);
+        if (point) {
+          this.player.x = point.x;
+          this.player.y = point.y;
         }
         break;
       }
@@ -871,12 +867,10 @@ export class MapScene extends Phaser.Scene {
           npcList.delete(npcKey);
         }
 
-        const spawnLayer = this.map.getObjectLayer("player_spawn");
-        if (spawnLayer) {
-          const spawn = spawnLayer.objects.find((o) => o.name === spawnId);
-          if (spawn) {
-            const cx = spawn.x! + (spawn.width ?? 32) / 2;
-            const cy = spawn.y! + (spawn.height ?? 32) / 2;
+        const point = this.getSpawnCenter(spawnId, payload?.nearSpawnId as string | undefined);
+        if (point) {
+            const cx = point.x;
+            const cy = point.y;
             const frameManifest = AssetManifest.frames.find((entry) => entry.key === framesPrefix) as
               | { displayScaleMultiplier?: number }
               | undefined;
@@ -900,7 +894,6 @@ export class MapScene extends Phaser.Scene {
               pendingDirections?.delete(npcKey);
               this.handleStoryEvent("set_npc_direction", { npcKey, direction: pendingDirection });
             }
-          }
         }
         break;
       }
@@ -934,6 +927,52 @@ export class MapScene extends Phaser.Scene {
           pendingDirections.set(npcKey, direction);
           this.registry.set("pendingNpcDirections", pendingDirections);
         }
+        break;
+      }
+      case "face_npc_towards": {
+        const npcKey = payload?.npcKey as string;
+        const targetNpcKey = payload?.targetNpcKey as string | undefined;
+        const targetSpawnId = payload?.targetSpawnId as string | undefined;
+        const targetPlayer = Boolean(payload?.targetPlayer);
+        if (!npcKey) break;
+        const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
+        const entry = npcList?.get(npcKey);
+        if (!entry) break;
+        const targetEntry = targetNpcKey ? npcList?.get(targetNpcKey) : undefined;
+        const targetPoint = targetPlayer && this.player
+          ? { x: this.player.x, y: this.player.y }
+          : targetEntry
+          ? { x: targetEntry.sprite.x, y: targetEntry.sprite.y }
+          : targetSpawnId
+            ? this.getSpawnCenter(targetSpawnId)
+            : null;
+        if (!targetPoint) break;
+        const dx = targetPoint.x - entry.sprite.x;
+        const dy = targetPoint.y - entry.sprite.y;
+        const direction = Math.abs(dx) >= Math.abs(dy)
+          ? (dx >= 0 ? "right" : "left")
+          : (dy >= 0 ? "down" : "up");
+        this.handleStoryEvent("set_npc_direction", { npcKey, direction });
+        break;
+      }
+      case "face_player_towards": {
+        if (!this.player || !this.playerCtrl) break;
+        const targetNpcKey = payload?.targetNpcKey as string | undefined;
+        const targetSpawnId = payload?.targetSpawnId as string | undefined;
+        const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
+        const targetEntry = targetNpcKey ? npcList?.get(targetNpcKey) : undefined;
+        const targetPoint = targetEntry
+          ? { x: targetEntry.sprite.x, y: targetEntry.sprite.y }
+          : targetSpawnId
+            ? this.getSpawnCenter(targetSpawnId)
+            : null;
+        if (!targetPoint) break;
+        const dx = targetPoint.x - this.player.x;
+        const dy = targetPoint.y - this.player.y;
+        const direction = Math.abs(dx) >= Math.abs(dy)
+          ? (dx >= 0 ? "right" : "left")
+          : (dy >= 0 ? "down" : "up");
+        this.playerCtrl.standFacing(direction as "left" | "right" | "up" | "down");
         break;
       }
       case "set_npc_pose": {
@@ -1013,7 +1052,7 @@ export class MapScene extends Phaser.Scene {
       }
       case "move_npc_path": {
         const npcKey = payload?.npcKey as string;
-        const path = (payload?.path as string[]) || [];
+        const path = (payload?.path as Array<string | { spawnId: string; nearSpawnId?: string }>) || [];
         if (!npcKey || path.length === 0) break;
         const npcList = this.registry.get("npcSprites") as Map<string, RuntimeNpcEntry> | undefined;
         const entry = npcList?.get(npcKey);
@@ -1026,11 +1065,15 @@ export class MapScene extends Phaser.Scene {
           } else if (direction) {
             this.handleStoryEvent("set_npc_direction", { npcKey, direction });
           }
+          const completedEventId = payload?.completedEventId as string | undefined;
+          if (completedEventId) {
+            window.dispatchEvent(new CustomEvent("map-story-event-complete", { detail: { eventId: completedEventId, npcKey } }));
+          }
         });
         break;
       }
       case "move_player_path": {
-        const path = (payload?.path as string[]) || [];
+        const path = (payload?.path as Array<string | { spawnId: string; nearSpawnId?: string }>) || [];
         if (!this.player || path.length === 0) break;
         this.moveSpriteAlongSpawns(this.player, undefined, path, (payload?.speed as number) || 120, "yps_frames", () => {
           const direction = payload?.direction as string | undefined;
@@ -1041,6 +1084,10 @@ export class MapScene extends Phaser.Scene {
           }
           if (payload?.freezeAfter) {
             this.setPlayerFrozen(true);
+          }
+          const completedEventId = payload?.completedEventId as string | undefined;
+          if (completedEventId) {
+            window.dispatchEvent(new CustomEvent("map-story-event-complete", { detail: { eventId: completedEventId } }));
           }
         });
         break;
@@ -1201,10 +1248,44 @@ export class MapScene extends Phaser.Scene {
     });
   }
 
-  private getSpawnCenter(spawnId: string): { x: number; y: number } | null {
+  private getSpawnCenter(
+    spawnId: string,
+    nearSpawnId?: string,
+    previousPoint?: { x: number; y: number }
+  ): { x: number; y: number } | null {
     const spawnLayer = this.map.getObjectLayer("player_spawn");
-    const spawn = spawnLayer?.objects.find((object) => object.name === spawnId);
-    if (!spawn) return null;
+    const candidates = (spawnLayer?.objects ?? []).filter((object) => object.name === spawnId);
+    if (candidates.length === 0) return null;
+
+    let referencePoint = previousPoint;
+    if (nearSpawnId) {
+      const nearSpawn = spawnLayer?.objects.find((object) => object.name === nearSpawnId);
+      if (nearSpawn) {
+        referencePoint = {
+          x: nearSpawn.x! + (nearSpawn.width ?? 32) / 2,
+          y: nearSpawn.y! + (nearSpawn.height ?? 32) / 2,
+        };
+      }
+    }
+
+    const spawn = referencePoint && candidates.length > 1
+      ? candidates.reduce((best, candidate) => {
+          const bestDistance = Phaser.Math.Distance.Between(
+            referencePoint.x,
+            referencePoint.y,
+            best.x! + (best.width ?? 32) / 2,
+            best.y! + (best.height ?? 32) / 2
+          );
+          const candidateDistance = Phaser.Math.Distance.Between(
+            referencePoint.x,
+            referencePoint.y,
+            candidate.x! + (candidate.width ?? 32) / 2,
+            candidate.y! + (candidate.height ?? 32) / 2
+          );
+          return candidateDistance < bestDistance ? candidate : best;
+        })
+      : candidates[0];
+
     return {
       x: spawn.x! + (spawn.width ?? 32) / 2,
       y: spawn.y! + (spawn.height ?? 32) / 2,
@@ -1300,29 +1381,20 @@ export class MapScene extends Phaser.Scene {
   private moveSpriteAlongSpawns(
     sprite: Phaser.GameObjects.Sprite,
     zone: Phaser.GameObjects.Zone | undefined,
-    path: string[],
+    path: Array<string | { spawnId: string; nearSpawnId?: string }>,
     speed: number,
     framesPrefix?: string,
     onComplete?: () => void
   ) {
-    const spawnLayer = this.map.getObjectLayer("player_spawn");
     let previousPoint = { x: sprite.x, y: sprite.y };
     const points = path
-      .map((spawnId) => {
-        const candidates = (spawnLayer?.objects ?? [])
-          .filter((object) => object.name === spawnId)
-          .map((object) => ({
-            x: object.x! + (object.width ?? 32) / 2,
-            y: object.y! + (object.height ?? 32) / 2,
-          }));
-        if (candidates.length === 0) return null;
-        const nearest = candidates.reduce((best, candidate) => {
-          const bestDistance = Phaser.Math.Distance.Between(previousPoint.x, previousPoint.y, best.x, best.y);
-          const candidateDistance = Phaser.Math.Distance.Between(previousPoint.x, previousPoint.y, candidate.x, candidate.y);
-          return candidateDistance < bestDistance ? candidate : best;
-        });
-        previousPoint = nearest;
-        return nearest;
+      .map((step) => {
+        const spawnId = typeof step === "string" ? step : step.spawnId;
+        const nearSpawnId = typeof step === "string" ? undefined : step.nearSpawnId;
+        const point = this.getSpawnCenter(spawnId, nearSpawnId, previousPoint);
+        if (!point) return null;
+        previousPoint = point;
+        return point;
       })
       .filter((point): point is { x: number; y: number } => Boolean(point));
     if (points.length === 0) {

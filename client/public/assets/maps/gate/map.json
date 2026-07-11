@@ -7,7 +7,7 @@
       "id": 1,
       "name": "ground",
       "type": "imagelayer",
-      "image": "校门白天.png",
+      "image": "校门夜晚.png",
       "x": 0,
       "y": 0,
       "width": 846,
@@ -8139,6 +8139,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E教学楼"
             }
           ]
         },
@@ -8159,6 +8164,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E校门"
             }
           ]
         },
@@ -8179,6 +8189,11 @@
               "name": "sceneId",
               "type": "string",
               "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E绿化带"
             }
           ]
         }
@@ -8257,8 +8272,8 @@
         {
           "id": 208,
           "name": "spawn_spawn_172",
-          "x": 289,
-          "y": 503,
+          "x": 290,
+          "y": 514,
           "width": 32,
           "height": 32
         },
@@ -8272,6 +8287,14 @@
         },
         {
           "id": 210,
+          "name": "spawn_spawn_185",
+          "x": 227,
+          "y": 534,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 211,
           "name": "spawn_spawn_174",
           "x": 237,
           "y": 655,
@@ -8279,15 +8302,15 @@
           "height": 32
         },
         {
-          "id": 211,
+          "id": 212,
           "name": "spawn_spawn_175",
-          "x": 292,
-          "y": 654,
+          "x": 294,
+          "y": 669,
           "width": 32,
           "height": 32
         },
         {
-          "id": 212,
+          "id": 213,
           "name": "spawn_spawn_176",
           "x": 265,
           "y": 709,
@@ -8295,7 +8318,7 @@
           "height": 32
         },
         {
-          "id": 213,
+          "id": 214,
           "name": "spawn_spawn_177",
           "x": 309,
           "y": 803,
@@ -8303,7 +8326,7 @@
           "height": 32
         },
         {
-          "id": 214,
+          "id": 215,
           "name": "spawn_spawn_178",
           "x": 267,
           "y": 875,
@@ -8311,7 +8334,7 @@
           "height": 32
         },
         {
-          "id": 215,
+          "id": 216,
           "name": "spawn_spawn_179",
           "x": 367,
           "y": 1064,
@@ -8319,7 +8342,7 @@
           "height": 32
         },
         {
-          "id": 216,
+          "id": 217,
           "name": "spawn_spawn_180",
           "x": 397,
           "y": 1176,
@@ -8327,7 +8350,7 @@
           "height": 32
         },
         {
-          "id": 217,
+          "id": 218,
           "name": "spawn_spawn_181",
           "x": 313,
           "y": 1153,
@@ -8335,7 +8358,7 @@
           "height": 32
         },
         {
-          "id": 218,
+          "id": 219,
           "name": "spawn_spawn_182",
           "x": 538,
           "y": 651,
@@ -8343,7 +8366,7 @@
           "height": 32
         },
         {
-          "id": 219,
+          "id": 220,
           "name": "spawn_spawn_183",
           "x": 368,
           "y": 965,
@@ -8351,7 +8374,7 @@
           "height": 32
         },
         {
-          "id": 220,
+          "id": 221,
           "name": "spawn_spawn_184",
           "x": 367,
           "y": 982,
@@ -8376,7 +8399,7 @@
     }
   ],
   "nextlayerid": 8,
-  "nextobjectid": 271,
+  "nextobjectid": 272,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

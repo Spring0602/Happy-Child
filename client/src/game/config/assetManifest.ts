@@ -1,3 +1,5 @@
+const CLASSROOM_MAP_VERSION = "20260711_spawn255";
+
 export const AssetManifest = {
   maps: {
     livingroom: {
@@ -165,8 +167,8 @@ export const AssetManifest = {
       tilesetImage: "/assets/maps/dormitory/tileset.png",
     },
     classroom: {
-      mapKey: "map_classroom",
-      mapJson: "/assets/maps/classroom/map.json",
+      mapKey: `map_classroom_${CLASSROOM_MAP_VERSION}`,
+      mapJson: `/assets/maps/classroom/map.json?v=${CLASSROOM_MAP_VERSION}`,
       groundKey: "ground_classroom",
       groundImage: "/assets/maps/classroom/教室.png",
       tilesetKey: "tileset_classroom",
@@ -348,9 +350,10 @@ export const AssetManifest = {
       run: true,
       sit: true,
       stand: true,
+      displayScaleMultiplier: 4,
       runFrameStartOverrides: { left: 8, right: 8, front: 0, back: 16 },
       frameFileOverrides: {
-        stand_front: "frame_014.png", stand_back: "frame_015.png", stand_left: "frame_023.png", stand_right: "frame_022.png",
+        stand_front: "frame_014.png", stand_back: "frame_015.png", stand_left: "frame_023.png", stand_right: "frame_023.png",
         sit_front: "frame_024.png", sit_back: "frame_025.png", sit_left: "frame_026.png", sit_right: "frame_026.png",
       },
     },
@@ -383,12 +386,13 @@ export const AssetManifest = {
       key: "？？？_frames",
       run: true,
       stand: true,
+      displayScaleMultiplier: 4,
       runFrameStartOverrides: { left: 8, right: 8, front: 0, back: 16 },
       frameFileOverrides: {
         stand_front: "frame_014.png",
         stand_back: "frame_015.png",
         stand_left: "frame_022.png",
-        stand_right: "frame_023.png",
+        stand_right: "frame_022.png",
       },
     },
   ],

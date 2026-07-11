@@ -364,7 +364,7 @@
           "polygon": [
             {
               "x": 0,
-              "y": 70
+              "y": 120
             },
             {
               "x": 0,
@@ -931,6 +931,11 @@
               "name": "sceneId",
               "type": "string",
               "value": "dorm_go_balcony"
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E前往阳台"
             }
           ]
         },
@@ -951,6 +956,11 @@
               "name": "sceneId",
               "type": "string",
               "value": "dorm_interact_pc"
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E查看电脑"
             }
           ]
         },
@@ -971,6 +981,11 @@
               "name": "sceneId",
               "type": "string",
               "value": "dorm_interact_cpp_book"
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E课本"
             }
           ]
         },
@@ -991,6 +1006,11 @@
               "name": "sceneId",
               "type": "string",
               "value": "dorm_go_balcony"
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E前往阳台"
             }
           ]
         },
@@ -1011,6 +1031,11 @@
               "name": "sceneId",
               "type": "string",
               "value": "dorm_interact_clock"
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E时钟"
             }
           ]
         },
@@ -1031,14 +1056,19 @@
               "name": "sceneId",
               "type": "string",
               "value": "dorm_interact_exit_door"
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E离开宿舍"
             }
           ]
         },
         {
           "id": 106,
           "name": "trigger_chair",
-          "x": 232,
-          "y": 1038,
+          "x": 227,
+          "y": 1058,
           "width": 83,
           "height": 79,
           "properties": [
@@ -1073,8 +1103,8 @@
         {
           "id": 201,
           "name": "spawn_sit_chair",
-          "x": 239,
-          "y": 1020,
+          "x": 236,
+          "y": 1028,
           "width": 32,
           "height": 32
         },

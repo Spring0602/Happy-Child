@@ -112,7 +112,7 @@
 场景ID：ch2_enter_bedroom
 地图：bedroom_1
 底图：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\maps\bedroom\主角房间(带行李).png
-出生点：spawn_spawn_36
+出生点：spawn_spawn_38
 玩家状态：client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
 冻结玩家：是
 [旁白]眼前场景像碎裂玻璃一样坠落，取而代之的是一间风格严谨、呆板的卧室。
@@ -169,7 +169,7 @@
 场景ID：ch2_bedroom_initial_search
 地图：bedroom
 底图：client\public\assets\maps\bedroom\主角房间(带行李).png ，使用new_map.json → 隐藏行囊后切换为 主角房间.png ，使用map.json
-出生点：spawn_spawn_36
+出生点：spawn_spawn_38
 玩家状态：client\public\assets\sprites\frames\yps_frames\yps_frames_stand_front
 冻结玩家：否
 
@@ -445,7 +445,7 @@ NPC：
 [旁白]但我总觉得吃了不太妙。吃了一半之后，我放下了碗，捂住肚子开始演戏。
 [主角说]妈，我感觉吃了肚子有点疼。
 [NPC:母亲]啊，怎么会呢？我平常都在同一家买肉菜，吃了这么久都没事，怎么今天突然就肚子疼了？
-[NPC:父亲]你别是为了晚上考试翘掉才在你妈面前装病。
+[NPC:父亲]你别是为了把晚上的考试翘掉才在你妈面前装病。
 [旁白]气氛骤然变得微妙。我正打算解释，却觉得有些呼吸困难。
 [主角]（怎么回事？）
 [旁白]我屏住呼吸，尽量不让父母发现异常。
@@ -480,7 +480,19 @@ NPC：
 [主角]（看来扉页上的内容也是规则。）
 
 条件：ch2_delayed_breakfast
-流程：沿用 `ch2_ate_small_breakfast` 的剧情文本；主角不能继续沉默，必须在母亲追问后用“胃不舒服/学校吃坏肚子”一类理由补救，并触发同一条“父亲维护好孩子→违规提醒→圆场修复”教学链。
+[NPC:父亲]一个考试能把你焦虑成这样？你别是为了把晚上的考试翘掉才在你妈面前装病。
+[旁白]气氛骤然变得微妙。我正打算解释，却觉得有些呼吸困难。
+[主角]（怎么回事？）
+[旁白]我屏住呼吸，尽量不让父母发现异常。
+→ 音效: warning_bell (once)
+[NPC:系统]技能"违规提醒"正在发动。
+[主角]（"违规提醒"……这是我的衍生技能？被动激活了？）
+[主角]（不管怎样——必须赶紧打个圆场。）
+[主角说]我不是这个意思，我会去考试的。
+[NPC:父亲]唉，现在的孩子，怎么这么点苦都吃不得。
+[主角说]……
+[旁白]父亲目光柔和下来，窒息感随之消失。\n\n但那些话却让我听得十分心寒。
+[主角]（“我”每天就是在这种环境下苟且偷生的吗？）
 
 → 跳转：ch2_breakfast_resolved
 
@@ -525,11 +537,9 @@ NPC：
 
 ---
 
-### [地图]如何应对思想违规
+### [CG]如何应对思想违规
 场景ID：ch2_thought_violation_choice
-地图：bedroom
-出生点：spawn_spawn_36
-冻结玩家：是
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\家\书桌.png
 
 → 选项：我爱学习，学习使我快乐，我是根正苗红的社会主义三好少年。今天学了这么多，感觉自己变得越来越优秀了。对，我变得越来越强了，应该感到高兴才对。
     AI标签：自我规训, 服从求生, 情绪压抑
@@ -550,7 +560,7 @@ NPC：
 
 ### [CG]恢复呼吸
 场景ID：ch2_thought_warning_resolved
-图片：无
+图片：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\CG\家\书桌.png
 
 [旁白]窒息感逐渐减轻。我整个人瘫在书桌上大口吸气，喉咙里发出破风箱般的声音。
 → 音效: stop suffocation_start
@@ -572,7 +582,7 @@ NPC：
 ### [地图]开始调查家庭
 场景ID：ch2_home_exploration_start
 地图：livingroom
-出生点：spawn_spawn_73
+出生点：spawn_bedroom
 玩家状态：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\sprites\frames\yps_frames\yps_frames_stand_back
 冻结玩家：否
 
@@ -583,6 +593,12 @@ NPC：
 → 回到地图
 
 ---
+@trigger_64
+  提示文字：E房间
+  触发：[对话]
+    [主角]（房间没什么可调查的了。）
+    → 设置flag: ch2_livingroom_cleanliness_seen
+    → 回到地图
 
 @trigger_68
   提示文字：E观察全家福
@@ -668,8 +684,9 @@ NPC：
 @trigger_65
   条件：ch2_family_rules_found
   提示文字：E调查厨房
-  触发：
-    → 跳转：ch2_kitchen_investigation
+  触发：[对话]
+    [主角]（先去调查卫生间吧。）
+    → 回到地图
 
   否则：
   触发：[对话]
@@ -768,8 +785,14 @@ NPC：
 
 @door_livingroom
   提示文字：E返回客厅
+  条件：ch2_kitchen_rules_found
   触发：
     → 跳转：ch2_home_investigation_end
+
+  否则：
+  触发：[对话]
+    [主角]（还没找到厨房的规则。）
+    → 返回地图
 
 ---
 
