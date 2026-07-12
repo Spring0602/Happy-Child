@@ -21,6 +21,7 @@ import { NotebookPanel } from "./components/NotebookPanel";
 import { TutorialPanel } from "./components/TutorialPanel";
 import { PhoneChatOverlay } from "./components/PhoneChatOverlay";
 import { gameBridge } from "./game/bridge/GameBridge";
+import { playBgm, stopBgm } from "./services/bgm";
 import { playOneShotSound, playSceneSounds, startRainAmbience, stopRainAmbience, unlockScriptedAudio } from "./services/scriptedAudio";
 import { MapRegistry } from "./game/config/mapRegistry";
 import {
@@ -39,6 +40,158 @@ type GamePhase = "menu" | "playing";
 const ENABLE_AI_FALLBACK_TEXT = import.meta.env.VITE_AI_ALLOW_FALLBACK === "true";
 const PHONE_CHAT_VISIBLE_HISTORY_LIMIT = 8;
 type ScreenEffect = "golden_light" | "shatter_screen";
+
+const STORY_BGM = {
+  explore: "/assets/audio/bgm/探索.mp3",
+  suspense: "/assets/audio/bgm/悬疑.mp3",
+  uplifting: "/assets/audio/bgm/向上.mp3",
+  reflectiveLoop: "/assets/audio/bgm/平凡中的感慨.mp3",
+  contemplation: "/assets/audio/bgm/沉思.mp3",
+  humor: "/assets/audio/bgm/幽默.mp3",
+  touching: "/assets/audio/bgm/触动.mp3",
+} as const;
+
+function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
+  if (gamePhase !== "playing") return null;
+
+  const sceneId = state.currentSceneId;
+  const mapId = state.currentMapId;
+
+  if (
+    sceneId === "ch3_classroom_entrance" ||
+    sceneId?.startsWith("ch3_homework_prank") ||
+    sceneId === "ch3_homework_choice" ||
+    sceneId === "ch3_prank_joined" ||
+    sceneId === "ch3_prank_returned" ||
+    sceneId === "ch3_prank_laughter"
+  ) {
+    return STORY_BGM.humor;
+  }
+
+  if (
+    sceneId === "ch3_returned_homework_empty_seat" ||
+    sceneId === "ch3_empty_seat_choice" ||
+    sceneId === "ch3_empty_seat_seen" ||
+    sceneId === "ch3_respond_zqr_then_seat" ||
+    sceneId === "ch3_liuyu_intervenes"
+  ) {
+    return STORY_BGM.suspense;
+  }
+
+  if (
+    sceneId === "ch3_exam_begins" ||
+    sceneId === "ch3_final_question_choice" ||
+    sceneId === "ch3_final_answer_safe" ||
+    sceneId === "ch3_final_answer_warning" ||
+    sceneId === "ch3_suffocation_start" ||
+    sceneId === "ch3_suffocation_resolved" ||
+    sceneId === "ch3_suffocation_death"
+  ) {
+    return STORY_BGM.contemplation;
+  }
+
+  if (
+    sceneId === "ch3_after_exam_gate" ||
+    sceneId === "ch3_after_exam_find_liuyu" ||
+    sceneId === "ch3_after_exam_greeting" ||
+    sceneId === "ch3_after_exam_private_start" ||
+    sceneId === "ch3_liuyu_private_talk_choice" ||
+    sceneId === "ch3_liuyu_help_commitment" ||
+    sceneId === "ch3_class_count_question" ||
+    sceneId === "ch3_gate_explanation_choice" ||
+    sceneId === "ch3_mother_pickup" ||
+    sceneId === "ch3_car_home"
+  ) {
+    return STORY_BGM.touching;
+  }
+
+  if (
+    sceneId === "ch1_game_start" ||
+    sceneId === "ch1_game_start_system" ||
+    sceneId === "ch2_game_start" ||
+    sceneId === "ch2_skill_info_panel" ||
+    sceneId === "ch2_after_skill_info" ||
+    sceneId === "ch2_dungeon_info_panel" ||
+    sceneId === "ch2_after_dungeon_info"
+  ) {
+    return STORY_BGM.uplifting;
+  }
+
+  if (
+    sceneId === "ch2_enter_bedroom" ||
+    sceneId?.startsWith("ch2_bedroom") ||
+    sceneId?.startsWith("ch2_plan_book") ||
+    (
+      !sceneId &&
+      (mapId === "bedroom" || mapId === "bedroom_luggage") &&
+      !state.flags["ch2_bedroom_rules_found"] &&
+      !state.flags["ch2_home_initial_investigation_completed"]
+    )
+  ) {
+    return STORY_BGM.reflectiveLoop;
+  }
+
+  if (
+    sceneId === "ch2_study_montage" ||
+    sceneId === "ch2_thought_violation_choice" ||
+    sceneId === "ch2_thought_warning_resolved"
+  ) {
+    return STORY_BGM.contemplation;
+  }
+
+  if (
+    sceneId === "ch2_home_exploration_start" ||
+    sceneId === "ch2_home_investigation_end" ||
+    sceneId === "ch2_home_findings_choice" ||
+    sceneId?.startsWith("ch2_family") ||
+    sceneId?.startsWith("ch2_livingroom") ||
+    sceneId?.startsWith("ch2_bathroom") ||
+    sceneId?.startsWith("ch2_kitchen") ||
+    (
+      !sceneId &&
+      (mapId === "livingroom" || mapId === "bathroom" || mapId === "kitchen") &&
+      state.flags["ch2_thoughts_can_violate"] &&
+      !state.flags["ch2_home_initial_investigation_completed"]
+    )
+  ) {
+    return STORY_BGM.reflectiveLoop;
+  }
+
+  if (
+    sceneId === "dorm_act4_pc_boot_shock" ||
+    sceneId?.startsWith("dorm_act4_pc_boot") ||
+    sceneId?.startsWith("dorm_act4_check_pc") ||
+    sceneId?.startsWith("dorm_act4_mail") ||
+    sceneId?.startsWith("dorm_act4_prepare") ||
+    sceneId?.startsWith("dorm_act4_god_view")
+  ) {
+    return STORY_BGM.suspense;
+  }
+
+  if (
+    sceneId === "dorm_cg_end_think" ||
+    sceneId?.startsWith("balcony_night") ||
+    (sceneId?.startsWith("dorm_act2") && sceneId !== "dorm_act2_sleep_result") ||
+    (!sceneId && (mapId === "dormitory" || mapId === "balcony_night"))
+  ) {
+    return STORY_BGM.explore;
+  }
+
+  if (
+    sceneId?.startsWith("ch1_shop_school") ||
+    sceneId === "ch1_shop_enter" ||
+    sceneId === "ch1_shop_enter_narrate" ||
+    sceneId === "ch1_shop_enter_think" ||
+    sceneId === "ch1_shop_enter_strategy" ||
+    sceneId === "ch1_shop_enter_weapon" ||
+    sceneId?.startsWith("ch1_shop_interact") ||
+    (!sceneId && (mapId === "shop_school" || mapId === "shop"))
+  ) {
+    return STORY_BGM.explore;
+  }
+
+  return null;
+}
 
 type FloatingTextItem = {
   id: string;
@@ -400,6 +553,7 @@ export default function App() {
   const [closingInfoPanelSceneId, setClosingInfoPanelSceneId] = useState<string | null>(null);
   const aiSceneRequestsRef = useRef<Set<string>>(new Set());
   const prevSceneIdRef = useRef<string>("");
+  const currentStoryBgmRef = useRef<string | null>(null);
   const corridorDeathTimerRef = useRef<number | null>(null);
 
   // 当前对话场景
@@ -439,6 +593,29 @@ export default function App() {
           : filterConditionalSceneText(rawDialogScene.text, state),
       }
     : null;
+
+  useEffect(() => {
+    if (gamePhase !== "playing") return;
+
+    const nextBgm = resolveStoryBgm(gamePhase, state);
+    if (nextBgm === currentStoryBgmRef.current) return;
+
+    currentStoryBgmRef.current = nextBgm;
+    if (nextBgm) {
+      playBgm(nextBgm, { loop: true, fadeMs: 900 });
+    } else {
+      stopBgm({ fadeMs: 700 });
+    }
+  }, [gamePhase, state.currentSceneId, state.currentMapId]);
+
+  useEffect(() => {
+    if (state.currentSceneId !== "ch2_plan_book_read") return;
+    const timer = window.setTimeout(() => {
+      stopBgm({ fadeMs: 800 });
+      currentStoryBgmRef.current = null;
+    }, 25200);
+    return () => window.clearTimeout(timer);
+  }, [state.currentSceneId]);
   const shouldCgTransitionTo = useCallback((nextSceneId: string) => {
     const nextScene = scenes[nextSceneId];
     if (!dialogScene || !nextScene) return true;
@@ -471,6 +648,24 @@ export default function App() {
           payload: { npcKey: "npc_mother", direction: "right" },
         });
       }, 520);
+    }
+  }, []);
+
+  const handleDialogSegmentStart = useCallback((sceneId: string, segmentText: string) => {
+    if (
+      (sceneId === "ch3_prank_returned" && segmentText.includes("教室里短暂安静了一瞬")) ||
+      (sceneId === "ch3_prank_laughter" && segmentText.includes("你笑什么？"))
+    ) {
+      if (currentStoryBgmRef.current === null) return;
+      currentStoryBgmRef.current = null;
+      stopBgm({ fadeMs: 450 });
+      return;
+    }
+
+    if (sceneId === "ch3_night_analysis" && segmentText.includes("但是更吸引我注意的是")) {
+      if (currentStoryBgmRef.current === STORY_BGM.contemplation) return;
+      currentStoryBgmRef.current = STORY_BGM.contemplation;
+      playBgm(STORY_BGM.contemplation, { loop: true, fadeMs: 900 });
     }
   }, []);
 
@@ -3369,6 +3564,7 @@ export default function App() {
             "ch6_ritual_desire_snowball",
             "ch6_ritual_backlash",
           ].includes(dialogScene.id)}
+          onSegmentStart={handleDialogSegmentStart}
         />
       )}
       {dialogScene?.infoPanel && (
@@ -3386,6 +3582,7 @@ export default function App() {
           onChoose={handleChoose}
           onAIEvent={handleAIEvent}
           onClose={handleCloseDialog}
+          onSegmentStart={handleDialogSegmentStart}
           onSegmentDone={handleDialogSegmentDone}
         />
       )}

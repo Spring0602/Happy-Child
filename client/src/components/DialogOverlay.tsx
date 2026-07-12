@@ -7,6 +7,7 @@ interface Props {
   onChoose: (choice: Choice) => void;
   onAIEvent: () => void;
   onClose: () => void;
+  onSegmentStart?: (sceneId: string, segmentText: string, segmentIndex: number) => void;
   onSegmentDone?: (sceneId: string, segmentText: string, segmentIndex: number) => void;
 }
 
@@ -90,7 +91,7 @@ function splitDialogSegments(text: string, fallbackSpeaker: string | undefined):
   return segments.length > 0 ? segments : [{ speaker: fallbackSpeaker, text: normalizedText }];
 }
 
-export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose, onSegmentDone }: Props) {
+export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose, onSegmentStart, onSegmentDone }: Props) {
   const hasChoices = scene.choices && scene.choices.length > 0;
   const hasAIEvent = !!scene.aiEvent;
   const chainEnded = !hasChoices && !hasAIEvent && !scene.nextSceneId;
@@ -151,6 +152,11 @@ export function DialogOverlay({ scene, onNext, onChoose, onAIEvent, onClose, onS
 
   // 当前段落的完整文本
   const fullText = currentSegment.text || "";
+
+  useEffect(() => {
+    if (!onSegmentStart) return;
+    onSegmentStart(scene.id, fullText, currentParagraph);
+  }, [onSegmentStart, scene.id, currentParagraph, fullText]);
 
   useEffect(() => {
     if (!typingDone || !onSegmentDone) return;

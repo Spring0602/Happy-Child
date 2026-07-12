@@ -9,6 +9,7 @@ interface Props {
   centerImageSrc?: string;
   preserveForPerformance?: boolean;
   shouldTransitionTo?: (nextSceneId: string) => boolean;
+  onSegmentStart?: (sceneId: string, segmentText: string, segmentIndex: number) => void;
 }
 
 /** 主角说话者名单 */
@@ -92,7 +93,7 @@ function splitDialogSegments(text: string, fallbackSpeaker: string | undefined):
   return segments.length > 0 ? segments : [{ speaker: fallbackSpeaker, text: normalizedText }];
 }
 
-export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImageSrc, preserveForPerformance = false, shouldTransitionTo }: Props) {
+export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImageSrc, preserveForPerformance = false, shouldTransitionTo, onSegmentStart }: Props) {
   const hasChoices = scene.choices && scene.choices.length > 0;
 
   // 稳定化 paragraphs 数组引用，避免每次都触发 useEffect
@@ -157,6 +158,11 @@ export function CgOverlay({ scene, onNext, onChoose, hideUi = false, centerImage
 
   // 当前段落的完整文本
   const fullText = currentSegment.text || "";
+
+  useEffect(() => {
+    if (hideUi || !onSegmentStart) return;
+    onSegmentStart(scene.id, fullText, currentParagraph);
+  }, [hideUi, onSegmentStart, scene.id, currentParagraph, fullText]);
 
   const goNextWithFade = useCallback(() => {
     if (exiting) return;

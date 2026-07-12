@@ -42,6 +42,7 @@
 ### [地图] CG结束后：主角坐在电脑前
 
 ```
+->播放bgm：G:\混沌\happy-child-game-scaffold\happy-child-game\client\public\assets\audio\bgm\探索.mp3
 冻结玩家：是
 → onCgEnd: dorm_enter_explore
 ```
@@ -50,6 +51,10 @@
 > 进入自由探索。
 
 ### [地图] 自由探索 · 交互触发器
+
+---
+
+->持续上一场景bgm
 
 ---
 
