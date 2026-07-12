@@ -1,8 +1,24 @@
 {
-  "functions": {
-    "api": {
-      "path": "/api/*",
-      "method": ["POST", "OPTIONS"]
+  "name": "happy-child-game",
+  "nodeVersion": "22.11.0",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".edgeone",
+  "routes": [
+    {
+      "pattern": "/api/*",
+      "script": "functions/api/index.js",
+      "methods": ["POST", "OPTIONS"]
     }
-  }
+  ],
+  "headers": [
+    {
+      "source": "/*",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
+  ]
 }
