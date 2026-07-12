@@ -1,9 +1,8 @@
 import type { GameState } from "../types/game";
 
-const API_BASE = import.meta.env.VITE_AI_SERVER_URL
-  ?? (typeof window !== "undefined" && window.location.hostname
-    ? `${window.location.protocol}//${window.location.hostname}:3001`
-    : "http://localhost:3001");
+// 生产环境（EdgeOne Pages）：边缘函数部署在同源 /api/* 路径，使用空字符串即可
+// 本地开发：可通过 VITE_AI_SERVER_URL 指定独立服务，或以相对路径回退
+const API_BASE = import.meta.env.VITE_AI_SERVER_URL ?? "";
 
 async function postJSON<T>(path: string, payload: unknown): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
