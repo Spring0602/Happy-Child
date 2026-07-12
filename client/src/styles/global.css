@@ -1481,6 +1481,84 @@ body {
   align-items: center;
 }
 
+/* 新手教程 */
+.tutorial-overlay {
+  z-index: 72;
+}
+
+.tutorial-panel {
+  width: min(720px, 92vw);
+  max-height: min(720px, 86vh);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(148, 205, 255, 0.38);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(76, 147, 255, 0.16), transparent 38%),
+    linear-gradient(145deg, rgba(16, 28, 68, 0.97), rgba(8, 13, 34, 0.98));
+  box-shadow: 0 26px 78px rgba(0, 0, 0, 0.58), 0 0 32px rgba(70, 150, 255, 0.12);
+  color: #eaf2ff;
+  overflow: hidden;
+}
+
+.tutorial-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid rgba(148, 205, 255, 0.2);
+}
+
+.tutorial-title {
+  margin: 0;
+  color: #f5f9ff;
+  font-size: 26px;
+  letter-spacing: 0.08em;
+}
+
+.tutorial-subtitle {
+  margin: 8px 0 0;
+  color: #a9c6f6;
+  font-size: 13px;
+}
+
+.tutorial-content {
+  padding: 22px 28px 8px;
+  overflow-y: auto;
+}
+
+.tutorial-section {
+  padding: 16px 18px;
+  border: 1px solid rgba(135, 190, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(12, 24, 58, 0.62);
+}
+
+.tutorial-section + .tutorial-section {
+  margin-top: 14px;
+}
+
+.tutorial-section-title {
+  margin: 0 0 10px;
+  color: #9fd7ff;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+}
+
+.tutorial-lines {
+  margin: 0;
+  padding-left: 20px;
+  color: #dce8ff;
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.tutorial-confirm {
+  align-self: center;
+  margin: 18px 0 24px;
+}
+
 /* 确认面板 */
 .confirm-panel {
   max-width: 400px;

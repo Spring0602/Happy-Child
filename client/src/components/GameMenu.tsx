@@ -3,6 +3,7 @@ import type { GameState } from "../types/game";
 import { getAllSaves, saveToSlot, loadSlot, deleteSlot, type SaveSlot } from "../engine/save";
 import { gameBridge } from "../game/bridge/GameBridge";
 import { SettingsPanel } from "./SettingsPanel";
+import { TutorialPanel } from "./TutorialPanel";
 
 /** 地图 ID → 中文场景名 */
 const MAP_NAMES: Record<string, string> = {
@@ -51,7 +52,7 @@ interface Props {
   forceSave?: boolean;
 }
 
-type MenuPage = "main" | "save" | "load" | "settings";
+type MenuPage = "main" | "save" | "load" | "settings" | "tutorial";
 
 export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle, onShowBacklog, onShowNotebook, dialogPreview, currentChapter, initialPage = "main", onSaveComplete, forceSave = false }: Props) {
   const [page, setPage] = useState<MenuPage>(initialPage);
@@ -124,6 +125,10 @@ export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle
     return <SettingsPanel onClose={() => setPage("main")} />;
   }
 
+  if (page === "tutorial") {
+    return <TutorialPanel onClose={() => setPage("main")} />;
+  }
+
   return (
     <div className="game-menu-overlay">
       <div className="game-menu-panel">
@@ -145,6 +150,9 @@ export function GameMenu({ state, onClose, onLoadState, onRestart, onExitToTitle
               </button>
               <button className="start-btn" onClick={() => { onShowNotebook(); onClose(); }}>
                 笔记本
+              </button>
+              <button className="start-btn" onClick={() => setPage("tutorial")}>
+                新手教程
               </button>
               <button className="start-btn" onClick={() => { onShowBacklog(); onClose(); }}>
                 回顾

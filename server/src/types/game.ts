@@ -7,6 +7,7 @@ export interface RequestGameState {
   rebellion: number;
   joyProof: number;
   aiTraces?: unknown[];
+  aiMemory?: unknown;
 }
 
 // AI裁决输出格式

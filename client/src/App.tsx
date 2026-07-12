@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useCallback, useState, useRef } from "react";
 import { scenes } from "./data/scenes";
 import { aiSceneConfigs } from "./data/aiSceneConfig";
+import { buildAiMemoryContext, createAiMemorySceneEntry, inferMonitorKeysForScene } from "./data/aiMemory";
 import { gameReducer, initialGameState } from "./engine/gameReducer";
 import {
   saveGame,
@@ -17,6 +18,7 @@ import { GameMenu } from "./components/GameMenu";
 import { Backlog, type DialogLogEntry } from "./components/Backlog";
 import { PersonalityPortrait } from "./components/PersonalityPortrait";
 import { NotebookPanel } from "./components/NotebookPanel";
+import { TutorialPanel } from "./components/TutorialPanel";
 import { PhoneChatOverlay } from "./components/PhoneChatOverlay";
 import { gameBridge } from "./game/bridge/GameBridge";
 import { playOneShotSound, playSceneSounds, startRainAmbience, stopRainAmbience, unlockScriptedAudio } from "./services/scriptedAudio";
@@ -383,6 +385,7 @@ export default function App() {
   const [showBacklog, setShowBacklog] = useState(false);
   const [showPortraitPanel, setShowPortraitPanel] = useState(false);
   const [showNotebookPanel, setShowNotebookPanel] = useState(false);
+  const [showTutorialPanel, setShowTutorialPanel] = useState(false);
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
   const [floatingTextPerformanceActive, setFloatingTextPerformanceActive] = useState(false);
   const [completedPhoneChats, setCompletedPhoneChats] = useState<Record<string, boolean>>({});
@@ -489,13 +492,17 @@ export default function App() {
       .replace(/\[旁白\]/g, "")
       .trim();
 
+    const monitorKeys = aiSceneConfig.monitorKeys ?? inferMonitorKeysForScene(dialogSceneId);
+    const memoryContext = buildAiMemoryContext(state.aiMemory, monitorKeys);
+    const runtimeContext = [aiSceneConfig.context, memoryContext].filter(Boolean).join("\n\n");
+
     void generateAiScene(
       state,
       dialogSceneId,
       aiSceneConfig.mode,
       prompt,
       aiSceneConfig.requiredLines,
-      aiSceneConfig.context
+      runtimeContext
     )
       .then((response) => {
         const script = response.result?.script?.trim();
@@ -517,6 +524,14 @@ export default function App() {
         setAiSceneLoadingId((current) => current === dialogSceneId ? null : current);
       });
   }, [dialogSceneId]);
+
+  useEffect(() => {
+    if (!dialogSceneId || !rawDialogScene) return;
+    const entry = createAiMemorySceneEntry(dialogSceneId, rawDialogScene.text);
+    if (!entry) return;
+    if (state.aiMemory?.importantEvents?.some((event) => event.id === entry.id)) return;
+    dispatch({ type: "RECORD_AI_MEMORY_SCENE", entry });
+  }, [dialogSceneId, rawDialogScene?.text, state.aiMemory?.importantEvents]);
 
   function resetAiSceneRuntime() {
     aiSceneRequestsRef.current.clear();
@@ -589,6 +604,11 @@ export default function App() {
           setShowPortraitPanel(false);
           return;
         }
+        if (showTutorialPanel) {
+          setShowTutorialPanel(false);
+          if (!state.currentSceneId) gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+          return;
+        }
         if (showNotebookPanel) {
           setShowNotebookPanel(false);
           return;
@@ -598,7 +618,35 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [gamePhase, showBacklog, showPortraitPanel, showNotebookPanel, finalSaveRequired]);
+  }, [gamePhase, showBacklog, showPortraitPanel, showNotebookPanel, showTutorialPanel, finalSaveRequired, state.currentSceneId]);
+
+  useEffect(() => {
+    if (gamePhase !== "playing") return;
+    if (state.currentSceneId) return;
+    if (state.flags["tutorial_exploration_seen"]) return;
+    if (gameMenuOpen || showBacklog || showPortraitPanel || showNotebookPanel || showTutorialPanel || finalSaveRequired) return;
+
+    dispatch({ type: "SET_FLAG", flag: "tutorial_exploration_seen" });
+    setShowTutorialPanel(true);
+    gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
+  }, [
+    gamePhase,
+    state.currentSceneId,
+    state.flags,
+    gameMenuOpen,
+    showBacklog,
+    showPortraitPanel,
+    showNotebookPanel,
+    showTutorialPanel,
+    finalSaveRequired,
+  ]);
+
+  function closeTutorialPanel() {
+    setShowTutorialPanel(false);
+    if (!state.currentSceneId && gamePhase === "playing" && !gameMenuOpen) {
+      gameBridge.sendToPhaser({ type: "UNFREEZE_PLAYER" });
+    }
+  }
 
   // 监听关闭 AI Trace
   useEffect(() => {
@@ -2089,7 +2137,7 @@ export default function App() {
           summary: portrait.summary,
         });
         setDemoPortraitGenerating(false);
-        dispatch({ type: "DIALOG_START", sceneId: "ch8_unfinished_threads" });
+        dispatch({ type: "DIALOG_START", sceneId: "ch8_demo_personality_review" });
       })();
       return;
     }
@@ -3314,7 +3362,7 @@ export default function App() {
           onNext={handleNext}
           onChoose={handleChoose}
           hideUi={floatingTextPerformanceActive || aiSceneIsLoading || phoneChatIsBlocking}
-          centerImageSrc={dialogScene.id === "ch8_demo_ending" ? demoPortrait?.imageDataUrl : undefined}
+          centerImageSrc={["ch8_demo_personality_review", "ch8_demo_ending"].includes(dialogScene.id) ? demoPortrait?.imageDataUrl : undefined}
           shouldTransitionTo={shouldCgTransitionTo}
           preserveForPerformance={[
             "ch6_ritual_wishes",
@@ -3384,6 +3432,10 @@ export default function App() {
 
       {showNotebookPanel && (
         <NotebookPanel state={state} onClose={() => setShowNotebookPanel(false)} />
+      )}
+
+      {showTutorialPanel && (
+        <TutorialPanel onClose={closeTutorialPanel} />
       )}
     </div>
   );

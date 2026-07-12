@@ -1,4 +1,5 @@
 import type { Choice, GameState, Trait } from "../types/game";
+import { updateAiMemoryFromChoice } from "../data/aiMemory";
 
 export function applyChoice(state: GameState, choice: Choice): GameState {
   const newTraits = { ...state.traits };
@@ -13,5 +14,6 @@ export function applyChoice(state: GameState, choice: Choice): GameState {
     currentSceneId: choice.nextSceneId,
     traits: newTraits,
     choiceHistory: [...state.choiceHistory, choice.id],
+    aiMemory: updateAiMemoryFromChoice(state, choice),
   };
 }

@@ -1,5 +1,6 @@
-import type { AITrace, GameState, Choice, Traits } from "../types/game";
+import type { AITrace, AiMemoryEntry, GameState, Choice, Traits } from "../types/game";
 import { applyChoice } from "./applyChoice";
+import { createInitialAiMemory, initialAiMemory, updateAiMemoryFromSceneEntry } from "../data/aiMemory";
 
 const initialTraits: Traits = {
   authorityResistance: 0,
@@ -11,26 +12,31 @@ const initialTraits: Traits = {
   joyPerception: 0,
 };
 
-export const initialGameState: GameState = {
-  currentSceneId: "start",
-  traits: initialTraits,
-  choiceHistory: [],
-  npcTrust: {
-    liuyu: 0,
-    wangTeacher: 0,
-    zhouJunxiu: 0,
-  },
-  exploration: 0,
-  rebellion: 0,
-  joyProof: 0,
-  aiTraces: [],
-  currentMapId: "dormitory",
-  currentSpawnId: "spawn_sit_desk",
-  playerPosition: { x: 0, y: 0 },
-  flags: {},
-  interactedItems: [],
-  endingReached: false,
-};
+export function createInitialGameState(): GameState {
+  return {
+    currentSceneId: "start",
+    traits: { ...initialTraits },
+    choiceHistory: [],
+    npcTrust: {
+      liuyu: 0,
+      wangTeacher: 0,
+      zhouJunxiu: 0,
+    },
+    exploration: 0,
+    rebellion: 0,
+    joyProof: 0,
+    aiTraces: [],
+    aiMemory: createInitialAiMemory(),
+    currentMapId: "dormitory",
+    currentSpawnId: "spawn_sit_desk",
+    playerPosition: { x: 0, y: 0 },
+    flags: {},
+    interactedItems: [],
+    endingReached: false,
+  };
+}
+
+export const initialGameState: GameState = createInitialGameState();
 
 export type GameAction =
   | { type: "CHOOSE"; choice: Choice }
@@ -44,7 +50,8 @@ export type GameAction =
   | { type: "UPDATE_POSITION"; position: { x: number; y: number } }
   | { type: "DIALOG_START"; sceneId: string }
   | { type: "DIALOG_END" }
-  | { type: "ENDING_REACHED" };
+  | { type: "ENDING_REACHED" }
+  | { type: "RECORD_AI_MEMORY_SCENE"; entry: AiMemoryEntry };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -72,11 +79,19 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         traits: { ...initialGameState.traits, ...loaded.traits },
         npcTrust: { ...initialGameState.npcTrust, ...loaded.npcTrust },
         flags: { ...initialGameState.flags, ...loaded.flags },
+        aiMemory: {
+          ...initialAiMemory,
+          ...loaded.aiMemory,
+          npcImpressions: {
+            ...initialAiMemory.npcImpressions,
+            ...loaded.aiMemory?.npcImpressions,
+          },
+        },
       };
     }
 
     case "RESET":
-      return initialGameState;
+      return createInitialGameState();
 
     case "CHANGE_MAP":
       return {
@@ -107,6 +122,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "ENDING_REACHED":
       return { ...state, endingReached: true };
+
+    case "RECORD_AI_MEMORY_SCENE":
+      return {
+        ...state,
+        aiMemory: updateAiMemoryFromSceneEntry(state.aiMemory, action.entry),
+      };
 
     default:
       return state;

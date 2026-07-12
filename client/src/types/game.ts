@@ -99,6 +99,33 @@ export interface AITrace {
   createdAt: string;
 }
 
+export type AiMemoryKey =
+  | "protagonist_profile"
+  | "protagonist_worldview"
+  | "liuyu_impression"
+  | "zhouqirui_impression"
+  | "wang_teacher_impression"
+  | "zhoujunxiu_impression"
+  | "mother_impression"
+  | "father_impression"
+  | "inner_self_impression";
+
+export interface AiMemoryEntry {
+  id: string;
+  sceneId: string;
+  choiceId?: string;
+  summary: string;
+  tags: string[];
+  observers: AiMemoryKey[];
+}
+
+export interface AiMemory {
+  protagonistProfile: string[];
+  protagonistWorldview: string[];
+  npcImpressions: Partial<Record<AiMemoryKey, string[]>>;
+  importantEvents: AiMemoryEntry[];
+}
+
 export interface MapRuntimeNpcSnapshot {
   npcKey: string;
   framesPrefix: string;
@@ -142,6 +169,7 @@ export interface GameState {
   rebellion: number;
   joyProof: number;
   aiTraces: AITrace[];
+  aiMemory: AiMemory;
 
   // ====== 探索模式字段 ======
   currentMapId: string;
