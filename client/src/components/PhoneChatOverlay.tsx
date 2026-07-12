@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PhoneChat, PhoneChatMessage } from "../types/game";
+import { playOneShotSound } from "../services/scriptedAudio";
 
 interface Props {
   chat: PhoneChat;
@@ -70,6 +71,7 @@ export function PhoneChatOverlay({ chat, sceneId, onComplete }: Props) {
     setTypingMessage(null);
     setVisibleMessages(prev => [...prev, message]);
     setNextIndex(prev => prev + 1);
+    playOneShotSound("message_ping");
   }, []);
 
   const advance = useCallback(() => {

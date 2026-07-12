@@ -19,133 +19,16 @@ type SoundName =
 
 type ScheduledSound = {
   name: SoundName;
-  delayMs?: number;
 };
 
 const sceneSounds: Record<string, ScheduledSound[]> = {
   dorm_act3_alarm: [{ name: "alarm_clock" }],
-  ch2_game_start: [
-    { name: "tinnitus", delayMs: 22000 },
-  ],
-  ch2_plan_book_read: [{ name: "door_knock", delayMs: 26000 }],
-  ch2_stumble_fail: [
-    { name: "warning_bell", delayMs: 100 },
-    { name: "horror_sting", delayMs: 700 },
-  ],
-  ch2_breakfast_violation: [{ name: "warning_bell", delayMs: 6000 }],
-  ch2_study_montage: [
-    { name: "paper_rustle", delayMs: 1200 },
-    { name: "warning_bell", delayMs: 7800 },
-    { name: "horror_sting", delayMs: 12000 },
-  ],
-  ch2_bathroom_knocking: [{ name: "door_knock" }],
   ch3_book_falls: [{ name: "book_drop" }],
   ch3_empty_seat_seen: [{ name: "tinnitus" }],
   ch3_respond_zqr_then_seat: [{ name: "tinnitus" }],
-  ch3_final_answer_warning: [{ name: "tinnitus", delayMs: 200 }],
-  ch3_class_count_question: [{ name: "tinnitus", delayMs: 9600 }],
-  ch3_night_analysis: [
-    { name: "paper_rustle", delayMs: 12000 },
-    { name: "warning_bell", delayMs: 30000 },
-  ],
-  ch3_suffocation_start: [{ name: "tinnitus", delayMs: 250 }],
   ch4_roster_ask_student: [{ name: "tinnitus" }],
   ch4_roster_observe: [{ name: "tinnitus" }],
-  ch4_lunch_attack_death: [
-    { name: "warning_bell", delayMs: 5800 },
-    { name: "horror_sting", delayMs: 12800 },
-  ],
-  ch5_wang_pressure: [{ name: "warning_bell", delayMs: 900 }],
-  ch5_class3_face_closeup: [
-    { name: "tinnitus" },
-    { name: "warning_bell", delayMs: 2400 },
-  ],
-  ch5_gallery_materials_warning: [{ name: "warning_bell", delayMs: 3200 }],
-  ch6_class3_exposure: [
-    { name: "tinnitus", delayMs: 200 },
-    { name: "warning_bell", delayMs: 7200 },
-  ],
-  ch6_corridor_return: [{ name: "warning_bell", delayMs: 100 }],
-  ch6_corridor_timeout_death: [
-    { name: "warning_bell", delayMs: 100 },
-    { name: "horror_sting", delayMs: 6200 },
-  ],
-  ch6_root_rule_trigger: [
-    { name: "warning_bell", delayMs: 11200 },
-    { name: "horror_sting", delayMs: 17600 },
-  ],
-  ch6_class3_door_locked: [{ name: "impact", delayMs: 2200 }],
-  ch6_class3_counter_standoff: [{ name: "school_bell", delayMs: 10500 }],
-  ch6_class3_cut_standoff: [{ name: "school_bell", delayMs: 10500 }],
-  ch6_break_vent: [{ name: "impact", delayMs: 6500 }],
-  ch6_break_vent_stall: [{ name: "impact", delayMs: 7600 }],
-  ch6_break_vent_fight: [{ name: "impact", delayMs: 7000 }],
-  ch7_rule_skill_initialize: [
-    { name: "rule_pierce", delayMs: 250 },
-    { name: "tinnitus", delayMs: 5200 },
-  ],
-  ch7_rule_skill_panel: [
-    { name: "tinnitus", delayMs: 180 },
-    { name: "paper_rustle", delayMs: 11500 },
-  ],
-  ch7_surface_rule_death: [
-    { name: "rule_pierce", delayMs: 8200 },
-    { name: "horror_sting", delayMs: 21500 },
-    { name: "rule_pierce", delayMs: 30000 },
-  ],
-  ch7_bad_child_born: [
-    { name: "paper_rustle", delayMs: 1200 },
-    { name: "tinnitus", delayMs: 8200 },
-  ],
-  ch7_overhear_parents: [
-    { name: "water_running", delayMs: 17000 },
-  ],
-  ch7_study_pressure: [
-    { name: "tinnitus", delayMs: 7600 },
-  ],
-  ch7_trial_group_joined: [{ name: "message_ping", delayMs: 360 }],
-  ch7_group_greeting_meme: [{ name: "message_ping", delayMs: 360 }],
-  ch7_group_greeting_honest: [{ name: "message_ping", delayMs: 360 }],
-  ch7_group_greeting_observe: [{ name: "message_ping", delayMs: 1400 }],
-  ch7_group_greeting_check_safety: [{ name: "message_ping", delayMs: 360 }],
-  ch7_group_common_chat: [
-    { name: "message_ping", delayMs: 500 },
-    { name: "message_ping", delayMs: 2300 },
-  ],
-  ch7_group_heshifan_welcome: [{ name: "message_ping", delayMs: 500 }],
-  ch7_group_owner_prompt: [
-    { name: "message_ping", delayMs: 500 },
-    { name: "message_ping", delayMs: 1800 },
-    { name: "message_ping", delayMs: 3100 },
-  ],
-  ch7_group_supply_reminder: [
-    { name: "message_ping", delayMs: 500 },
-    { name: "message_ping", delayMs: 1800 },
-    { name: "message_ping", delayMs: 3100 },
-  ],
-  ch7_group_ask_relationship: [
-    { name: "message_ping", delayMs: 500 },
-    { name: "message_ping", delayMs: 1900 },
-  ],
-  ch7_group_cheng_liuyu_reply: [
-    { name: "message_ping", delayMs: 500 },
-    { name: "message_ping", delayMs: 1800 },
-  ],
-  ch7_liuyu_private_chat: [
-    { name: "message_ping", delayMs: 500 },
-    { name: "message_ping", delayMs: 2600 },
-    { name: "message_ping", delayMs: 5200 },
-  ],
-  ch7_mirror_space: [
-    { name: "footsteps_slow", delayMs: 5200 },
-    { name: "horror_sting", delayMs: 14500 },
-  ],
   ch8_mirror_ghost: [{ name: "horror_sting" }],
-  ch8_bathroom_knocking: [
-    { name: "door_knock" },
-    { name: "door_knock_heavy", delayMs: 5200 },
-  ],
-  ch8_inner_voice_returns: [{ name: "warning_bell", delayMs: 3400 }],
 };
 
 let audioContext: AudioContext | null = null;
@@ -337,10 +220,8 @@ export function playOneShotSound(name: SoundName) {
 }
 
 export function playSceneSounds(sceneId: string): () => void {
-  const timers = (sceneSounds[sceneId] ?? []).map(({ name, delayMs = 0 }) =>
-    window.setTimeout(() => playSynthSound(name), delayMs),
-  );
-  return () => timers.forEach((timer) => window.clearTimeout(timer));
+  (sceneSounds[sceneId] ?? []).forEach(({ name }) => playSynthSound(name));
+  return () => {};
 }
 
 /** 开始循环播放雨声（进入阳台时调用） */

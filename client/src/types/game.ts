@@ -24,7 +24,6 @@ export interface PhoneChatMessage {
   text: string;
   avatar?: string;
   align?: "left" | "right" | "center";
-  delayMs?: number;
   typingMs?: number;
   system?: boolean;
 }

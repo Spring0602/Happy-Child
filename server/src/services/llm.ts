@@ -251,7 +251,7 @@ export async function callLLM(prompt: string, mockType: MockType) {
 
   if (mockType === "scene_fragment") {
     return {
-      script: "[旁白]短暂的沉默后，人物重新审视了彼此。\n\n[NPC:刘宇]先照我们说好的做，别在这里停太久。\n\n[主角]（至少主线没有偏离。）",
+      script: "[NPC:系统]当前后端处于 mock 模式，未调用真实AI模型。\n\n[旁白]请确认 server/.env 中 MODEL_PROVIDER=hunyuan，并重启后端服务。",
     };
   }
 

@@ -4,7 +4,7 @@ import { getAllSaves, loadSlot, type SaveSlot } from "../engine/save";
 import { SettingsPanel } from "./SettingsPanel";
 import { playBgm, stopBgm } from "../services/bgm";
 
-const TITLE_BGM = "/assets/audio/bgm/大气磅礴.mp3";
+const TITLE_BGM = "/assets/audio/bgm/灰烬回声.mp3";
 
 interface Props {
   onNewGame: () => void;

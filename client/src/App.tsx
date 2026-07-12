@@ -49,13 +49,23 @@ const STORY_BGM = {
   contemplation: "/assets/audio/bgm/沉思.mp3",
   humor: "/assets/audio/bgm/幽默.mp3",
   touching: "/assets/audio/bgm/触动.mp3",
+  horror: "/assets/audio/bgm/恐怖.mp3",
+  daily: "/assets/audio/bgm/日常.mp3",
+  quietThought: "/assets/audio/bgm/静思水面 -思考.mp3",
+  ritual: "/assets/audio/bgm/祭祀.mp3",
+  ashEcho: "/assets/audio/bgm/灰烬回声.mp3",
 } as const;
 
 function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
-  if (gamePhase !== "playing") return null;
+  if (gamePhase !== "playing") return undefined;
 
   const sceneId = state.currentSceneId;
   const mapId = state.currentMapId;
+
+  // ── 游戏开始 CG（无BGM）──
+  if (sceneId === "start" || sceneId === "ch1_think_balcony") {
+    return null;
+  }
 
   if (
     sceneId === "ch3_classroom_entrance" ||
@@ -78,11 +88,23 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.suspense;
   }
 
+  // 三、优秀学生品质测试（考试中）：静思水面 -思考
   if (
     sceneId === "ch3_exam_begins" ||
     sceneId === "ch3_final_question_choice" ||
     sceneId === "ch3_final_answer_safe" ||
-    sceneId === "ch3_final_answer_warning" ||
+    sceneId === "ch3_final_answer_warning"
+  ) {
+    return STORY_BGM.quietThought;
+  }
+
+  // [CG]夜间卧室分析：进入场景先静音，等“红笔批注”分段出现时再由 onSegmentStart 开始沉思
+  if (sceneId === "ch3_night_analysis") {
+    return null;
+  }
+
+  // “红笔批注”出现后 → 第三章结束：沉思
+  if (
     sceneId === "ch3_suffocation_start" ||
     sceneId === "ch3_suffocation_resolved" ||
     sceneId === "ch3_suffocation_death"
@@ -117,10 +139,12 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.uplifting;
   }
 
+  // 进入副本卧室 → 计划本与人生蓝图 door_knock 之前：循环中的感慨
   if (
     sceneId === "ch2_enter_bedroom" ||
     sceneId?.startsWith("ch2_bedroom") ||
-    sceneId?.startsWith("ch2_plan_book") ||
+    sceneId === "ch2_plan_book_intro" ||
+    sceneId === "ch2_plan_book_read" ||
     (
       !sceneId &&
       (mapId === "bedroom" || mapId === "bedroom_luggage") &&
@@ -139,6 +163,18 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.contemplation;
   }
 
+  // ch2_breakfast*：早餐在 uplifting 结束后、进入卧室前的过渡，需求未涉及 → 静音
+  // ch2_mother_door_choice：door_knock 后进入母亲选项，也属静音过渡
+  if (
+    sceneId === "ch2_breakfast" ||
+    sceneId === "ch2_breakfast_choice" ||
+    sceneId === "ch2_breakfast_violation" ||
+    sceneId === "ch2_mother_door_choice"
+  ) {
+    return null;
+  }
+
+  // interact_livingroom_*：第二章客厅交互节点（有 sceneId），归属第五幕 reflectiveLoop
   if (
     sceneId === "ch2_home_exploration_start" ||
     sceneId === "ch2_home_investigation_end" ||
@@ -147,6 +183,7 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     sceneId?.startsWith("ch2_livingroom") ||
     sceneId?.startsWith("ch2_bathroom") ||
     sceneId?.startsWith("ch2_kitchen") ||
+    sceneId?.startsWith("interact_livingroom_") ||
     (
       !sceneId &&
       (mapId === "livingroom" || mapId === "bathroom" || mapId === "kitchen") &&
@@ -157,19 +194,35 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.reflectiveLoop;
   }
 
+  // [地图]电脑自动开机 → [CG]上帝视角（第六部分完）结束前：悬疑
+  // dorm_act4_god_view / dorm_act4_god_view_narrate 是"上帝视角"本体，属"结束前"边界外，不含
+  // dorm_act4_return_dorm*：返回宿舍过渡节点，属悬疑区间内
+  // dorm_act4_choice_*/strategy_*/analyze_*/tip*/death_*：邮件后选择/策略/提示/死亡节点，均属悬疑
   if (
     sceneId === "dorm_act4_pc_boot_shock" ||
     sceneId?.startsWith("dorm_act4_pc_boot") ||
     sceneId?.startsWith("dorm_act4_check_pc") ||
     sceneId?.startsWith("dorm_act4_mail") ||
     sceneId?.startsWith("dorm_act4_prepare") ||
-    sceneId?.startsWith("dorm_act4_god_view")
+    sceneId?.startsWith("dorm_act4_return_dorm") ||
+    sceneId?.startsWith("dorm_act4_choice_") ||
+    sceneId?.startsWith("dorm_act4_strategy_") ||
+    sceneId?.startsWith("dorm_act4_analyze_") ||
+    sceneId?.startsWith("dorm_act4_tip") ||
+    sceneId?.startsWith("dorm_act4_death_")
   ) {
     return STORY_BGM.suspense;
   }
 
+  // 二、宿舍第一幕自由探索 → 四、宿舍第二幕（阳台回来后）结束之前：探索
+  // dorm_act2_sleep_result 是"睡觉"节点，属宿舍第二幕结束，不含（之后第三幕静音）
   if (
     sceneId === "dorm_cg_end_think" ||
+    sceneId === "dorm_go_balcony" ||
+    sceneId === "dorm_interact_pc" ||
+    sceneId === "dorm_interact_cpp_book" ||
+    sceneId === "dorm_interact_clock" ||
+    sceneId === "dorm_interact_exit_door" ||
     sceneId?.startsWith("balcony_night") ||
     (sceneId?.startsWith("dorm_act2") && sceneId !== "dorm_act2_sleep_result") ||
     (!sceneId && (mapId === "dormitory" || mapId === "balcony_night"))
@@ -177,8 +230,29 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.explore;
   }
 
+  // 五、宿舍第三幕（次日清晨）：静音——从睡觉结果到电脑开机之前
   if (
+    sceneId === "dorm_act2_sleep_result" ||
+    sceneId?.startsWith("dorm_act3") ||
+    (!sceneId && mapId === "dormitory_day")
+  ) {
+    return null;
+  }
+
+  // 七、赛前准备（上帝视角过渡 → 校园小卖部 → 厨房用品店探索结束前）：静思水面 -思考
+  // ch1_shop_converge_escape 是厨房用品店最后一个节点，之后 ch1_game_eve* 是静音过渡
+  // shop_school_interact_*/leave_*/checkout_* 是校园小卖部地图交互节点（有 sceneId），需显式覆盖
+  if (sceneId?.startsWith("ch1_shop_converge")) {
+    return null;
+  }
+
+  if (
+    sceneId === "dorm_act4_god_view" ||
+    sceneId === "dorm_act4_god_view_narrate" ||
     sceneId?.startsWith("ch1_shop_school") ||
+    sceneId?.startsWith("shop_school_interact") ||
+    sceneId?.startsWith("shop_school_leave") ||
+    sceneId?.startsWith("shop_school_checkout") ||
     sceneId === "ch1_shop_enter" ||
     sceneId === "ch1_shop_enter_narrate" ||
     sceneId === "ch1_shop_enter_think" ||
@@ -187,9 +261,249 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     sceneId?.startsWith("ch1_shop_interact") ||
     (!sceneId && (mapId === "shop_school" || mapId === "shop"))
   ) {
+    return STORY_BGM.quietThought;
+  }
+
+  // 厨房用品店结束后 → 参赛前夕过渡段：静音
+  if (sceneId?.startsWith("ch1_game_eve")) {
+    return null;
+  }
+
+  // ── 第4章 BGM ──
+
+  // 一、[地图]寻找宣传册（探索）→ 早上教室 结束前：探索
+  if (
+    sceneId === "ch4_find_brochure" ||
+    sceneId === "ch4_classroom_rules" ||
+    sceneId === "ch4_brochure_content" ||
+    sceneId === "ch4_morning_classroom" ||
+    sceneId === "ch4_morning_liuyu_sits"
+  ) {
     return STORY_BGM.explore;
   }
 
+  // 二、看不见的名字（花名册异常→汇合）：沉思
+  if (
+    sceneId === "ch4_roster_anomaly" ||
+    sceneId === "ch4_roster_ask_student" ||
+    sceneId === "ch4_roster_observe" ||
+    sceneId === "ch4_roster_test_liuyu" ||
+    sceneId === "ch4_roster_converge"
+  ) {
+    return STORY_BGM.contemplation;
+  }
+
+  // [CG]攻击刘宇·死亡：沉思
+  if (sceneId === "ch4_lunch_attack_death") {
+    return STORY_BGM.contemplation;
+  }
+
+  // 四、周骐瑞的是非问答（午休寻找周骐瑞→绿化带开始前）：静思水面 -思考
+  if (
+    sceneId === "ch4_lunch_outside_test" ||
+    sceneId === "ch4_lunch_refuse" ||
+    sceneId === "ch4_lunch_tease" ||
+    sceneId === "ch4_zhou_lunch_approach" ||
+    sceneId?.startsWith("ch4_zhou_") ||
+    sceneId === "ch4_lunch_toilet" ||
+    (!sceneId && mapId === "classroom" && (
+      state.choiceHistory.includes("ch4_lunch_punished") ||
+      state.choiceHistory.includes("ch4_lunch_not_punished")
+    ))
+  ) {
+    return STORY_BGM.quietThought;
+  }
+
+  // [地图]前往绿化带 → 第五章[CG]前往五楼 结束前：静思水面 -思考
+  if (
+    sceneId === "ch4_greenbelt_start" ||
+    sceneId === "ch4_greenbelt_after_walk" ||
+    sceneId === "ch4_liuyu_fixed_warning" ||
+    sceneId === "ch5_liuyu_negotiate" ||
+    sceneId === "ch5_liuyu_negotiation_choice" ||
+    sceneId === "ch5_liuyu_dynamic_response" ||
+    sceneId === "ch5_permission_inference" ||
+    sceneId === "ch5_liuyu_permission_reaction" ||
+    sceneId === "ch5_go_to_wang_gallery" ||
+    sceneId === "ch5_enter_fifth_floor" ||
+    sceneId?.startsWith("ch4_greenbelt_") ||
+    sceneId?.startsWith("ch4_evening_") ||
+    sceneId?.startsWith("ch4_night_") ||
+    (!sceneId && mapId === "gate" && (
+      state.choiceHistory.includes("ch4_lunch_punished") ||
+      state.choiceHistory.includes("ch4_lunch_not_punished")
+    ))
+  ) {
+    return STORY_BGM.quietThought;
+  }
+
+  // ── 第5章 BGM ──
+
+  // [地图]进入王沁林工作室 → [CG]向王沁林提问 结束前：探索
+  if (
+    sceneId === "ch5_wang_gallery_enter" ||
+    sceneId === "ch5_gallery_explore" ||
+    sceneId === "ch5_return_to_office" ||
+    sceneId === "ch5_offer_help_choice" ||
+    sceneId === "ch5_zhoujunxiu_help_response" ||
+    sceneId === "ch5_wang_trade_opening" ||
+    (!sceneId && mapId === "wang_gallery")
+  ) {
+    return STORY_BGM.explore;
+  }
+
+  // [CG]陪周隽秀返回3班 → [混合]调查3班 触发@trigger_250 且满足 ch5_class3_students_checked 之前：平凡中的感慨
+  if (
+    sceneId === "ch5_walk_with_zhoujunxiu" ||
+    sceneId === "ch5_zhoujunxiu_conversation_choice" ||
+    sceneId === "ch5_zhoujunxiu_dynamic_reply" ||
+    sceneId?.startsWith("ch5_zhoujunxiu_") ||
+    sceneId === "ch5_class3_explore" ||
+    sceneId === "ch5_class3_students" ||
+    sceneId === "ch5_class3_slogan" ||
+    sceneId === "ch5_class3_leave_blocked" ||
+    sceneId === "ch5_class3_rules_wait" ||
+    (!sceneId && mapId === "classroom_3" && !state.flags["ch5_class3_students_checked"])
+  ) {
+    return STORY_BGM.reflectiveLoop;
+  }
+
+  // [CG]陌生同学 → 第六章[地图]刘宇判定迟到之前：悬疑
+  if (
+    sceneId === "ch5_class3_face_closeup" ||
+    sceneId === "ch5_class3_rules" ||
+    sceneId === "ch5_class3_disguise_choice" ||
+    sceneId === "ch5_class3_exposure" ||
+    sceneId?.startsWith("ch6_class3_") ||
+    sceneId === "ch6_zhoujunxiu_reaction" ||
+    sceneId?.startsWith("ch6_corridor_") ||
+    (!sceneId && mapId === "classroom_3" && !!state.flags["ch5_class3_students_checked"])
+  ) {
+    return STORY_BGM.suspense;
+  }
+
+  // ── 第6章 BGM ──
+
+  // [地图]进入教师办公室（班主任"不听话"台词起）→ [CG]一楼厕所 结束：恐怖
+  if (
+    sceneId === "ch6_office_escape_choice" ||
+    sceneId === "ch6_break_vent" ||
+    sceneId === "ch6_break_vent_stall" ||
+    sceneId === "ch6_break_vent_fight" ||
+    sceneId === "ch6_verified_route_death" ||
+    sceneId === "ch6_vent_escape_commit" ||
+    sceneId === "ch6_vent_escape_block" ||
+    sceneId === "ch6_vent_escape_distract" ||
+    sceneId === "ch6_toilet_encounter"
+  ) {
+    return STORY_BGM.horror;
+  }
+
+  // [地图]放学后的同行 → [CG]周围突然安静 之前：平凡中的感慨
+  if (
+    sceneId === "ch6_after_school_walk" ||
+    sceneId === "ch6_after_school_injury" ||
+    sceneId === "ch6_injury_explanation_choice" ||
+    sceneId === "ch6_liuyu_root_rule_test"
+  ) {
+    return STORY_BGM.reflectiveLoop;
+  }
+
+  // [CG]全校追杀 → 第七章一、删除好孩子结束前：祭祀
+  if (
+    sceneId === "ch6_root_rule_experiment_choice" ||
+    sceneId === "ch6_root_rule_trigger" ||
+    sceneId === "ch6_capture_ritual" ||
+    sceneId === "ch6_ritual_wishes" ||
+    sceneId === "ch6_ritual_desire_snowball" ||
+    sceneId === "ch6_ritual_backlash" ||
+    sceneId === "ch6_numbers_attack" ||
+    sceneId === "ch7_rule_skill_initialize" ||
+    sceneId === "ch7_rule_skill_panel" ||
+    sceneId === "ch7_delete_rule_struggle" ||
+    sceneId === "ch7_surface_rule_death" ||
+    sceneId === "ch7_bad_child_born"
+  ) {
+    return STORY_BGM.ritual;
+  }
+
+  // ── 第7章 BGM ──
+
+  // [地图]回到家中 → [CG]具体规则仍然存在 之前：平凡中的感慨
+  if (
+    sceneId === "ch7_return_livingroom" ||
+    sceneId === "ch7_overhear_parents" ||
+    sceneId === "ch7_overhear_parents_after" ||
+    sceneId === "ch7_family_response_choice" ||
+    sceneId === "ch7_family_dynamic_response" ||
+    sceneId === "ch7_mother_chat_choice" ||
+    sceneId === "ch7_mother_rebellion_response" ||
+    sceneId === "ch7_mother_memory_response" ||
+    (!sceneId && mapId === "livingroom" && !!state.flags["ch7_deleted_good_child"] && !state.flags["ch7_trial_started"])
+  ) {
+    return STORY_BGM.reflectiveLoop;
+  }
+
+  // 三、六个人的试胆活动（开始→结束）：日常
+  if (
+    sceneId === "ch7_trial_signup" ||
+    sceneId === "ch7_trial_group_joined" ||
+    sceneId === "ch7_trial_group_members" ||
+    sceneId?.startsWith("ch7_group_") ||
+    sceneId === "ch7_private_liuyu_choice" ||
+    sceneId === "ch7_liuyu_private_group_switch" ||
+    sceneId === "ch7_liuyu_private_chat"
+  ) {
+    return STORY_BGM.daily;
+  }
+
+  // [地图]进入镜中空间 → 第八章[CG]凌晨一点的查房 之前：恐怖
+  // ch8_walk_to_bathroom_* 是门缝/镜子走路过渡节点，属恐怖区间
+  if (
+    sceneId === "ch7_prepare_mirror" ||
+    sceneId === "ch7_mirror_entry_choice" ||
+    sceneId === "ch7_enter_mirror_careful" ||
+    sceneId === "ch7_enter_mirror_recording" ||
+    sceneId === "ch7_enter_mirror_direct" ||
+    sceneId === "ch7_enter_mirror_timed" ||
+    sceneId === "ch7_mirror_space" ||
+    sceneId === "ch8_mirror_figure_disappears" ||
+    sceneId === "ch8_mirror_ghost" ||
+    sceneId === "ch8_bathroom_knocking" ||
+    sceneId === "ch8_door_response_choice" ||
+    sceneId === "ch8_door_identity_result" ||
+    sceneId === "ch8_door_gap_result" ||
+    sceneId === "ch8_mirror_check_result" ||
+    sceneId === "ch8_open_bathroom_door" ||
+    sceneId === "ch8_mother_ghost_enters" ||
+    sceneId === "ch8_bathroom_death_vision" ||
+    sceneId?.startsWith("ch8_walk_to_bathroom_")
+  ) {
+    return STORY_BGM.horror;
+  }
+
+  // ── 第8章 BGM ──
+
+  // [地图]深夜天台开始 → 第八章结束/返回标题前：灰烬回声
+  if (
+    sceneId === "ch8_rooftop_arrival" ||
+    sceneId === "ch8_rooftop_observation_choice" ||
+    sceneId === "ch8_rooftop_perspective" ||
+    sceneId === "ch8_rooftop_circle_argument" ||
+    sceneId === "ch8_rooftop_method_choice" ||
+    sceneId === "ch8_inner_truth_choice" ||
+    sceneId === "ch8_inner_voice_final_response" ||
+    sceneId === "ch8_rooftop_resolution" ||
+    sceneId === "ch8_return_home" ||
+    sceneId === "ch8_demo_personality_review" ||
+    sceneId === "ch8_unfinished_threads" ||
+    sceneId === "ch8_demo_ending" ||
+    sceneId === "ch8_open_final_save"
+  ) {
+    return STORY_BGM.ashEcho;
+  }
+
+  // 所有已知场景均已显式覆盖；若仍未匹配则静音（防止 BGM 泄漏）
   return null;
 }
 
@@ -243,6 +557,14 @@ function createAiFailureScript(sceneId: string, error: unknown) {
     `[旁白]场景ID：${sceneId}`,
     "[旁白]请确认后端服务正在运行：在项目根目录执行 npm run dev:server，并确认 server/.env 中 MODEL_PROVIDER=hunyuan。",
     `[旁白]错误摘要：${safeMessage}`,
+  ].join("\n\n");
+}
+
+function createAiFallbackScript(sceneId: string, fallback: string) {
+  return [
+    "[NPC:系统]AI服务连接失败，当前显示的是离线占位剧情，不是模型生成结果。",
+    `[旁白]场景ID：${sceneId}`,
+    fallback,
   ].join("\n\n");
 }
 
@@ -554,6 +876,7 @@ export default function App() {
   const aiSceneRequestsRef = useRef<Set<string>>(new Set());
   const prevSceneIdRef = useRef<string>("");
   const currentStoryBgmRef = useRef<string | null>(null);
+  const triggeredSegmentSoundRef = useRef<Set<string>>(new Set());
   const corridorDeathTimerRef = useRef<number | null>(null);
 
   // 当前对话场景
@@ -595,27 +918,26 @@ export default function App() {
     : null;
 
   useEffect(() => {
-    if (gamePhase !== "playing") return;
+    if (gamePhase !== "playing") {
+      currentStoryBgmRef.current = null;
+      return;
+    }
 
     const nextBgm = resolveStoryBgm(gamePhase, state);
+    if (nextBgm === undefined) return;
+
+    if (!nextBgm) {
+      currentStoryBgmRef.current = null;
+      stopBgm({ fadeMs: 700 });
+      return;
+    }
+
     if (nextBgm === currentStoryBgmRef.current) return;
 
     currentStoryBgmRef.current = nextBgm;
-    if (nextBgm) {
-      playBgm(nextBgm, { loop: true, fadeMs: 900 });
-    } else {
-      stopBgm({ fadeMs: 700 });
-    }
-  }, [gamePhase, state.currentSceneId, state.currentMapId]);
+    playBgm(nextBgm, { loop: true, fadeMs: 900 });
+  }, [gamePhase, state.currentSceneId, state.currentMapId, state.flags, state.choiceHistory]);
 
-  useEffect(() => {
-    if (state.currentSceneId !== "ch2_plan_book_read") return;
-    const timer = window.setTimeout(() => {
-      stopBgm({ fadeMs: 800 });
-      currentStoryBgmRef.current = null;
-    }, 25200);
-    return () => window.clearTimeout(timer);
-  }, [state.currentSceneId]);
   const shouldCgTransitionTo = useCallback((nextSceneId: string) => {
     const nextScene = scenes[nextSceneId];
     if (!dialogScene || !nextScene) return true;
@@ -651,7 +973,214 @@ export default function App() {
     }
   }, []);
 
-  const handleDialogSegmentStart = useCallback((sceneId: string, segmentText: string) => {
+  const playSegmentSoundOnce = useCallback((sceneId: string, segmentIndex: number, soundName: Parameters<typeof playOneShotSound>[0]) => {
+    const key = `${sceneId}:${segmentIndex}:${soundName}`;
+    if (triggeredSegmentSoundRef.current.has(key)) return;
+    triggeredSegmentSoundRef.current.add(key);
+    playOneShotSound(soundName);
+  }, []);
+
+  const handleDialogSegmentStart = useCallback((sceneId: string, segmentText: string, segmentIndex: number) => {
+    if (sceneId === "ch2_game_start" && segmentText.includes("根据您的特质，系统为您生成了最适合您的技能")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+
+    if (sceneId === "ch2_plan_book_read" && segmentText.includes("我被吓了一跳")) {
+      currentStoryBgmRef.current = null;
+      stopBgm({ fadeMs: 250 });
+      playSegmentSoundOnce(sceneId, segmentIndex, "door_knock");
+      return;
+    }
+
+    if (sceneId === "ch2_stumble_fail" && segmentText.includes("技能\"违规提醒\"正在发动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+
+    if (sceneId === "ch2_stumble_fail" && segmentText.includes("窒息感猝然攥住喉咙")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+
+    if (sceneId === "ch2_breakfast_violation" && segmentText.includes("技能\"违规提醒\"正在发动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+
+    if (sceneId === "ch2_study_montage" && segmentText.includes("我按照计划表行动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "paper_rustle");
+      return;
+    }
+
+    if (sceneId === "ch2_study_montage" && segmentText.includes("技能\"违规提醒\"正在发动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+
+    if (sceneId === "ch2_study_montage" && segmentText.includes("窒息感骤然增强")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+
+    const has = (...patterns: string[]) => patterns.some(pattern => segmentText.includes(pattern));
+
+    if (sceneId === "ch3_final_answer_warning" && has("我写下答案的瞬间")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch3_class_count_question" && has("我顿时毛骨悚然")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch3_night_analysis" && has("我翻开计划本")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "paper_rustle");
+      return;
+    }
+    if (sceneId === "ch3_night_analysis" && has("技能“违规提醒”强烈发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch3_suffocation_start" && has("突然有一只无形的")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+
+    if (sceneId === "ch4_lunch_attack_death" && has("技能“违规提醒”正在发动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch4_lunch_attack_death" && has("下一秒，握住水杯的手")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+
+    if (sceneId === "ch5_wang_pressure" && has("技能“违规提醒”强烈发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch5_class3_face_closeup" && has("下一秒，一张被无限放大的脸")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch5_class3_face_closeup" && has("技能“违规提醒”强烈发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch5_gallery_materials_warning" && has("技能“违规提醒”正在发动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+
+    if (sceneId === "ch6_class3_exposure" && has("那双瞪得浑圆的眼睛")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch6_class3_exposure" && has("技能“违规提醒”强烈发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch6_corridor_return" && has("技能“违规提醒”发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch6_corridor_timeout_death" && has("技能“违规提醒”强烈发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch6_corridor_timeout_death" && has("倒计时归零", "最后一口空气")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+    if (sceneId === "ch6_root_rule_trigger" && has("技能“违规提醒”强烈发动中")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+    if (sceneId === "ch6_root_rule_trigger" && has("您即刻遭到全校追杀")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+    if (sceneId === "ch6_class3_door_locked" && has("冲着门一个飞踢")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "impact");
+      return;
+    }
+    if (
+      (sceneId === "ch6_class3_counter_standoff" || sceneId === "ch6_class3_cut_standoff") &&
+      has("晚自习铃声响起")
+    ) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "school_bell");
+      return;
+    }
+    if (
+      (sceneId === "ch6_break_vent" || sceneId === "ch6_break_vent_stall" || sceneId === "ch6_break_vent_fight") &&
+      has("用刀柄猛砸")
+    ) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "impact");
+      return;
+    }
+
+    if (sceneId === "ch7_rule_skill_initialize" && has("猩红数字从试卷上脱离")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "rule_pierce");
+      return;
+    }
+    if (sceneId === "ch7_rule_skill_initialize" && has("70%")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch7_rule_skill_panel" && has("主动技能：篡改规则")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch7_rule_skill_panel" && has("我忍住疼痛，艰难地用舌头")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "paper_rustle");
+      return;
+    }
+    if (sceneId === "ch7_surface_rule_death" && has("已删除该规则")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "rule_pierce");
+      return;
+    }
+    if (sceneId === "ch7_surface_rule_death" && has("它们像收到最终命令一样")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+    if (sceneId === "ch7_surface_rule_death" && has("参赛者死亡")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "rule_pierce");
+      return;
+    }
+    if (sceneId === "ch7_bad_child_born" && has("新的纸团再次堵住我的嘴")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "paper_rustle");
+      return;
+    }
+    if (sceneId === "ch7_bad_child_born" && has("恭喜您在学校区域获得")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch7_study_pressure" && has("窒息感再次袭来")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "tinnitus");
+      return;
+    }
+    if (sceneId === "ch7_mirror_space" && has("一阵脚步声从黑暗中响起")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "footsteps_slow");
+      return;
+    }
+    if (sceneId === "ch7_mirror_space" && has("黑暗中似乎出现了一个人形轮廓")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "horror_sting");
+      return;
+    }
+
+    if (sceneId === "ch8_bathroom_knocking" && has("砰砰砰")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "door_knock");
+      return;
+    }
+    if (sceneId === "ch8_bathroom_knocking" && has("一遍遍地敲门")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "door_knock_heavy");
+      return;
+    }
+    if (sceneId === "ch8_inner_voice_returns" && has("技能“违规提醒”正在发动")) {
+      playSegmentSoundOnce(sceneId, segmentIndex, "warning_bell");
+      return;
+    }
+
     if (
       (sceneId === "ch3_prank_returned" && segmentText.includes("教室里短暂安静了一瞬")) ||
       (sceneId === "ch3_prank_laughter" && segmentText.includes("你笑什么？"))
@@ -666,8 +1195,17 @@ export default function App() {
       if (currentStoryBgmRef.current === STORY_BGM.contemplation) return;
       currentStoryBgmRef.current = STORY_BGM.contemplation;
       playBgm(STORY_BGM.contemplation, { loop: true, fadeMs: 900 });
+      return;
     }
-  }, []);
+
+    if (sceneId === "ch6_teacher_office_after_liuyu_leaves" && segmentText.includes("不听话的孩子，就应该受到应有的惩罚")) {
+      if (currentStoryBgmRef.current === STORY_BGM.horror) return;
+      currentStoryBgmRef.current = STORY_BGM.horror;
+      playBgm(STORY_BGM.horror, { loop: true, fadeMs: 700 });
+      return;
+    }
+
+  }, [playSegmentSoundOnce]);
 
   const handleInfoPanelNext = useCallback((sceneId: string, nextSceneId: string) => {
     setClosingInfoPanelSceneId(sceneId);
@@ -683,9 +1221,10 @@ export default function App() {
 
     aiSceneRequestsRef.current.add(dialogSceneId);
     setAiSceneLoadingId(dialogSceneId);
-    const prompt = (aiSceneConfig.prompt ?? rawDialogScene.text)
-      .replace(/\[旁白\]/g, "")
-      .trim();
+    const prompt = rawDialogScene.text.trim();
+    const requiredLines = prompt.includes("AI生成要求")
+      ? []
+      : aiSceneConfig.requiredLines;
 
     const monitorKeys = aiSceneConfig.monitorKeys ?? inferMonitorKeysForScene(dialogSceneId);
     const memoryContext = buildAiMemoryContext(state.aiMemory, monitorKeys);
@@ -696,7 +1235,7 @@ export default function App() {
       dialogSceneId,
       aiSceneConfig.mode,
       prompt,
-      aiSceneConfig.requiredLines,
+      requiredLines,
       runtimeContext
     )
       .then((response) => {
@@ -711,7 +1250,7 @@ export default function App() {
         setAiSceneTexts((previous) => ({
           ...previous,
           [dialogSceneId]: ENABLE_AI_FALLBACK_TEXT
-            ? aiSceneConfig.fallback
+            ? createAiFallbackScript(dialogSceneId, aiSceneConfig.fallback)
             : createAiFailureScript(dialogSceneId, error),
         }));
       })
@@ -730,6 +1269,7 @@ export default function App() {
 
   function resetAiSceneRuntime() {
     aiSceneRequestsRef.current.clear();
+    triggeredSegmentSoundRef.current.clear();
     setAiSceneTexts({});
     setAiSceneLoadingId(null);
     setCompletedPhoneChats({});
@@ -893,6 +1433,7 @@ export default function App() {
   }
 
   function restoreLoadedGame(loaded: GameState, closeGameMenu = false) {
+    stopRainAmbience();
     resetAiSceneRuntime();
     const normalized = normalizeLoadedState(loaded);
     const playerState = scenes[normalized.state.currentSceneId]?.playerState;
@@ -921,6 +1462,7 @@ export default function App() {
 
   // ── 重新开始（清存档，回到初始场景） ──
   function handleRestart() {
+    stopRainAmbience();
     clearSave();
     resetAiSceneRuntime();
     dispatch({ type: "RESET" });
@@ -933,6 +1475,7 @@ export default function App() {
 
   // ── 退出到标题 ──
   function handleExitToTitle() {
+    stopRainAmbience();
     resetAiSceneRuntime();
     setGameMenuOpen(false);
     setGamePhase("menu");
@@ -3123,6 +3666,7 @@ export default function App() {
       await showSingle("母亲：好，我知道了。这些年攒下了一些积蓄，够平生读大学。我这边还能再撑一会。", "58%", "30%", 4200);
       await showSingle("父亲：是我对不起你们……", "12%", "38%", 2600);
       await showSingle("母亲：别说了。经济不景气，房地产更是……我们这样的寻常百姓又能左右什么？认命吧。", "58%", "34%", 4600);
+      playOneShotSound("water_running");
       await showSingle("厨房传来哗哗水声。", "50%", "50%", 2200, "34%");
       await showSingle("母亲：你要是真觉得对不起我们，就主动帮我把家务干了。", "58%", "36%", 3600);
       setFloatingTexts([]);
