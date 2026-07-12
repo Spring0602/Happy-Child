@@ -20,7 +20,7 @@ export function StartMenu({ onNewGame, onStartChapter4, onLoadGame, onShowPortra
   const [saves, setSaves] = useState<SaveSlot[]>([]);
 
   useEffect(() => {
-    playBgm(TITLE_BGM, { loop: true, restart: true, fadeMs: 900 });
+    playBgm(TITLE_BGM, { loop: true, fadeMs: 900 });
     return () => stopBgm({ fadeMs: 600, reset: true });
   }, []);
 

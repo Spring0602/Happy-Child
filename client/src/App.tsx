@@ -83,7 +83,8 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     sceneId === "ch3_empty_seat_choice" ||
     sceneId === "ch3_empty_seat_seen" ||
     sceneId === "ch3_respond_zqr_then_seat" ||
-    sceneId === "ch3_liuyu_intervenes"
+    sceneId === "ch3_liuyu_intervenes" ||
+    sceneId === "ch3_liuyu_check_state"
   ) {
     return STORY_BGM.suspense;
   }
@@ -304,6 +305,12 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     sceneId === "ch4_lunch_refuse" ||
     sceneId === "ch4_lunch_tease" ||
     sceneId === "ch4_zhou_lunch_approach" ||
+    sceneId === "ch4_liuyu_lunch_tease" ||
+    sceneId === "ch4_seat_busy" ||
+    sceneId === "ch4_empty_seat_lunch" ||
+    sceneId === "ch4_lunch_corridor_blocked" ||
+    sceneId === "ch4_classroom_slogan" ||
+    sceneId === "ch4_classroom_noticeboard" ||
     sceneId?.startsWith("ch4_zhou_") ||
     sceneId === "ch4_lunch_toilet" ||
     (!sceneId && mapId === "classroom" && (
@@ -358,9 +365,10 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     sceneId === "ch5_zhoujunxiu_conversation_choice" ||
     sceneId === "ch5_zhoujunxiu_dynamic_reply" ||
     sceneId?.startsWith("ch5_zhoujunxiu_") ||
+    sceneId === "ch5_enter_class3" ||
     sceneId === "ch5_class3_explore" ||
     sceneId === "ch5_class3_students" ||
-    sceneId === "ch5_class3_slogan" ||
+    (sceneId === "ch5_class3_slogan" && !state.flags["ch5_class3_students_checked"]) ||
     sceneId === "ch5_class3_leave_blocked" ||
     sceneId === "ch5_class3_rules_wait" ||
     (!sceneId && mapId === "classroom_3" && !state.flags["ch5_class3_students_checked"])
@@ -503,9 +511,9 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.ashEcho;
   }
 
-  // 未匹配的场景（演出节点、手机群聊节点、过渡节点等）维持当前 BGM 不变，
-  // 避免演出期间 BGM 戛然而止。若确实需要静音，请在上方显式 return null。
-  return undefined;
+  // 未匹配的场景默认静音。需要跨场景连续播放的演出节点必须显式加入上方区间，
+  // 否则 BGM 会在区间结束后拖到后续几段对白甚至下一首 BGM 才停。
+  return null;
 }
 
 type FloatingTextItem = {
@@ -874,11 +882,18 @@ export default function App() {
   const [aiSceneTexts, setAiSceneTexts] = useState<Record<string, string>>({});
   const [aiSceneLoadingId, setAiSceneLoadingId] = useState<string | null>(null);
   const [closingInfoPanelSceneId, setClosingInfoPanelSceneId] = useState<string | null>(null);
+  const [bgmRefreshToken, setBgmRefreshToken] = useState(0);
   const aiSceneRequestsRef = useRef<Set<string>>(new Set());
   const prevSceneIdRef = useRef<string>("");
   const currentStoryBgmRef = useRef<string | null>(null);
+  const bgmPerformanceHoldUntilRef = useRef(0);
+  const bgmPerformanceHoldTimerRef = useRef<number | null>(null);
+  const stateRef = useRef(state);
+  const gamePhaseRef = useRef(gamePhase);
   const triggeredSegmentSoundRef = useRef<Set<string>>(new Set());
   const corridorDeathTimerRef = useRef<number | null>(null);
+  /** 教程面板在本次浏览器会话中是否已经自动弹出过（不受游戏 RESET 影响） */
+  const tutorialAutoShownRef = useRef(false);
 
   // 当前对话场景
   const dialogSceneId = state.currentSceneId && scenes[state.currentSceneId]
@@ -919,9 +934,59 @@ export default function App() {
     : null;
 
   useEffect(() => {
+    stateRef.current = state;
+    gamePhaseRef.current = gamePhase;
+  }, [state, gamePhase]);
+
+  const holdStoryBgmDuringPerformance = useCallback((durationMs: number) => {
+    const until = Date.now() + durationMs;
+    bgmPerformanceHoldUntilRef.current = until;
+
+    if (bgmPerformanceHoldTimerRef.current !== null) {
+      window.clearTimeout(bgmPerformanceHoldTimerRef.current);
+    }
+
+    bgmPerformanceHoldTimerRef.current = window.setTimeout(() => {
+      if (bgmPerformanceHoldUntilRef.current !== until) return;
+      bgmPerformanceHoldUntilRef.current = 0;
+      bgmPerformanceHoldTimerRef.current = null;
+
+      if (
+        gamePhaseRef.current === "playing" &&
+        !stateRef.current.currentSceneId &&
+        currentStoryBgmRef.current
+      ) {
+        currentStoryBgmRef.current = null;
+        stopBgm({ fadeMs: 450 });
+      }
+    }, durationMs + 120);
+  }, []);
+
+  useEffect(() => {
     if (gamePhase !== "playing") {
+      bgmPerformanceHoldUntilRef.current = 0;
+      if (bgmPerformanceHoldTimerRef.current !== null) {
+        window.clearTimeout(bgmPerformanceHoldTimerRef.current);
+        bgmPerformanceHoldTimerRef.current = null;
+      }
       currentStoryBgmRef.current = null;
       return;
+    }
+
+    if (
+      !state.currentSceneId &&
+      currentStoryBgmRef.current &&
+      bgmPerformanceHoldUntilRef.current > Date.now()
+    ) {
+      return;
+    }
+
+    if (state.currentSceneId && bgmPerformanceHoldUntilRef.current > 0) {
+      bgmPerformanceHoldUntilRef.current = 0;
+      if (bgmPerformanceHoldTimerRef.current !== null) {
+        window.clearTimeout(bgmPerformanceHoldTimerRef.current);
+        bgmPerformanceHoldTimerRef.current = null;
+      }
     }
 
     const nextBgm = resolveStoryBgm(gamePhase, state);
@@ -937,7 +1002,7 @@ export default function App() {
 
     currentStoryBgmRef.current = nextBgm;
     playBgm(nextBgm, { loop: true, fadeMs: 900 });
-  }, [gamePhase, state.currentSceneId, state.currentMapId, state.flags, state.choiceHistory]);
+  }, [gamePhase, state.currentSceneId, state.currentMapId, state.flags, state.choiceHistory, bgmRefreshToken]);
 
   const shouldCgTransitionTo = useCallback((nextSceneId: string) => {
     const nextScene = scenes[nextSceneId];
@@ -1223,9 +1288,9 @@ export default function App() {
     aiSceneRequestsRef.current.add(dialogSceneId);
     setAiSceneLoadingId(dialogSceneId);
     const prompt = rawDialogScene.text.trim();
-    const requiredLines = prompt.includes("AI生成要求")
-      ? []
-      : aiSceneConfig.requiredLines;
+    // requiredLines / skeletonLines 始终透传，由服务端 enforce（不再因 prompt 含"AI生成要求"而跳过）
+    const requiredLines = aiSceneConfig.requiredLines ?? [];
+    const skeletonLines = aiSceneConfig.skeletonLines ?? [];
 
     const monitorKeys = aiSceneConfig.monitorKeys ?? inferMonitorKeysForScene(dialogSceneId);
     const memoryContext = buildAiMemoryContext(state.aiMemory, monitorKeys);
@@ -1237,6 +1302,7 @@ export default function App() {
       aiSceneConfig.mode,
       prompt,
       requiredLines,
+      skeletonLines,
       runtimeContext
     )
       .then((response) => {
@@ -1356,19 +1422,21 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [gamePhase, showBacklog, showPortraitPanel, showNotebookPanel, showTutorialPanel, finalSaveRequired, state.currentSceneId]);
 
+  // 教程面板自动弹出：仅在本次浏览器会话中触发一次（使用 ref 避免 RESET 清空 flag 导致重复弹出）
   useEffect(() => {
     if (gamePhase !== "playing") return;
     if (state.currentSceneId) return;
-    if (state.flags["tutorial_exploration_seen"]) return;
+    if (state.currentMapId !== "dormitory") return;
+    if (tutorialAutoShownRef.current) return;
     if (gameMenuOpen || showBacklog || showPortraitPanel || showNotebookPanel || showTutorialPanel || finalSaveRequired) return;
 
-    dispatch({ type: "SET_FLAG", flag: "tutorial_exploration_seen" });
+    tutorialAutoShownRef.current = true;
     setShowTutorialPanel(true);
     gameBridge.sendToPhaser({ type: "FREEZE_PLAYER" });
   }, [
     gamePhase,
     state.currentSceneId,
-    state.flags,
+    state.currentMapId,
     gameMenuOpen,
     showBacklog,
     showPortraitPanel,
@@ -1438,6 +1506,12 @@ export default function App() {
     // 读档时先停止当前 BGM 并重置引用，确保新场景从零开始决策 BGM
     stopBgm({ fadeMs: 400, reset: true });
     currentStoryBgmRef.current = null;
+    bgmPerformanceHoldUntilRef.current = 0;
+    if (bgmPerformanceHoldTimerRef.current !== null) {
+      window.clearTimeout(bgmPerformanceHoldTimerRef.current);
+      bgmPerformanceHoldTimerRef.current = null;
+    }
+    setBgmRefreshToken((value) => value + 1);
     resetAiSceneRuntime();
     const normalized = normalizeLoadedState(loaded);
     const playerState = scenes[normalized.state.currentSceneId]?.playerState;
@@ -1501,6 +1575,7 @@ export default function App() {
       choice.nextSceneId === "ch4_show_painting" &&
       ["ch4_painting_puppet", "ch4_painting_memory", "ch4_painting_safe"].includes(choice.id)
     ) {
+      holdStoryBgmDuringPerformance(3600);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -1524,6 +1599,7 @@ export default function App() {
     }
 
     if (choice.id === "ch4_roster_test_liuyu" && choice.nextSceneId === "ch4_roster_test_liuyu") {
+      holdStoryBgmDuringPerformance(4200);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -1543,6 +1619,7 @@ export default function App() {
     }
 
     if (choice.id === "ch3_returned_homework" && choice.nextSceneId === "ch3_prank_returned") {
+      holdStoryBgmDuringPerformance(6000);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2466,6 +2543,7 @@ export default function App() {
     }
 
     if (nextSceneId === "ch4_morning_liuyu_sits") {
+      holdStoryBgmDuringPerformance(3000);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2486,6 +2564,7 @@ export default function App() {
     }
 
     if (nextSceneId === "ch4_roster_test_liuyu") {
+      holdStoryBgmDuringPerformance(4200);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2538,6 +2617,7 @@ export default function App() {
     }
 
     if (nextSceneId === "ch4_show_painting") {
+      holdStoryBgmDuringPerformance(3600);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2566,6 +2646,7 @@ export default function App() {
     }
 
     if (nextSceneId === "ch4_greenbelt_after_walk") {
+      holdStoryBgmDuringPerformance(6600);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2764,6 +2845,7 @@ export default function App() {
     }
 
     if (dialogScene?.id === "ch7_return_livingroom" && nextSceneId === "ch7_overhear_parents") {
+      holdStoryBgmDuringPerformance(4000);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2805,6 +2887,7 @@ export default function App() {
     }
 
     if (nextSceneId === "ch8_walk_to_bathroom_door_identity" || nextSceneId === "ch8_walk_to_bathroom_door_mirror") {
+      holdStoryBgmDuringPerformance(2600);
       dispatch({ type: "DIALOG_END" });
       gameBridge.sendToPhaser({
         type: "STORY_EVENT",
@@ -2855,6 +2938,7 @@ export default function App() {
     if (dialogScene?.id === "ch8_return_home" && nextSceneId === "ch8_demo_personality_review") {
       dispatch({ type: "SET_FLAG", flag: "ch8_abandoned_cry_fragment_2" });
       dispatch({ type: "SET_FLAG", flag: "ch8_demo_story_completed" });
+      holdStoryBgmDuringPerformance(30000);
       dispatch({ type: "DIALOG_END" });
       setDemoPortraitGenerating(true);
       void (async () => {

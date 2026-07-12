@@ -59,7 +59,7 @@ aiRouter.post("/npc-dialogue", async (req, res) => {
 
 aiRouter.post("/generate-scene", async (req, res) => {
   try {
-    const { gameState, sceneId, mode, prompt, context, requiredLines } = req.body;
+    const { gameState, sceneId, mode, prompt, context, requiredLines, skeletonLines } = req.body;
     if (!gameState || typeof sceneId !== "string" || typeof prompt !== "string") {
       res.status(400).json({ ok: false, message: "invalid scene generation request" });
       return;
@@ -69,8 +69,11 @@ aiRouter.post("/generate-scene", async (req, res) => {
     const normalizedRequiredLines = Array.isArray(requiredLines)
       ? requiredLines.filter((line): line is string => typeof line === "string")
       : [];
+    const normalizedSkeletonLines = Array.isArray(skeletonLines)
+      ? skeletonLines.filter((line): line is string => typeof line === "string")
+      : [];
     const result = await callLLM(
-      sceneFragmentPrompt(gameState, sceneId, normalizedMode, normalizedContext, prompt, normalizedRequiredLines),
+      sceneFragmentPrompt(gameState, sceneId, normalizedMode, normalizedContext, prompt, normalizedRequiredLines, normalizedSkeletonLines),
       "scene_fragment"
     );
     if (typeof result.script === "string") {
@@ -80,6 +83,16 @@ aiRouter.post("/generate-scene", async (req, res) => {
       });
       if (missing.length > 0) {
         result.script = `${missing.join("\n\n")}\n\n${result.script}`;
+      }
+      // 骨架行检查：仅日志告警，不改变输出（骨架行需展开而非逐字复制）
+      if (normalizedSkeletonLines.length > 0) {
+        const skeletonMissing = normalizedSkeletonLines.filter((line) => {
+          const spokenText = line.replace(/^\[[^\]]+\]\s*/, "");
+          return spokenText && !(result.script as string).includes(spokenText);
+        });
+        if (skeletonMissing.length > 0) {
+          console.warn(`[AI] 骨架句缺失场景=${sceneId}, 缺失${skeletonMissing.length}条`);
+        }
       }
     }
     res.json({ ok: true, result });

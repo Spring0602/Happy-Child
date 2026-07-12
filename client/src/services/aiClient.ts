@@ -42,6 +42,7 @@ export async function generateAiScene(
   mode: "dialogue" | "fragment",
   prompt: string,
   requiredLines: string[] = [],
+  skeletonLines: string[] = [],
   context = ""
 ) {
   return postJSON<{ ok: boolean; result: { script: string } }>("/api/generate-scene", {
@@ -51,6 +52,7 @@ export async function generateAiScene(
     context,
     prompt,
     requiredLines,
+    skeletonLines,
   });
 }
 
