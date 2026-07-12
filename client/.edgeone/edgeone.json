@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api": {
+      "path": "/api/*",
+      "method": ["POST", "OPTIONS"]
+    }
+  }
+}
