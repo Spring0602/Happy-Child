@@ -1,0 +1,265 @@
+{
+  "compressionlevel": -1,
+  "height": 20,
+  "infinite": false,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "厨房.png",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": 2,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "wall_top",
+          "x": 22,
+          "y": 290,
+          "width": 960,
+          "height": 32
+        },
+        {
+          "id": 2,
+          "name": "wall_left",
+          "x": 145,
+          "y": -89,
+          "width": 32,
+          "height": 640
+        },
+        {
+          "id": 3,
+          "name": "wall_right",
+          "x": 778,
+          "y": -82,
+          "width": 32,
+          "height": 640
+        },
+        {
+          "id": 4,
+          "name": "collision_7",
+          "x": 140,
+          "y": 540,
+          "width": 399.351256296677,
+          "height": 24.25965575634018
+        },
+        {
+          "id": 5,
+          "name": "collision_8",
+          "x": 632,
+          "y": 541,
+          "width": 167.95146292850905,
+          "height": 22
+        },
+        {
+          "id": 6,
+          "name": "collision_9",
+          "x": 637,
+          "y": 215,
+          "width": 52.25156624442502,
+          "height": 175.41597239199834
+        },
+        {
+          "id": 7,
+          "name": "collision_10",
+          "x": 713,
+          "y": 243,
+          "width": 63.448330439659,
+          "height": 139.9595524404242
+        },
+        {
+          "id": 8,
+          "name": "collision_11",
+          "x": 172,
+          "y": 213,
+          "width": 358.29645424748594,
+          "height": 154.8885713674028
+        },
+        {
+          "id": 9,
+          "name": "collision_12",
+          "x": 176,
+          "y": 469,
+          "width": 315.3755248324225,
+          "height": 80
+        },
+        {
+          "id": 10,
+          "name": "collision_13",
+          "x": 157,
+          "y": 155,
+          "width": 97.03862302536079,
+          "height": 377
+        },
+        {
+          "id": 11,
+          "name": "collision_14",
+          "x": 536,
+          "y": 141,
+          "width": 97.03862302536072,
+          "height": 240.7304301975296
+        },
+        {
+          "id": 12,
+          "name": "collision_18",
+          "x": 527,
+          "y": 570,
+          "width": 117.16548468722635,
+          "height": 19.7100815361689
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "occlusion_15",
+          "type": "furniture",
+          "x": 176,
+          "y": 456,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 317,
+              "y": 0
+            },
+            {
+              "x": 319,
+              "y": 73
+            },
+            {
+              "x": 4,
+              "y": 76
+            },
+            {
+              "x": 0,
+              "y": 1
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "triggers",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 100,
+          "name": "door_livingroom",
+          "x": 540,
+          "y": 449,
+          "width": 90,
+          "height": 75,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E返回客厅"
+            }
+          ]
+        },
+        {
+          "id": 101,
+          "name": "trigger_18",
+          "x": 739,
+          "y": 379,
+          "width": 66.41042860344896,
+          "height": 155.9201367211411,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E墙壁上的规则"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 200,
+          "name": "spawn_kitchen_door",
+          "x": 568,
+          "y": 508,
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "npcs",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    },
+    {
+      "id": 7,
+      "name": "items",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 251,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 30
+}

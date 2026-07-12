@@ -1,0 +1,1016 @@
+{
+  "compressionlevel": -1,
+  "height": 24,
+  "infinite": false,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "教师办公室.png",
+      "x": 0,
+      "y": 0,
+      "width": 1376,
+      "height": 768
+    },
+    {
+      "id": 2,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "collision_1",
+          "x": 13,
+          "y": 706,
+          "width": 632.3183675273364,
+          "height": 59.279846955687844
+        },
+        {
+          "id": 2,
+          "name": "collision_2",
+          "x": 727,
+          "y": 708,
+          "width": 645.4916668508225,
+          "height": 65.86649661743093
+        },
+        {
+          "id": 3,
+          "name": "collision_4",
+          "x": 36,
+          "y": 5,
+          "width": 28.542148534220047,
+          "height": 761.8558108749505
+        },
+        {
+          "id": 4,
+          "name": "collision_5",
+          "x": 1313,
+          "y": -8,
+          "width": 54.88874718119223,
+          "height": 775.0291101984367
+        },
+        {
+          "id": 5,
+          "name": "collision_6",
+          "x": 68,
+          "y": 524,
+          "width": 207.90143516245428,
+          "height": 200
+        },
+        {
+          "id": 6,
+          "name": "collision_7",
+          "x": 67,
+          "y": 312,
+          "width": 207.90143516245428,
+          "height": 200
+        },
+        {
+          "id": 7,
+          "name": "collision_8",
+          "x": 66,
+          "y": 135,
+          "width": 330.68885995638703,
+          "height": 163.25146251011512
+        },
+        {
+          "id": 8,
+          "name": "collision_9",
+          "x": 893,
+          "y": 648,
+          "width": 276.6611437997868,
+          "height": 112.26829023759467
+        },
+        {
+          "id": 9,
+          "name": "collision_10",
+          "x": 1246,
+          "y": 614,
+          "width": 60.73186709964625,
+          "height": 94.29421470734565
+        },
+        {
+          "id": 10,
+          "name": "collision_11",
+          "x": 1241,
+          "y": 534,
+          "width": 60.73186709964625,
+          "height": 102.28524985203592
+        },
+        {
+          "id": 11,
+          "name": "collision_12",
+          "x": 1240,
+          "y": 320,
+          "width": 71.91931630221279,
+          "height": 194.98125753044354
+        },
+        {
+          "id": 12,
+          "name": "collision_13",
+          "x": 966,
+          "y": 212,
+          "width": 343.6145112216832,
+          "height": 108.67807796778817
+        },
+        {
+          "id": 13,
+          "name": "collision_14",
+          "x": 1181,
+          "y": 307,
+          "width": 49.54441789707994,
+          "height": 35.1605546366373
+        },
+        {
+          "id": 14,
+          "name": "collision_15",
+          "x": 901,
+          "y": 194,
+          "width": 62.33007412858433,
+          "height": 103.88345688097397
+        },
+        {
+          "id": 15,
+          "name": "collision_16",
+          "x": 536,
+          "y": 296,
+          "width": 301.7522763219986,
+          "height": 180.7286360859029
+        },
+        {
+          "id": 16,
+          "name": "collision_17",
+          "x": 646,
+          "y": 235,
+          "width": 85.52337243350757,
+          "height": 77
+        },
+        {
+          "id": 17,
+          "name": "collision_18",
+          "x": 362,
+          "y": 26,
+          "width": 626.3024800229583,
+          "height": 207.99713358696033
+        },
+        {
+          "id": 18,
+          "name": "collision_19",
+          "x": 287,
+          "y": 397,
+          "width": 81.8215428362239,
+          "height": 107.39077497254385
+        },
+        {
+          "id": 19,
+          "name": "collision_20",
+          "x": 17,
+          "y": 376,
+          "width": 44.26336185025565,
+          "height": 261
+        },
+        {
+          "id": 20,
+          "name": "collision_21",
+          "x": 18,
+          "y": 23,
+          "width": 44.263361850255706,
+          "height": 392.2649653626105
+        },
+        {
+          "id": 21,
+          "name": "collision_22",
+          "x": 11,
+          "y": 449,
+          "width": 51.894975962368676,
+          "height": 230.47474618581396
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "occlusion_23",
+          "type": "furniture",
+          "x": 537,
+          "y": 296,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 3,
+              "y": 110
+            },
+            {
+              "x": 0,
+              "y": 106
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 301,
+              "y": 0
+            },
+            {
+              "x": 303,
+              "y": 108
+            },
+            {
+              "x": 297,
+              "y": 111
+            },
+            {
+              "x": 5,
+              "y": 110
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "occlusion_24",
+          "type": "furniture",
+          "x": 544,
+          "y": 404,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 1,
+              "y": 15
+            },
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 286,
+              "y": 0
+            },
+            {
+              "x": 287,
+              "y": 16
+            },
+            {
+              "x": 0,
+              "y": 15
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "occlusion_25",
+          "type": "furniture",
+          "x": 549,
+          "y": 264,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 30
+            },
+            {
+              "x": 19,
+              "y": 0
+            },
+            {
+              "x": 31,
+              "y": 0
+            },
+            {
+              "x": 45,
+              "y": 5
+            },
+            {
+              "x": 53,
+              "y": 7
+            },
+            {
+              "x": 53,
+              "y": 14
+            },
+            {
+              "x": 54,
+              "y": 16
+            },
+            {
+              "x": 54,
+              "y": 23
+            },
+            {
+              "x": 56,
+              "y": 28
+            },
+            {
+              "x": 55,
+              "y": 32
+            },
+            {
+              "x": 56,
+              "y": 44
+            },
+            {
+              "x": 1,
+              "y": 49
+            },
+            {
+              "x": 0,
+              "y": 30
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "occlusion_26",
+          "type": "furniture",
+          "x": 753,
+          "y": 290,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 18,
+              "y": 0
+            },
+            {
+              "x": 14,
+              "y": 12
+            },
+            {
+              "x": 0,
+              "y": 13
+            },
+            {
+              "x": 9,
+              "y": 2
+            },
+            {
+              "x": 18,
+              "y": 0
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "occlusion_27",
+          "type": "furniture",
+          "x": 777,
+          "y": 268,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 21
+            },
+            {
+              "x": 21,
+              "y": 3
+            },
+            {
+              "x": 24,
+              "y": 1
+            },
+            {
+              "x": 29,
+              "y": 0
+            },
+            {
+              "x": 31,
+              "y": 3
+            },
+            {
+              "x": 41,
+              "y": 10
+            },
+            {
+              "x": 46,
+              "y": 14
+            },
+            {
+              "x": 51,
+              "y": 21
+            },
+            {
+              "x": 53,
+              "y": 27
+            },
+            {
+              "x": 53,
+              "y": 32
+            },
+            {
+              "x": 45,
+              "y": 32
+            },
+            {
+              "x": 45,
+              "y": 24
+            },
+            {
+              "x": 42,
+              "y": 18
+            },
+            {
+              "x": 36,
+              "y": 14
+            },
+            {
+              "x": 32,
+              "y": 14
+            },
+            {
+              "x": 30,
+              "y": 18
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": 33,
+              "y": 29
+            },
+            {
+              "x": 32,
+              "y": 35
+            },
+            {
+              "x": 0,
+              "y": 34
+            },
+            {
+              "x": 0,
+              "y": 21
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "occlusion_29",
+          "type": "furniture",
+          "x": 290,
+          "y": 396,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 75
+            },
+            {
+              "x": 3,
+              "y": 10
+            },
+            {
+              "x": 6,
+              "y": 9
+            },
+            {
+              "x": 6,
+              "y": 0
+            },
+            {
+              "x": 36,
+              "y": 0
+            },
+            {
+              "x": 37,
+              "y": 3
+            },
+            {
+              "x": 70,
+              "y": 2
+            },
+            {
+              "x": 72,
+              "y": 8
+            },
+            {
+              "x": 77,
+              "y": 10
+            },
+            {
+              "x": 76,
+              "y": 14
+            },
+            {
+              "x": 76,
+              "y": 76
+            },
+            {
+              "x": 1,
+              "y": 76
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "occlusion_31",
+          "type": "furniture",
+          "x": 280,
+          "y": 406,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 13,
+              "y": 0
+            },
+            {
+              "x": 3,
+              "y": 0
+            },
+            {
+              "x": 0,
+              "y": 3
+            },
+            {
+              "x": 0,
+              "y": 28
+            },
+            {
+              "x": 4,
+              "y": 32
+            },
+            {
+              "x": 13,
+              "y": 33
+            },
+            {
+              "x": 13,
+              "y": 27
+            },
+            {
+              "x": 7,
+              "y": 25
+            },
+            {
+              "x": 6,
+              "y": 6
+            },
+            {
+              "x": 13,
+              "y": 5
+            },
+            {
+              "x": 13,
+              "y": 1
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "occlusion_32",
+          "type": "furniture",
+          "x": 365,
+          "y": 405,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 2,
+              "y": 0
+            },
+            {
+              "x": 10,
+              "y": 0
+            },
+            {
+              "x": 12,
+              "y": 3
+            },
+            {
+              "x": 12,
+              "y": 30
+            },
+            {
+              "x": 8,
+              "y": 33
+            },
+            {
+              "x": 1,
+              "y": 34
+            },
+            {
+              "x": 0,
+              "y": 26
+            },
+            {
+              "x": 5,
+              "y": 26
+            },
+            {
+              "x": 6,
+              "y": 8
+            },
+            {
+              "x": 1,
+              "y": 8
+            },
+            {
+              "x": 1,
+              "y": 1
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "occlusion_33",
+          "type": "furniture",
+          "x": 70,
+          "y": 332,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 205,
+              "y": 1
+            },
+            {
+              "x": 205,
+              "y": 117
+            },
+            {
+              "x": 1,
+              "y": 121
+            },
+            {
+              "x": 1,
+              "y": 0
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "occlusion_34",
+          "type": "furniture",
+          "x": 68,
+          "y": 545,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 205,
+              "y": 0
+            },
+            {
+              "x": 206,
+              "y": 122
+            },
+            {
+              "x": 0,
+              "y": 118
+            },
+            {
+              "x": 0,
+              "y": 3
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "occlusion_41",
+          "type": "furniture",
+          "x": 731,
+          "y": 706,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 49
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 622,
+              "y": 2
+            },
+            {
+              "x": 625,
+              "y": 51
+            },
+            {
+              "x": 0,
+              "y": 51
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "occlusion_42",
+          "type": "furniture",
+          "x": 896,
+          "y": 646,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 61
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 272,
+              "y": 0
+            },
+            {
+              "x": 275,
+              "y": 61
+            },
+            {
+              "x": 1,
+              "y": 62
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "occlusion_43",
+          "type": "furniture",
+          "x": 25,
+          "y": 709,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 618,
+              "y": 2
+            },
+            {
+              "x": 616,
+              "y": 51
+            },
+            {
+              "x": 0,
+              "y": 54
+            },
+            {
+              "x": 2,
+              "y": 0
+            },
+            {
+              "x": 618,
+              "y": 0
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "occlusion_43",
+          "type": "furniture",
+          "x": 729,
+          "y": 729,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 36
+            },
+            {
+              "x": 0,
+              "y": 6
+            },
+            {
+              "x": 630,
+              "y": 0
+            },
+            {
+              "x": 630,
+              "y": 36
+            },
+            {
+              "x": 0,
+              "y": 36
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "triggers",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    },
+    {
+      "id": 5,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 200,
+          "name": "spawn_spawn_35",
+          "x": 674,
+          "y": 656,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 201,
+          "name": "spawn_spawn_37",
+          "x": 674,
+          "y": 463,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 202,
+          "name": "spawn_spawn_38",
+          "x": 837,
+          "y": 241,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 203,
+          "name": "spawn_spawn_36",
+          "x": 673,
+          "y": 242,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_38",
+          "x": 676,
+          "y": 715,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 205,
+          "name": "spawn_spawn_39",
+          "x": 780,
+          "y": 716,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 206,
+          "name": "spawn_spawn_40",
+          "x": 675,
+          "y": 762,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 207,
+          "name": "spawn_spawn_44",
+          "x": 778,
+          "y": 462,
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "npcs",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    },
+    {
+      "id": 7,
+      "name": "items",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 258,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 43
+}

@@ -1,0 +1,983 @@
+{
+  "compressionlevel": -1,
+  "height": 20,
+  "infinite": false,
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "主角房间.png",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 640
+    },
+    {
+      "id": 2,
+      "name": "collision",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "collision_1",
+          "x": 64,
+          "y": 338,
+          "width": 263.578,
+          "height": 215
+        },
+        {
+          "id": 2,
+          "name": "collision_2",
+          "x": 51,
+          "y": 351,
+          "width": 82.174,
+          "height": 103
+        },
+        {
+          "id": 3,
+          "name": "collision_3",
+          "x": 46,
+          "y": 43,
+          "width": 52.716,
+          "height": 310.092
+        },
+        {
+          "id": 4,
+          "name": "collision_4",
+          "x": 90,
+          "y": 126,
+          "width": 31.009,
+          "height": 220.51
+        },
+        {
+          "id": 5,
+          "name": "collision_5",
+          "x": 119,
+          "y": 137,
+          "width": 18.606,
+          "height": 197.081
+        },
+        {
+          "id": 6,
+          "name": "collision_6",
+          "x": 127,
+          "y": 111,
+          "width": 24.807,
+          "height": 209.485
+        },
+        {
+          "id": 7,
+          "name": "collision_7",
+          "x": 144,
+          "y": 107,
+          "width": 24.807,
+          "height": 195.703
+        },
+        {
+          "id": 8,
+          "name": "collision_8",
+          "x": 170,
+          "y": 13,
+          "width": 590.726,
+          "height": 278.394
+        },
+        {
+          "id": 9,
+          "name": "collision_9",
+          "x": 798,
+          "y": 18,
+          "width": 161.023,
+          "height": 569.034
+        },
+        {
+          "id": 10,
+          "name": "collision_10",
+          "x": 667,
+          "y": 309,
+          "width": 65.693,
+          "height": 74
+        },
+        {
+          "id": 11,
+          "name": "collision_11",
+          "x": 595,
+          "y": 304,
+          "width": 44.727,
+          "height": 47.212
+        },
+        {
+          "id": 12,
+          "name": "collision_13",
+          "x": 747,
+          "y": 187,
+          "width": 29.935,
+          "height": 78.425
+        },
+        {
+          "id": 13,
+          "name": "collision_14",
+          "x": 772,
+          "y": 205,
+          "width": 29.935,
+          "height": 74.224
+        },
+        {
+          "id": 14,
+          "name": "collision_15",
+          "x": 783,
+          "y": 203,
+          "width": 31.51,
+          "height": 86.828
+        },
+        {
+          "id": 15,
+          "name": "collision_16",
+          "x": 680,
+          "y": 457,
+          "width": 104.779,
+          "height": 75.772
+        },
+        {
+          "id": 16,
+          "name": "collision_17",
+          "x": 582,
+          "y": 255,
+          "width": 61.685,
+          "height": 59.931
+        },
+        {
+          "id": 17,
+          "name": "collision_45",
+          "x": 13,
+          "y": 569,
+          "width": 474.28663154249926,
+          "height": 20
+        },
+        {
+          "id": 18,
+          "name": "collision_46",
+          "x": 607,
+          "y": 570,
+          "width": 348.0376720671577,
+          "height": 19
+        },
+        {
+          "id": 19,
+          "name": "collision_47",
+          "x": 485,
+          "y": 585,
+          "width": 129.6610935152156,
+          "height": 7
+        },
+        {
+          "id": 20,
+          "name": "collision_48",
+          "x": 12,
+          "y": 16,
+          "width": 34.55225239774555,
+          "height": 573.3114471922223
+        },
+        {
+          "id": 21,
+          "name": "collision_49",
+          "x": 795,
+          "y": 16,
+          "width": 113.36510375474143,
+          "height": 342.45708425911465
+        },
+        {
+          "id": 22,
+          "name": "collision_50",
+          "x": 783,
+          "y": 216,
+          "width": 37.65581943383995,
+          "height": 115.79164475905804
+        },
+        {
+          "id": 23,
+          "name": "collision_51",
+          "x": 761,
+          "y": 199,
+          "width": 64.95628852337404,
+          "height": 96.02233955629202
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "furniture_objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 1,
+          "name": "occlusion_18",
+          "type": "furniture",
+          "x": 676,
+          "y": 418,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 63.646
+            },
+            {
+              "x": 0,
+              "y": 28.877
+            },
+            {
+              "x": 38.453,
+              "y": 0
+            },
+            {
+              "x": 53.702,
+              "y": 2.357
+            },
+            {
+              "x": 55.028,
+              "y": 17.09
+            },
+            {
+              "x": 111.381,
+              "y": 38.306
+            },
+            {
+              "x": 111.381,
+              "y": 61.878
+            },
+            {
+              "x": 0,
+              "y": 61.878
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "occlusion_19",
+          "type": "furniture",
+          "x": 671,
+          "y": 266,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0.663,
+              "y": 40.663
+            },
+            {
+              "x": 0,
+              "y": 11.786
+            },
+            {
+              "x": 2.652,
+              "y": 7.072
+            },
+            {
+              "x": 6.63,
+              "y": 1.768
+            },
+            {
+              "x": 12.597,
+              "y": 2.357
+            },
+            {
+              "x": 12.597,
+              "y": 0
+            },
+            {
+              "x": 45.746,
+              "y": 0
+            },
+            {
+              "x": 48.398,
+              "y": 1.768
+            },
+            {
+              "x": 52.376,
+              "y": 1.768
+            },
+            {
+              "x": 53.702,
+              "y": 4.125
+            },
+            {
+              "x": 57.017,
+              "y": 5.304
+            },
+            {
+              "x": 57.017,
+              "y": 7.661
+            },
+            {
+              "x": 59.669,
+              "y": 9.429
+            },
+            {
+              "x": 70.939,
+              "y": 9.429
+            },
+            {
+              "x": 71.602,
+              "y": 29.466
+            },
+            {
+              "x": 70.939,
+              "y": 32.413
+            },
+            {
+              "x": 66.298,
+              "y": 31.234
+            },
+            {
+              "x": 59.669,
+              "y": 30.645
+            },
+            {
+              "x": 59.669,
+              "y": 43.02
+            },
+            {
+              "x": 55.691,
+              "y": 47.145
+            },
+            {
+              "x": 51.713,
+              "y": 50.092
+            },
+            {
+              "x": 12.597,
+              "y": 50.681
+            },
+            {
+              "x": 7.956,
+              "y": 49.503
+            },
+            {
+              "x": 5.304,
+              "y": 46.556
+            },
+            {
+              "x": 0.663,
+              "y": 41.842
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "occlusion_21",
+          "type": "furniture",
+          "x": 658,
+          "y": 276,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 0.589
+            },
+            {
+              "x": 16.575,
+              "y": 0
+            },
+            {
+              "x": 15.249,
+              "y": 22.394
+            },
+            {
+              "x": 0,
+              "y": 22.394
+            },
+            {
+              "x": 0,
+              "y": 0.589
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "occlusion_24",
+          "type": "furniture",
+          "x": 56,
+          "y": 352,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 2.947
+            },
+            {
+              "x": 21.878,
+              "y": 2.947
+            },
+            {
+              "x": 25.193,
+              "y": 1.179
+            },
+            {
+              "x": 29.834,
+              "y": 0
+            },
+            {
+              "x": 37.79,
+              "y": 0
+            },
+            {
+              "x": 45.083,
+              "y": 1.768
+            },
+            {
+              "x": 49.061,
+              "y": 5.304
+            },
+            {
+              "x": 69.613,
+              "y": 4.715
+            },
+            {
+              "x": 69.613,
+              "y": 33.591
+            },
+            {
+              "x": 1.326,
+              "y": 32.413
+            },
+            {
+              "x": 0.663,
+              "y": 4.715
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "occlusion_40",
+          "type": "furniture",
+          "x": 49,
+          "y": 378,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 1.326,
+              "y": 33.591
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 15.912,
+              "y": 0
+            },
+            {
+              "x": 15.912,
+              "y": 33.002
+            },
+            {
+              "x": 78.232,
+              "y": 33.002
+            },
+            {
+              "x": 80.221,
+              "y": 25.93
+            },
+            {
+              "x": 108.729,
+              "y": 25.341
+            },
+            {
+              "x": 110.718,
+              "y": 30.055
+            },
+            {
+              "x": 260.552,
+              "y": 28.877
+            },
+            {
+              "x": 261.215,
+              "y": 14.733
+            },
+            {
+              "x": 279.779,
+              "y": 14.144
+            },
+            {
+              "x": 278.453,
+              "y": 64.236
+            },
+            {
+              "x": 1.989,
+              "y": 64.236
+            },
+            {
+              "x": 1.989,
+              "y": 33.591
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "occlusion_48",
+          "type": "furniture",
+          "x": 662,
+          "y": 296,
+          "width": 0,
+          "height": 0,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 2
+            },
+            {
+              "x": 10,
+              "y": 1
+            },
+            {
+              "x": 10,
+              "y": 10
+            },
+            {
+              "x": 19,
+              "y": 19
+            },
+            {
+              "x": 60,
+              "y": 19
+            },
+            {
+              "x": 66,
+              "y": 12
+            },
+            {
+              "x": 68,
+              "y": 0
+            },
+            {
+              "x": 75,
+              "y": 0
+            },
+            {
+              "x": 75,
+              "y": 10
+            },
+            {
+              "x": 74,
+              "y": 14
+            },
+            {
+              "x": 70,
+              "y": 21
+            },
+            {
+              "x": 65,
+              "y": 27
+            },
+            {
+              "x": 59,
+              "y": 30
+            },
+            {
+              "x": 18,
+              "y": 30
+            },
+            {
+              "x": 13,
+              "y": 27
+            },
+            {
+              "x": 8,
+              "y": 23
+            },
+            {
+              "x": 4,
+              "y": 16
+            },
+            {
+              "x": 0,
+              "y": 10
+            },
+            {
+              "x": 0,
+              "y": 2
+            }
+          ],
+          "properties": [
+            {
+              "name": "walkable",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "triggers",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 100,
+          "name": "trigger_25",
+          "x": 661,
+          "y": 282,
+          "width": 79.84,
+          "height": 75.27,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E坐下"
+            }
+          ]
+        },
+        {
+          "id": 101,
+          "name": "trigger_26",
+          "x": 623,
+          "y": 167,
+          "width": 134.276,
+          "height": 66.667,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E电脑"
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "name": "trigger_27",
+          "x": 744,
+          "y": 228,
+          "width": 92.114,
+          "height": 45.295,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E阅读计划本"
+            }
+          ]
+        },
+        {
+          "id": 103,
+          "name": "trigger_28",
+          "x": 595,
+          "y": 301,
+          "width": 47.282,
+          "height": 46.004,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E垃圾桶"
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "name": "trigger_29",
+          "x": 348,
+          "y": 183,
+          "width": 125.676,
+          "height": 105.292,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E查看书架"
+            }
+          ]
+        },
+        {
+          "id": 105,
+          "name": "trigger_30",
+          "x": 190,
+          "y": 181,
+          "width": 121.342,
+          "height": 107.86,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E查看书架"
+            }
+          ]
+        },
+        {
+          "id": 106,
+          "name": "trigger_31",
+          "x": 73,
+          "y": 242,
+          "width": 86.692,
+          "height": 72.459,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E查看书架"
+            }
+          ]
+        },
+        {
+          "id": 107,
+          "name": "trigger_32",
+          "x": 123,
+          "y": 393,
+          "width": 193.981,
+          "height": 53.154,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E床"
+            }
+          ]
+        },
+        {
+          "id": 108,
+          "name": "trigger_33",
+          "x": 510,
+          "y": 171,
+          "width": 52.488,
+          "height": 50.898,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E盆景"
+            }
+          ]
+        },
+        {
+          "id": 109,
+          "name": "trigger_37",
+          "x": 479,
+          "y": 522,
+          "width": 133.663,
+          "height": 56.359,
+          "properties": [
+            {
+              "name": "triggerType",
+              "type": "string",
+              "value": "interact"
+            },
+            {
+              "name": "sceneId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "hintText",
+              "type": "string",
+              "value": "E客厅"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "player_spawn",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 200,
+          "name": "spawn_spawn_35",
+          "x": 681,
+          "y": 265,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 201,
+          "name": "spawn_spawn_38",
+          "x": 532,
+          "y": 498,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 202,
+          "name": "spawn_spawn_38",
+          "x": 211,
+          "y": 397,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 203,
+          "name": "spawn_spawn_37",
+          "x": 522,
+          "y": 368,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "id": 204,
+          "name": "spawn_spawn_36",
+          "x": 684,
+          "y": 371,
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "npcs",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    },
+    {
+      "id": 7,
+      "name": "items",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "objects": []
+    }
+  ],
+  "nextlayerid": 8,
+  "nextobjectid": 255,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.10.2",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 30
+}
