@@ -79,6 +79,11 @@ function parseModelResponse(text: string, mockType: MockType): Record<string, un
       if (/\[(?:旁白|主角|主角说|NPC:[^\]]+)\]/.test(script)) {
         return { script };
       }
+      // 模型忽略格式要求直接返回对话内容：将纯文本包装为旁白段落返回
+      const plainText = text.trim();
+      if (plainText.length > 0) {
+        return { script: `[旁白]${plainText}` };
+      }
     }
     throw error;
   }
@@ -158,13 +163,14 @@ async function callHunyuan(prompt: string, mockType: MockType): Promise<Record<s
           messages: [
             {
               role: "system",
-              content: "你是《快乐小孩》的叙事引擎。严格保持角色设定，不创造提示词之外的关键事实，只输出要求的 JSON 对象。",
+              content: "你是《快乐小孩》的叙事引擎。严格保持角色设定，不创造提示词之外的关键事实，只输出要求的 JSON 对象。【重要】你的回答必须始终是合法的 JSON 字符串，绝对不能直接扮演角色说话或输出纯文本台词。",
             },
             { role: "user", content: prompt },
           ],
           stream: false,
           temperature: 0.7,
           max_tokens: 2400,
+          response_format: { type: "json_object" },
         }),
         signal: AbortSignal.timeout(timeoutMs),
         dispatcher: getProxyAgent(),

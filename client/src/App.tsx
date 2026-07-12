@@ -503,8 +503,9 @@ function resolveStoryBgm(gamePhase: GamePhase, state: GameState) {
     return STORY_BGM.ashEcho;
   }
 
-  // 所有已知场景均已显式覆盖；若仍未匹配则静音（防止 BGM 泄漏）
-  return null;
+  // 未匹配的场景（演出节点、手机群聊节点、过渡节点等）维持当前 BGM 不变，
+  // 避免演出期间 BGM 戛然而止。若确实需要静音，请在上方显式 return null。
+  return undefined;
 }
 
 type FloatingTextItem = {
@@ -1434,6 +1435,9 @@ export default function App() {
 
   function restoreLoadedGame(loaded: GameState, closeGameMenu = false) {
     stopRainAmbience();
+    // 读档时先停止当前 BGM 并重置引用，确保新场景从零开始决策 BGM
+    stopBgm({ fadeMs: 400, reset: true });
+    currentStoryBgmRef.current = null;
     resetAiSceneRuntime();
     const normalized = normalizeLoadedState(loaded);
     const playerState = scenes[normalized.state.currentSceneId]?.playerState;
