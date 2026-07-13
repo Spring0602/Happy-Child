@@ -1,4 +1,5 @@
 import type { GameState } from "../types/game";
+import { createInitialGameState } from "./gameReducer";
 
 const SAVE_KEY = "happy_child_saves";
 const SAVE_BACKUP_KEY = `${SAVE_KEY}_backup`;
@@ -37,6 +38,45 @@ function cloneState(state: GameState): GameState {
   return JSON.parse(JSON.stringify(state)) as GameState;
 }
 
+function migrateGameState(value: unknown, _fromVersion = 1): GameState | null {
+  if (!value || typeof value !== "object") return null;
+
+  const loaded = value as Partial<GameState>;
+  if (typeof loaded.currentSceneId !== "string" || typeof loaded.currentMapId !== "string") {
+    return null;
+  }
+
+  const base = createInitialGameState();
+  return {
+    ...base,
+    ...loaded,
+    traits: { ...base.traits, ...loaded.traits },
+    npcTrust: { ...base.npcTrust, ...loaded.npcTrust },
+    flags: { ...base.flags, ...loaded.flags },
+    choiceHistory: Array.isArray(loaded.choiceHistory) ? loaded.choiceHistory : base.choiceHistory,
+    aiTraces: Array.isArray(loaded.aiTraces) ? loaded.aiTraces : base.aiTraces,
+    interactedItems: Array.isArray(loaded.interactedItems) ? loaded.interactedItems : base.interactedItems,
+    playerPosition: loaded.playerPosition ?? base.playerPosition,
+    aiMemory: {
+      ...base.aiMemory,
+      ...loaded.aiMemory,
+      npcImpressions: {
+        ...base.aiMemory.npcImpressions,
+        ...loaded.aiMemory?.npcImpressions,
+      },
+      protagonistProfile: Array.isArray(loaded.aiMemory?.protagonistProfile)
+        ? loaded.aiMemory.protagonistProfile
+        : base.aiMemory.protagonistProfile,
+      protagonistWorldview: Array.isArray(loaded.aiMemory?.protagonistWorldview)
+        ? loaded.aiMemory.protagonistWorldview
+        : base.aiMemory.protagonistWorldview,
+      importantEvents: Array.isArray(loaded.aiMemory?.importantEvents)
+        ? loaded.aiMemory.importantEvents
+        : base.aiMemory.importantEvents,
+    },
+  };
+}
+
 function checksum(value: unknown): string {
   const text = JSON.stringify(value);
   let hash = 2166136261;
@@ -59,22 +99,25 @@ function isGameState(value: unknown): value is GameState {
 function normalizeSlot(value: unknown): SaveSlot | null {
   if (!value || typeof value !== "object") return null;
   const slot = value as Partial<SaveSlot>;
-  if (!Number.isInteger(slot.slot) || slot.slot! < 0 || slot.slot! >= MAX_SLOTS || !isGameState(slot.state)) {
+  const version = typeof slot.version === "number" ? slot.version : 1;
+  if (!Number.isInteger(slot.slot) || slot.slot! < 0 || slot.slot! >= MAX_SLOTS) {
     return null;
   }
   if (slot.checksum && slot.checksum !== checksum(slot.state)) {
     console.warn(`[Save] 存档 ${slot.slot! + 1} 校验失败，已跳过`);
     return null;
   }
+  const state = migrateGameState(slot.state, version);
+  if (!state) return null;
   return {
     slot: slot.slot!,
-    state: cloneState(slot.state),
+    state,
     timestamp: typeof slot.timestamp === "string" ? slot.timestamp : "未知时间",
     preview: typeof slot.preview === "string" ? slot.preview : "",
     chapter: typeof slot.chapter === "string" ? slot.chapter : undefined,
     mapId: typeof slot.mapId === "string" ? slot.mapId : undefined,
-    version: typeof slot.version === "number" ? slot.version : 1,
-    checksum: slot.checksum,
+    version: SAVE_VERSION,
+    checksum: checksum(state),
   };
 }
 
@@ -169,9 +212,10 @@ function parseAutoSave(raw: string | null): GameState | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as AutoSaveRecord | GameState;
-    if (isGameState(parsed)) return cloneState(parsed);
-    if (!isGameState(parsed.state) || parsed.checksum !== checksum(parsed.state)) return null;
-    return cloneState(parsed.state);
+    if (isGameState(parsed)) return migrateGameState(parsed);
+    if (!parsed || typeof parsed !== "object" || !("state" in parsed)) return null;
+    if (parsed.checksum !== checksum(parsed.state)) return null;
+    return migrateGameState(parsed.state, parsed.version);
   } catch {
     return null;
   }

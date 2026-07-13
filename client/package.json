@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && node scripts/postbuild.mjs",
-    "preview": "vite preview"
+    "dev:web": "vite --host 0.0.0.0",
+    "dev:pages": "wrangler pages dev public --proxy 5173 --port 8788 --local-protocol http",
+    "build": "npm run validate && tsc && vite build && node scripts/postbuild.mjs",
+    "preview": "vite preview",
+    "validate": "node scripts/validate-scenes.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
@@ -18,6 +21,7 @@
   },
   "devDependencies": {
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "wrangler": "^3.114.17"
   }
 }

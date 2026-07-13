@@ -1,5 +1,4 @@
 import type { Scene } from "../types/game";
-import { ch2Scenes } from "./ch2Scenes";
 
 // ══════════════════════════════════════════════════════════════
 // scenes.ts · 第1章场景树 + 客厅交互场景
@@ -2140,9 +2139,6 @@ export const scenes: Record<string, Scene> = {
     text: "欢迎参赛者来到\u201C人类进化计划\u201D候场区~",
     nextSceneId: "ch2_game_start",
   },
-
-
-  ...ch2Scenes,
 
   // ══════════════════════════════════════════════
   // ══════════════════════════════════════════════

@@ -1,6 +1,7 @@
 import type { MapEntry } from "../types/gameMap";
 
 const CLASSROOM_MAP_VERSION = "20260711_spawn255";
+const DUMMY_TILESET_IMAGE = "/assets/maps/dormitory/tileset.png";
 
 export const MapRegistry: Record<string, MapEntry> = {
   livingroom: {
@@ -9,7 +10,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_livingroom",
     groundImage: "/assets/maps/livingroom/客厅.png",
     tilesetKey: "tileset_livingroom",
-    tilesetImage: "/assets/maps/livingroom/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_livingroom_center",
     furnitureImages: [
@@ -41,7 +42,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_bathroom",
     groundImage: "/assets/maps/bathroom/卫生间.png",
     tilesetKey: "tileset_bathroom",
-    tilesetImage: "/assets/maps/bathroom/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_bathroom_door",
     width: 640,
@@ -55,7 +56,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_bedroom",
     groundImage: "/assets/maps/bedroom/主角房间.png",
     tilesetKey: "tileset_bedroom",
-    tilesetImage: "/assets/maps/bedroom/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_spawn_38",
     width: 960,
@@ -69,7 +70,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_bedroom_parents",
     groundImage: "/assets/maps/bedroom_parents/父母房间.png",
     tilesetKey: "tileset_bedroom_parents",
-    tilesetImage: "/assets/maps/bedroom_parents/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_bedroom_parents_door",
     width: 960,
@@ -83,7 +84,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_kitchen",
     groundImage: "/assets/maps/kitchen/厨房.png",
     tilesetKey: "tileset_kitchen",
-    tilesetImage: "/assets/maps/kitchen/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_kitchen_door",
     width: 960,
@@ -126,7 +127,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_balcony",
     groundImage: "/assets/maps/balcony/阳台_白天.png",
     tilesetKey: "tileset_balcony",
-    tilesetImage: "/assets/maps/balcony/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_spawn_77",
     furnitureImages: [
@@ -152,7 +153,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_balcony_night",
     groundImage: "/assets/maps/balcony/阳台_夜晚.png",
     tilesetKey: "tileset_balcony_night",
-    tilesetImage: "/assets/maps/balcony/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_spawn_77",
     furnitureTint: 0x8899aa, // 夜晚阳台色调
@@ -214,7 +215,7 @@ export const MapRegistry: Record<string, MapEntry> = {
     groundKey: "ground_bedroom_luggage",
     groundImage: "/assets/maps/bedroom/主角房间(带行李).png",
     tilesetKey: "tileset_bedroom_luggage",
-    tilesetImage: "/assets/maps/bedroom/tileset.png",
+    tilesetImage: DUMMY_TILESET_IMAGE,
     tilesetNameInTiled: "dummy",
     defaultSpawn: "spawn_spawn_38",
     width: 960,

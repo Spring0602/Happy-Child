@@ -7,3 +7,6 @@ build/
 client/.vite/
 server/dist/
 .codebuddy/
+client/.edgeone/
+deploy/
+*.pem

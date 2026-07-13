@@ -1,4 +1,5 @@
 const CLASSROOM_MAP_VERSION = "20260711_spawn255";
+const DUMMY_TILESET_IMAGE = "/assets/maps/dormitory/tileset.png";
 
 export const AssetManifest = {
   maps: {
@@ -8,7 +9,7 @@ export const AssetManifest = {
       groundKey: "ground_livingroom",
       groundImage: "/assets/maps/livingroom/客厅.png",
       tilesetKey: "tileset_livingroom",
-      tilesetImage: "/assets/maps/livingroom/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
       furnitureImages: [
         { key: "item_01", path: "/assets/maps/livingroom/客厅物品_sprites/item_01.png" },
         { key: "item_02", path: "/assets/maps/livingroom/客厅物品_sprites/item_02.png" },
@@ -34,7 +35,7 @@ export const AssetManifest = {
       groundKey: "ground_bathroom",
       groundImage: "/assets/maps/bathroom/卫生间.png",
       tilesetKey: "tileset_bathroom",
-      tilesetImage: "/assets/maps/bathroom/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
     },
     bedroom: {
       mapKey: "map_bedroom",
@@ -42,7 +43,7 @@ export const AssetManifest = {
       groundKey: "ground_bedroom",
       groundImage: "/assets/maps/bedroom/主角房间.png",
       tilesetKey: "tileset_bedroom",
-      tilesetImage: "/assets/maps/bedroom/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
     },
     bedroom_luggage: {
       mapKey: "map_bedroom_luggage",
@@ -50,7 +51,7 @@ export const AssetManifest = {
       groundKey: "ground_bedroom_luggage",
       groundImage: "/assets/maps/bedroom/主角房间(带行李).png",
       tilesetKey: "tileset_bedroom_luggage",
-      tilesetImage: "/assets/maps/bedroom/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
     },
     bedroom_parents: {
       mapKey: "map_bedroom_parents",
@@ -58,7 +59,7 @@ export const AssetManifest = {
       groundKey: "ground_bedroom_parents",
       groundImage: "/assets/maps/bedroom_parents/父母房间.png",
       tilesetKey: "tileset_bedroom_parents",
-      tilesetImage: "/assets/maps/bedroom_parents/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
     },
     kitchen: {
       mapKey: "map_kitchen",
@@ -66,7 +67,7 @@ export const AssetManifest = {
       groundKey: "ground_kitchen",
       groundImage: "/assets/maps/kitchen/厨房.png",
       tilesetKey: "tileset_kitchen",
-      tilesetImage: "/assets/maps/kitchen/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
     },
     /** 厨房用品店（校外店铺，厨具便利店） */
     shop: {
@@ -117,7 +118,7 @@ export const AssetManifest = {
       groundKey: "ground_balcony",
       groundImage: "/assets/maps/balcony/阳台_白天.png",
       tilesetKey: "tileset_balcony",
-      tilesetImage: "/assets/maps/balcony/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
       furnitureImages: [
         { key: "item_01", path: "/assets/maps/balcony/物品_sprites/item_01.png" },
         { key: "item_02", path: "/assets/maps/balcony/物品_sprites/item_02.png" },
@@ -137,7 +138,7 @@ export const AssetManifest = {
       groundKey: "ground_balcony_night",
       groundImage: "/assets/maps/balcony/阳台_夜晚.png",
       tilesetKey: "tileset_balcony_night",
-      tilesetImage: "/assets/maps/balcony/tileset.png",
+      tilesetImage: DUMMY_TILESET_IMAGE,
     },
     /** 宿舍白天版（使用 map1.json + 白天底图，用于第三幕） */
     dormitory_day: {

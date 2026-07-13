@@ -4,11 +4,37 @@
 // 处理所有 /api/* 请求（AI对话、人格分析、结局裁决、人格画像）
 // ══════════════════════════════════════════════════════════════
 
-// ── 环境变量通过 EdgeOne Pages 控制台配置，通过 process.env 访问 ──
+// ── 环境变量：Cloudflare Pages Functions 使用 context.env，旧 EdgeOne 兼容 process.env ──
 // MODEL_PROVIDER, HUNYUAN_API_KEY, HUNYUAN_BASE_URL, HUNYUAN_MODEL, LLM_TIMEOUT_MS
 
+let requestEnv = {};
+
 function getEnv(key, fallback) {
-  return (typeof process !== "undefined" && process.env && process.env[key]) || fallback;
+  return requestEnv[key] || (typeof process !== "undefined" && process.env && process.env[key]) || fallback;
+}
+
+async function forwardToAiProxy(request, route) {
+  const proxyUrl = getEnv("AI_PROXY_URL", "").replace(/\/+$/, "");
+  if (!proxyUrl) return null;
+
+  const token = getEnv("AI_PROXY_TOKEN", "");
+  const headers = { "Content-Type": request.headers.get("Content-Type") || "application/json" };
+  if (token) headers["X-Happy-Child-Proxy-Token"] = token;
+
+  const response = await fetch(proxyUrl + "/api/" + route, {
+    method: "POST",
+    headers,
+    body: await request.text(),
+  });
+  const text = await response.text();
+
+  return new Response(text, {
+    status: response.status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": response.headers.get("Content-Type") || "application/json; charset=utf-8",
+    },
+  });
 }
 
 // ═══════════════════════ CORS ═══════════════════════
@@ -469,6 +495,7 @@ async function handlePersonalityPortrait(body) {
 
 export async function onRequest(context) {
   const { request } = context;
+  requestEnv = context.env || {};
 
   // Handle CORS preflight
   if (request.method === "OPTIONS") {
@@ -477,10 +504,14 @@ export async function onRequest(context) {
 
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, "");
+  const route = path.split("/").pop();
 
   if (request.method !== "POST") {
     return jsonResponse({ ok: false, message: "method not allowed" }, 405);
   }
+
+  const proxyResponse = await forwardToAiProxy(request, route);
+  if (proxyResponse) return proxyResponse;
 
   let body;
   try {
@@ -491,7 +522,6 @@ export async function onRequest(context) {
 
   try {
     let result;
-    const route = path.split("/").pop();
 
     switch (route) {
       case "analyze-choice":

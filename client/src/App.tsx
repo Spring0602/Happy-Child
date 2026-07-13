@@ -1,5 +1,4 @@
 import { useEffect, useReducer, useCallback, useState, useRef } from "react";
-import { scenes } from "./data/scenes";
 import { aiSceneConfigs } from "./data/aiSceneConfig";
 import { buildAiMemoryContext, createAiMemorySceneEntry, inferMonitorKeysForScene } from "./data/aiMemory";
 import { gameReducer, initialGameState } from "./engine/gameReducer";
@@ -33,7 +32,7 @@ import {
   judgeEnding,
   type GeneratedPersonalityPortrait,
 } from "./services/aiClient";
-import type { AITrace, Choice, GameState, InfoPanel, PhoneChatMessage } from "./types/game";
+import type { AITrace, Choice, GameState, InfoPanel, PhoneChatMessage, Scene } from "./types/game";
 import "./styles/global.css";
 
 type GamePhase = "menu" | "playing";
@@ -564,7 +563,8 @@ function createAiFailureScript(sceneId: string, error: unknown) {
   return [
     "[NPC:系统]AI服务连接失败，本场景没有使用默认占位剧情。",
     `[旁白]场景ID：${sceneId}`,
-    "[旁白]请确认后端服务正在运行：在项目根目录执行 npm run dev:server，并确认 server/.env 中 MODEL_PROVIDER=hunyuan。",
+    "[旁白]请确认本地从 Cloudflare Pages 入口运行：在 client 目录分别执行 npm run dev:web 和 npm run dev:pages，然后打开 http://localhost:8788。",
+    "[旁白]同时确认 client/.dev.vars 已设置 MODEL_PROVIDER 和对应模型密钥。",
     `[旁白]错误摘要：${safeMessage}`,
   ].join("\n\n");
 }
@@ -861,6 +861,7 @@ function restoreDynamicMapActors(loaded: GameState) {
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
+  const [scenes, setScenes] = useState<Record<string, Scene>>({});
   const [gameMenuOpen, setGameMenuOpen] = useState(false);
   const [showAITrace, setShowAITrace] = useState(false);
   const [eyeOpening, setEyeOpening] = useState(false);
@@ -890,10 +891,28 @@ export default function App() {
   const bgmPerformanceHoldTimerRef = useRef<number | null>(null);
   const stateRef = useRef(state);
   const gamePhaseRef = useRef(gamePhase);
+  const scenesRef = useRef<Record<string, Scene>>({});
+  const scenesLoadPromiseRef = useRef<Promise<Record<string, Scene>> | null>(null);
   const triggeredSegmentSoundRef = useRef<Set<string>>(new Set());
   const corridorDeathTimerRef = useRef<number | null>(null);
   /** 教程面板在本次浏览器会话中是否已经自动弹出过（不受游戏 RESET 影响） */
   const tutorialAutoShownRef = useRef(false);
+
+  const loadScenes = useCallback(async () => {
+    if (Object.keys(scenesRef.current).length > 0) return scenesRef.current;
+
+    scenesLoadPromiseRef.current ??= Promise.all([
+      import("./data/scenes"),
+      import("./data/ch2Scenes"),
+    ]).then(([baseScenesModule, ch2ScenesModule]) => ({
+      ...baseScenesModule.scenes,
+      ...ch2ScenesModule.ch2Scenes,
+    }));
+    const loadedScenes = await scenesLoadPromiseRef.current;
+    scenesRef.current = loadedScenes;
+    setScenes(loadedScenes);
+    return loadedScenes;
+  }, []);
 
   // 当前对话场景
   const dialogSceneId = state.currentSceneId && scenes[state.currentSceneId]
@@ -936,7 +955,8 @@ export default function App() {
   useEffect(() => {
     stateRef.current = state;
     gamePhaseRef.current = gamePhase;
-  }, [state, gamePhase]);
+    scenesRef.current = scenes;
+  }, [state, gamePhase, scenes]);
 
   const holdStoryBgmDuringPerformance = useCallback((durationMs: number) => {
     const until = Date.now() + durationMs;
@@ -1005,7 +1025,7 @@ export default function App() {
   }, [gamePhase, state.currentSceneId, state.currentMapId, state.flags, state.choiceHistory, bgmRefreshToken]);
 
   const shouldCgTransitionTo = useCallback((nextSceneId: string) => {
-    const nextScene = scenes[nextSceneId];
+    const nextScene = scenesRef.current[nextSceneId];
     if (!dialogScene || !nextScene) return true;
     if (!dialogScene.cgMode || !nextScene.cgMode) return true;
     return dialogScene.background !== nextScene.background;
@@ -1472,7 +1492,8 @@ export default function App() {
   }
 
   // ── 开始新游戏 ──
-  function handleNewGame() {
+  async function handleNewGame() {
+    await loadScenes();
     clearSave();
     resetAiSceneRuntime();
     dispatch({ type: "RESET" });
@@ -1486,7 +1507,8 @@ export default function App() {
     setGamePhase("playing");
   }
 
-  function handleStartChapter4() {
+  async function handleStartChapter4() {
+    await loadScenes();
     clearSave();
     resetAiSceneRuntime();
     dispatch({ type: "RESET" });
@@ -1501,7 +1523,8 @@ export default function App() {
     setGamePhase("playing");
   }
 
-  function restoreLoadedGame(loaded: GameState, closeGameMenu = false) {
+  async function restoreLoadedGame(loaded: GameState, closeGameMenu = false) {
+    const loadedScenes = await loadScenes();
     stopRainAmbience();
     // 读档时先停止当前 BGM 并重置引用，确保新场景从零开始决策 BGM
     stopBgm({ fadeMs: 400, reset: true });
@@ -1514,7 +1537,7 @@ export default function App() {
     setBgmRefreshToken((value) => value + 1);
     resetAiSceneRuntime();
     const normalized = normalizeLoadedState(loaded);
-    const playerState = scenes[normalized.state.currentSceneId]?.playerState;
+    const playerState = loadedScenes[normalized.state.currentSceneId]?.playerState;
     const runtimeSnapshot = normalized.state.mapRuntime?.mapId === normalized.mapId
       ? normalized.state.mapRuntime
       : undefined;
@@ -1535,7 +1558,7 @@ export default function App() {
 
   // ── 读取存档进入游戏 ──
   function handleLoadGame(loaded: GameState) {
-    restoreLoadedGame(loaded);
+    void restoreLoadedGame(loaded);
   }
 
   // ── 重新开始（清存档，回到初始场景） ──
@@ -2125,7 +2148,7 @@ export default function App() {
     }
 
     // 检测 CG 结束后的场景转换效果
-    const nextScene = scenes[nextSceneId];
+    const nextScene = scenesRef.current[nextSceneId];
     if (nextScene?.onCgEnd) {
       if (nextScene.onCgEnd === "enter_balcony") {
         dispatch({ type: "CHANGE_MAP", mapId: "balcony_night", spawnId: "spawn_spawn_77", position: { x: 0, y: 0 } });
@@ -3615,7 +3638,7 @@ export default function App() {
       }
     }
 
-    const scene = scenes[actualSceneId];
+    const scene = scenesRef.current[actualSceneId];
     if (scene?.onCgEnd) {
       if (scene.onCgEnd === "enter_balcony") {
         dispatch({ type: "DIALOG_END" });
@@ -3674,7 +3697,7 @@ export default function App() {
   }, [clearCorridorDeathTimer]);
 
   const getScenePlayerState = useCallback((sceneId: string, fallback?: string) => {
-    return scenes[sceneId]?.playerState || fallback;
+    return scenesRef.current[sceneId]?.playerState || fallback;
   }, []);
 
   const changeMapForScene = useCallback((mapId: string, spawnId: string, sceneId: string, fallbackPlayerState?: string) => {

@@ -6,12 +6,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const root = resolve(__dirname, ".."); // client/ directory
 
-// 1. Copy edgeone.json
+// 1. Copy dist/ contents (Vite build output) to .edgeone/
+const srcDist = resolve(root, "dist");
+const dstDist = resolve(root, ".edgeone");
+if (existsSync(srcDist)) {
+  copyDirSync(srcDist, dstDist);
+  console.log("[postbuild] copied dist/ → .edgeone/");
+} else {
+  console.warn("[postbuild] WARNING: dist/ directory not found!");
+}
+
+// 2. Copy edgeone.json after dist/ because copying dist/ refreshes .edgeone/.
 const srcJson = resolve(root, "edgeone.json");
 const dstJson = resolve(root, ".edgeone/edgeone.json");
 copyFileSafe(srcJson, dstJson);
 
-// 2. Copy entire functions/ directory
+// 3. Copy entire functions/ directory
 const srcFuncs = resolve(root, "functions");
 const dstFuncs = resolve(root, ".edgeone/functions");
 if (existsSync(srcFuncs)) {
