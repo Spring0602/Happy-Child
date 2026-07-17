@@ -121,6 +121,51 @@ export const scenes: Record<string, Scene> = {
     text: "一盆绿萝，叶片有些发黄。\n\n看来很久没人浇水了。它和我们家一样，都在努力活着。",
   },
 
+  // --- 餐桌 ---
+  interact_livingroom_dining_table: {
+    id: "interact_livingroom_dining_table",
+    chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
+    speaker: "叶平生",
+    text: "餐桌上铺着干净的桌布，中间摆着一小瓶干花。\n\n记得小时候，全家人每天都会围坐在这里吃饭。现在……好像很久没这样了。",
+  },
+
+  // --- 电视柜 ---
+  interact_livingroom_tv_stand: {
+    id: "interact_livingroom_tv_stand",
+    chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
+    speaker: "叶平生",
+    text: "电视柜的抽屉半掩着。我拉开看了看，里面塞了些旧遥控器、电池和一本泛黄的家庭相册。\n\n相册第一页是全家福……大家都笑得很开心。",
+  },
+
+  // --- 沙发 ---
+  interact_livingroom_sofa: {
+    id: "interact_livingroom_sofa",
+    chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
+    speaker: "叶平生",
+    text: "沙发柔软得让人一坐下就不想起来。抱枕上还留着淡淡的洗衣液香味。\n\n爸爸经常窝在这儿看新闻。妈妈喜欢靠那边织毛衣。",
+  },
+
+  // --- 全家福（触发器交互）---
+  interact_livingroom_photo: {
+    id: "interact_livingroom_photo",
+    chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
+    speaker: "叶平生",
+    text: "墙上挂着一幅全家福。照片里的我还是个小不点，被爸爸举在肩膀上。妈妈站在旁边，笑得眼睛弯成月牙。\n\n（那时候……家里还没有这么多规矩吧。）",
+  },
+
+  // --- 垃圾桶规则纸（触发器交互）---
+  interact_livingroom_trash_rule: {
+    id: "interact_livingroom_trash_rule",
+    chapter: "客厅",
+    background: "/assets/bg/bedroom_day.svg",
+    speaker: "叶平生",
+    text: "我把那张揉皱的纸条展开又看了一遍。\n\n「规则第③条——家庭区域内，禁止在22:00后离开卧室。」\n\n字是爸爸的笔迹。但为什么会被揉成团扔进垃圾桶？",
+  },
+
   // --- 椅子（坐下动作）---
   // 注：椅子交互走 sitAction 路径（PlayerController.sit），不触发此对话
   // 此 sceneId 作为占位，防止未定义错误

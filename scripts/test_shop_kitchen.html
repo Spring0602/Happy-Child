@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>厨具便利店碰撞测试</title>
+<style>
+  body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+  #game-container { position: relative; }
+  #hud {
+    position: fixed; top: 10px; left: 10px;
+    color: #0f0; font: 14px monospace; background: rgba(0,0,0,0.7);
+    padding: 8px 12px; border-radius: 4px; z-index: 10;
+    pointer-events: none;
+  }
+  #loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #fff; font: 18px monospace; z-index: 20; }
+  #toolbar {
+    position: fixed; top: 10px; right: 10px; z-index: 30;
+    display: flex; gap: 6px; align-items: center;
+  }
+  #toolbar button {
+    padding: 6px 14px; border: 1px solid #60a5fa; border-radius: 4px;
+    background: rgba(0,0,0,0.7); color: #60a5fa; font: 12px monospace;
+    cursor: pointer; white-space: nowrap;
+  }
+  #toolbar button:hover { background: #0f3460; }
+  #toolbar .src {
+    font-size: 10px; color: #707080; padding: 4px 8px;
+    background: rgba(0,0,0,0.5); border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+<div id="game-container"></div>
+<div id="hud">加载中...</div>
+<div id="loading">正在加载 map.json...</div>
+
+<div id="toolbar">
+  <span class="src" id="info-src">📁 磁盘文件</span>
+  <button onclick="loadCustomJSON()">📥 加载导出的 JSON</button>
+  <button onclick="resetToDefault()" style="border-color:#707080;color:#707080;">🔄 重置</button>
+</div>
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="onFileSelected(event)">
+
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+<script>
+const LS_KEY = "shop_kitchen_map_data";
+const MAP_JSON_URL = "../client/public/assets/maps/shop/map.json";
+let MAP_DATA = null;
+
+// ========== Phaser 场景 ==========
+class TestScene extends Phaser.Scene {
+  constructor() { super({ key: "TestScene" }); }
+
+  preload() {
+    const FRAMES = "../client/public/assets/sprites/frames/yps_frames";
+
+    // 底图
+    this.load.image("ground", "../client/public/assets/maps/shop/厨具便利店.png");
+
+    // 叶平生精灵帧 — 站立（4 方向 × 1 帧）
+    this.load.image("yps_frames_stand_front_0", `${FRAMES}/yps_frames_stand_front/frame_00.png`);
+    this.load.image("yps_frames_stand_back_0",  `${FRAMES}/yps_frames_stand_back/frame_00.png`);
+    this.load.image("yps_frames_stand_left_0",  `${FRAMES}/yps_frames_stand_left/frame_00.png`);
+    this.load.image("yps_frames_stand_right_0", `${FRAMES}/yps_frames_stand_right/frame_00.png`);
+
+    // 跑步帧（左/前/后 各 6 帧）
+    for (let i = 0; i < 6; i++) {
+      this.load.image(`yps_frames_left_${i}`,  `${FRAMES}/yps_frames_left/frame_0${i}.png`);
+      this.load.image(`yps_frames_front_${i}`, `${FRAMES}/yps_frames_front/frame_0${i}.png`);
+      this.load.image(`yps_frames_back_${i}`,  `${FRAMES}/yps_frames_back/frame_0${i}.png`);
+    }
+  }
+
+  create() {
+    if (!MAP_DATA) {
+      document.getElementById("loading").textContent = "map.json 加载失败！";
+      return;
+    }
+    document.getElementById("loading").style.display = "none";
+
+    const mapW = MAP_DATA.width * MAP_DATA.tilewidth;
+    const mapH = MAP_DATA.height * MAP_DATA.tileheight;
+
+    // 取出生点
+    const spawnLayer = MAP_DATA.layers.find(l => l.name === "player_spawn");
+    const spawnObj = spawnLayer && spawnLayer.objects[0];
+    const spawnX = spawnObj ? spawnObj.x : mapW / 2;
+    const spawnY = spawnObj ? spawnObj.y : mapH / 2;
+
+    // 1. 底图
+    this.add.image(0, 0, "ground").setOrigin(0, 0).setDepth(0);
+
+    // 2. 动画
+    const makeAnim = (key, prefix, count, rate, repeat) => {
+      this.anims.create({
+        key,
+        frames: Array.from({ length: count }, (_, i) => ({ key: `${prefix}_${i}` })),
+        frameRate: rate,
+        repeat
+      });
+    };
+    makeAnim("yps_run_left",  "yps_frames_left",  6, 10, -1);
+    makeAnim("yps_run_down",  "yps_frames_front", 6, 10, -1);
+    makeAnim("yps_run_up",    "yps_frames_back",  6, 10, -1);
+    makeAnim("yps_idle_left", "yps_frames_stand_left",  1, 1, 0);
+    makeAnim("yps_idle_up",   "yps_frames_stand_back",  1, 1, 0);
+    makeAnim("yps_idle_down", "yps_frames_stand_front", 1, 1, 0);
+
+    // 3. 玩家
+    this.player = this.physics.add.sprite(spawnX, spawnY, "yps_frames_stand_front_0");
+    this.player.setOrigin(0.5, 1);
+    this.player.setScale(3);
+    this.player.body.setSize(12, 12);
+    this.player.body.setOffset(10, 48);
+    this.player.setCollideWorldBounds(true);
+    this.player.setDepth(1);
+    this.player.play("yps_idle_down");
+    this.player.lastDir = "down";
+
+    // 4. 碰撞体
+    this.collisionGroup = this.physics.add.staticGroup();
+    const collisionLayer = MAP_DATA.layers.find(l => l.name === "collision");
+    this.collisionObjs = collisionLayer ? collisionLayer.objects : [];
+    const debugGfx = this.add.graphics().setDepth(10);
+    debugGfx.lineStyle(2, 0x00ff00, 0.5);
+
+    for (const obj of this.collisionObjs) {
+      const zone = this.add.zone(obj.x + obj.width / 2, obj.y + obj.height / 2, obj.width, obj.height);
+      this.physics.add.existing(zone, true);
+      this.collisionGroup.add(zone);
+      debugGfx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+    }
+
+    this.physics.add.collider(this.player, this.collisionGroup);
+
+    // 5. 相机
+    this.cameras.main.setBounds(0, 0, mapW, mapH);
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+
+    // 6. 键盘
+    this.cursors = this.input.keyboard.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D
+    });
+
+    // 7. 出生点标记
+    const sm = this.add.graphics().setDepth(11);
+    sm.fillStyle(0xffff00, 0.8);
+    sm.fillCircle(spawnX, spawnY, 6);
+    sm.lineStyle(1, 0xffff00, 1);
+    sm.strokeCircle(spawnX, spawnY, 8);
+
+    this.mapW = mapW;
+    this.mapH = mapH;
+    this.hudEl = document.getElementById("hud");
+  }
+
+  update() {
+    const speed = 160;
+    const body = this.player.body;
+    body.setVelocity(0);
+
+    const left = this.cursors.left.isDown;
+    const right = this.cursors.right.isDown;
+    const up = this.cursors.up.isDown;
+    const down = this.cursors.down.isDown;
+
+    let dir = this.player.lastDir;
+    if (left)  { body.setVelocityX(-speed); dir = "left"; }
+    if (right) { body.setVelocityX(speed);  dir = "right"; }
+    if (up)    { body.setVelocityY(-speed); dir = "up"; }
+    if (down)  { body.setVelocityY(speed);  dir = "down"; }
+
+    const moving = left || right || up || down;
+
+    if (dir === "right") {
+      this.player.setFlipX(true);
+      this.player.play(moving ? "yps_run_left" : "yps_idle_left", true);
+    } else {
+      this.player.setFlipX(false);
+      if (moving) {
+        this.player.play(`yps_run_${dir}`, true);
+      } else {
+        this.player.play(`yps_idle_${dir}`);
+      }
+    }
+
+    this.player.lastDir = dir;
+    this.player.setDepth(this.player.y / this.mapH);
+
+    this.hudEl.textContent =
+      `WASD 移动 | 坐标 (${Math.round(this.player.x)}, ${Math.round(this.player.y)}) | 碰撞框 ${this.collisionObjs.length} 个`;
+  }
+}
+
+// ========== 工具栏函数 ==========
+function loadCustomJSON() {
+  document.getElementById("fileInput").click();
+}
+
+function onFileSelected(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      document.getElementById("loading").textContent = "已加载: " + file.name + "，刷新页面生效...";
+      setTimeout(() => location.reload(), 300);
+    } catch (e) {
+      document.getElementById("loading").textContent = "解析失败: " + e.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetToDefault() {
+  localStorage.removeItem(LS_KEY);
+  location.reload();
+}
+
+// ========== 加载 map 数据（localStorage 优先） ==========
+async function loadMapData() {
+  // 1. 尝试从 localStorage 读取（编辑器导出的最新数据）
+  const stored = localStorage.getItem(LS_KEY);
+  if (stored) {
+    try {
+      MAP_DATA = JSON.parse(stored);
+      document.getElementById("info-src").textContent = "📝 编辑器导出";
+      const colCount = MAP_DATA.layers.find(l => l.name === "collision")?.objects.length || 0;
+      document.getElementById("loading").textContent = "加载成功（编辑器导出，" + colCount + " 个碰撞框）";
+      return;
+    } catch (e) { /* 忽略损坏的 localStorage */ }
+  }
+
+  // 2. 回退到磁盘文件
+  try {
+    const res = await fetch(MAP_JSON_URL);
+    MAP_DATA = await res.json();
+    document.getElementById("info-src").textContent = "📁 磁盘文件";
+    const colCount = MAP_DATA.layers.find(l => l.name === "collision")?.objects.length || 0;
+    document.getElementById("loading").textContent = "加载成功（磁盘文件，" + colCount + " 个碰撞框）";
+  } catch (e) {
+    document.getElementById("loading").textContent = "map.json 加载失败: " + e.message;
+    MAP_DATA = null;
+  }
+}
+
+// ========== 启动 ==========
+(async () => {
+  await loadMapData();
+
+  new Phaser.Game({
+    type: Phaser.AUTO,
+    width: MAP_DATA ? MAP_DATA.width * MAP_DATA.tilewidth : 1376,
+    height: MAP_DATA ? MAP_DATA.height * MAP_DATA.tileheight : 768,
+    parent: "game-container",
+    backgroundColor: "#222",
+    physics: {
+      default: "arcade",
+      arcade: { gravity: { y: 0 }, debug: false }
+    },
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    scene: [TestScene]
+  });
+})();
+</script>
+</body>
+</html>
